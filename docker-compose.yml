@@ -1,0 +1,40 @@
+version: '3'
+services:
+
+  mssql-server:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql-db
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./database/sql/create-db.sql:/create-db.sql
+      - ./database/sql/entrypoint.sh:/entrypoint.sh
+    command:
+      - /bin/bash
+      - /entrypoint.sh
+
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      - mssql-server
+    container_name: backend
+    image: backend
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - mssql-server
+    container_name: frontend
+    image: frontend
+    ports:
+        - "3000:3000"
+    environment:
+        - PORT=${FRONTEND_PORT}
+
