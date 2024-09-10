@@ -1,5 +1,5 @@
 # Use the official Microsoft SQL Server image
-FROM mcr.microsoft.com/mssql/server:2019-latest
+FROM mcr.microsoft.com/mssql/server:2019-CU14-ubuntu-20.04
 
 ARG SA_PASSWORD
 
@@ -7,13 +7,11 @@ ARG SA_PASSWORD
 ENV ACCEPT_EULA=Y
 ENV SA_PASSWORD=$SA_PASSWORD
 
-# Copy the SQL script into the container
+# Copy SQL script and entrypoint script into the container
 COPY create-db.sql /create-db.sql
-
-# Copy custom entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 
-# Set execute permissions for the entrypoint script
+# Make entrypoint.sh executable as root and set entrypoint
 RUN chmod +x /entrypoint.sh
 
 # Set the custom entrypoint script as the entrypoint
