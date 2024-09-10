@@ -2,7 +2,7 @@ version: '3'
 services:
 
   mssql-server:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2019-CU14-ubuntu-20.04
     container_name: mssql-db
     ports:
       - "1433:1433"
@@ -15,14 +15,19 @@ services:
     command:
       - /bin/bash
       - /entrypoint.sh
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${DB_PASSWORD} -Q 'SELECT 1' || exit 1" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
   backend:
     build:
       context: ./backend
     depends_on:
-      - mssql-server
+      mssql-server:
+        condition: service_healthy
     container_name: backend
-    image: backend
     ports:
       - "5000:5000"
 
@@ -30,11 +35,10 @@ services:
     build:
       context: ./frontend
     depends_on:
-      - mssql-server
+      backend:
+        condition: service_started
     container_name: frontend
-    image: frontend
     ports:
-        - "3000:3000"
+      - "3000:3000"
     environment:
-        - PORT=${FRONTEND_PORT}
-
+      - PORT=${FRONTEND_PORT}
