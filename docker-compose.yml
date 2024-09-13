@@ -2,7 +2,7 @@ version: '3'
 services:
 
   mssql-server:
-    image: mcr.microsoft.com/mssql/server:2019-CU14-ubuntu-20.04
+    image: mcr.microsoft.com/mssql/server:2019-CU27-ubuntu-20.04
     container_name: mssql-db
     ports:
       - "1433:1433"
