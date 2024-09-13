@@ -22,19 +22,23 @@ The repository includes 3 main directories. The backend is created with Node.js,
 
 Create a .env in the root folder.
 
-#FRONTEND
+#FRONTEND <br>
 FRONTEND_PORT=3000
 
-#BACKEND
+#BACKEND<br>
+
 BACKEND_PORT=5000
 
 SQL_HOST=mssql-db
+
 SQL_PORT=1433
+
 SQL_NAME=books
+
 SQL_USER=SA
 
 
-#DATABASE
+#DATABASE<br>
 DB_PASSWORD=YourStrongPassword123
 
 
