@@ -30,6 +30,13 @@ services:
     container_name: backend
     ports:
       - "5000:5000"
+    environment:
+        - PORT=${BACKEND_PORT}
+        - SQL_HOST=${SQL_HOST}
+        - SQL_PORT=${SQL_PORT}
+        - SQL_NAME=${SQL_NAME}
+        - SQL_USER=${SQL_USER}
+        - SQL_PASSWORD=${DB_PASSWORD}
 
   frontend:
     build:

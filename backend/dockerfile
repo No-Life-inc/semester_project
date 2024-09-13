@@ -1,6 +1,20 @@
 # 1. Use an official Node.js runtime as the base image
 FROM node:20
 
+ARG PORT
+ARG SQL_HOST
+ARG SQL_PORT
+ARG SQL_NAME
+ARG SQL_USER
+ARG SQL_PASSWORD
+
+ENV PORT=$PORT
+ENV SQL_HOST=$SQL_HOST
+ENV SQL_PORT=$SQL_PORT
+ENV SQL_NAME=$SQL_NAME
+ENV SQL_USER=$SQL_USER
+ENV SQL_PASSWORD=$SQL_PASSWORD
+
 # 2. Set the working directory
 WORKDIR /usr/src/app
 
@@ -14,7 +28,7 @@ RUN npm install --production
 COPY . .
 
 # 6. Expose the port the app runs on
-EXPOSE 5000
+EXPOSE $PORT
 
 # 7. Start the app
 CMD ["npm", "start"]
