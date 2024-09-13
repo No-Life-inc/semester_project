@@ -37,6 +37,10 @@ services:
         - SQL_NAME=${SQL_NAME}
         - SQL_USER=${SQL_USER}
         - SQL_PASSWORD=${DB_PASSWORD}
+        - CLIENT_ID=${CLIENT_ID}
+        - ISSUER_BASE_URL=${ISSUER_BASE_URL}
+        - AUTH0_SECRET=${AUTH0_SECRET}
+        - BASE_URL=${BASE_URL}
 
   frontend:
     build:
