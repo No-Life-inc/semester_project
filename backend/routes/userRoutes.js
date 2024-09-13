@@ -14,11 +14,15 @@ router.get("/login", requiresAuth(), (req, res) => {
   res.redirect("/api/dashboard");
 });
 
-//TODO 
+//TODO
 // Logger ikke ud korrekt, skal fikses
 // router.get("/logout", (req, res) => {
-//     const logoutUrl = `https://${process.env.ISSUER_BASE_URL}/v2/logout?client_id=${process.env.CLIENT_ID}&returnTo=${process.env.BASE_URL}`;
-//     res.redirect(logoutUrl);
-//   });
+//   req.oidc.logout({ returnTo: "http://localhost:5000/api" });
+// });
+
+// router.get("/logout", (req, res) => {
+//   const logoutUrl = `https://${process.env.ISSUER_BASE_URL}/v2/logout?returnTo=http://localhost:5000`;
+//   res.redirect(logoutUrl);
+// });
 
 export default router;
