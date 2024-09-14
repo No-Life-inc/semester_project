@@ -1,6 +1,6 @@
 rightclick on folder -> open in terminal
 
-docker build -t mssql-books-collection.
+docker build -t mssql-books-collection .
 
 docker run -d -p 1433:1433 --name mssql-books-collection mssql-books-collection
 

@@ -6,6 +6,7 @@ import BookCollection from './BookCollection.js';
 const BookHasBookCollection = sequelize.define('BookHasBookCollection', {
     books_id: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         references: {
             model: Book,
             key: 'id'
@@ -13,6 +14,7 @@ const BookHasBookCollection = sequelize.define('BookHasBookCollection', {
     },
     book_collections_id: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         references: {
             model: BookCollection,
             key: 'id'
@@ -20,7 +22,8 @@ const BookHasBookCollection = sequelize.define('BookHasBookCollection', {
     },
     status: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        defaultValue: 'want to read',
     }
 }, {
     tableName: 'books_has_bookcollection',

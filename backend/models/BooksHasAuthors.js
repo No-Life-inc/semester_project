@@ -6,6 +6,7 @@ import Author from './Author.js';
 const BooksHasAuthors = sequelize.define('BooksHasAuthors', {
     book_id: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         references: {
             model: Book,
             key: 'id'
@@ -13,6 +14,7 @@ const BooksHasAuthors = sequelize.define('BooksHasAuthors', {
     },
     author_id: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         references: {
             model: Author,
             key: 'id'
