@@ -23,13 +23,15 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: backend
     depends_on:
       mssql-server:
         condition: service_healthy
     container_name: backend
     ports:
       - "5000:5000"
+    volumes:
+      - ./backend:/usr/src/app
     environment:
         - PORT=${BACKEND_PORT}
         - SQL_HOST=${SQL_HOST}

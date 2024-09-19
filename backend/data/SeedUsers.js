@@ -1,4 +1,4 @@
-import User from '../models/User.js';
+import User from '../models/User.ts';
 
 const seedUsers = async () => {
     try {

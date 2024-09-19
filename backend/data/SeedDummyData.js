@@ -1,6 +1,6 @@
 import e from 'express';
-import sequelize from '../config/SqlConfig.js';
-import { User, BookCollection, Book, Author, Publisher, BookHasBookCollection, BooksHasAuthors } from '../models/Associations.js';
+import sequelize from '../config/SqlConfig.ts';
+import { User, BookCollection, Book, Author, Publisher, BookHasBookCollection, BooksHasAuthors } from '../models/Associations.ts';
 import { configDotenv } from 'dotenv';
 
 configDotenv();
