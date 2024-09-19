@@ -50,6 +50,10 @@ Setup all the Repositories for this project and update them to the the developme
 Be in the root of the project with your terminal
 Lastly, use the following command:
 
+Check i bunden om der står CRLF, hvis ja så skift til LF
+
+KØR DOCKER COMPOSE OG IKKE ANDET
+
 ```bash
 docker-compose up --build
 ```
