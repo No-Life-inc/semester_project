@@ -18,8 +18,8 @@ Publisher.hasMany(Book, { foreignKey: 'publisher_id' });
 Book.belongsTo(Publisher, { foreignKey: 'publisher_id' });
 
 // Book - Author many-to-many relationship
-Book.belongsToMany(Author, { through: BooksHasAuthors, foreignKey: 'book_id' });
-Author.belongsToMany(Book, { through: BooksHasAuthors, foreignKey: 'author_id' });
+Book.belongsToMany(Author, { through: 'BooksAuthors', as: 'authors' });
+Author.belongsToMany(Book, { through: 'BooksAuthors', as: 'books' });
 
 // Book - BookCollection many-to-many relationship
 Book.belongsToMany(BookCollection, { through: BookHasBookCollection, foreignKey: 'books_id' });
