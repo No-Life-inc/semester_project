@@ -1,8 +1,8 @@
-# 1. Use the latest Node.js to build the React app
+# 1. Use the latest Node.js to build the React server
 FROM node:20
 
 # 2. Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /usr/src/server
 
 # 3. Copy the package.json and package-lock.json to install dependencies
 COPY package*.json ./
@@ -10,14 +10,14 @@ COPY package*.json ./
 # 4. Install dependencies
 RUN npm install
 
-# 5. Copy the rest of the application code and build the app
+# 5. Copy the rest of the application code and build the server
 COPY . .
 RUN npm run build
 
 # 6. Install a static file server globally (e.g., `serve`)
 RUN npm install -g serve
 
-# 7. Serve the app from the `build` directory
+# 7. Serve the server from the `build` directory
 CMD ["serve", "-s", "build"]
 
 # 8. Expose port 3000 (or your preferred port)

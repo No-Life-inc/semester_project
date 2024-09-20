@@ -30,13 +30,13 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # 4. Install dependencies
-RUN npm install --production
+RUN npm install
 
 # 5. Copy the rest of the application code to the container
 COPY . .
 
-# 6. Expose the port the app runs on
+# 6. Expose the port the server runs on
 EXPOSE $PORT
 
-# 7. Start the app
-CMD ["npm", "start"]
+# 7. Start the server
+CMD ["npx", "nodemon", "--exec", "npx ts-node --transpile-only", "app.ts"]

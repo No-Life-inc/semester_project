@@ -1,41 +1,40 @@
-import express from 'express';
-import User from '../models/User.js'; // Import the User model
-import BookCollection from '../models/BookCollection.js'; // Import the BookCollection model
-import Book from '../models/Book.js'; // Import the Book model
-import Author from '../models/Author.js'; // Import the Author model
-import Publisher from '../models/Publisher.js'; // Import the Publisher model
-
+import express, { Request, Response } from "express";
+import User from "../models/User"; // Removed .js extension, as TS resolves it
+import BookCollection from "../models/BookCollection";
+import Book from "../models/Book";
+import Author from "../models/Author";
+import Publisher from "../models/Publisher";
 
 const router = express.Router();
 
 // Define your routes here
-router.get('/', (req, res) => {
-    res.json({ message: 'Hello from v1 API!' });
+router.get("/", (req: Request, res: Response) => {
+    res.json({ message: "Hello from v1 API!" });
 });
 
 // Endpoint to get all data for each model
-router.get('/:model', async (req, res) => {
+router.get("/:model", async (req: Request, res: Response) => {
     const { model } = req.params;
-    let Model;
+    let Model: any;
 
     switch (model) {
-        case 'users':
+        case "users":
             Model = User;
             break;
-        case 'bookCollections':
+        case "bookCollections":
             Model = BookCollection;
             break;
-        case 'books':
+        case "books":
             Model = Book;
             break;
-        case 'authors':
+        case "authors":
             Model = Author;
             break;
-        case 'publishers':
+        case "publishers":
             Model = Publisher;
             break;
         default:
-            return res.status(400).json({ error: 'Invalid model name' });
+            return res.status(400).json({ error: "Invalid model name" });
     }
 
     try {
@@ -48,28 +47,28 @@ router.get('/:model', async (req, res) => {
 });
 
 // Endpoint to get data by ID for each model
-router.get('/:model/:id', async (req, res) => {
+router.get("/:model/:id", async (req: Request, res: Response) => {
     const { model, id } = req.params;
-    let Model;
+    let Model: any;
 
     switch (model) {
-        case 'users':
+        case "users":
             Model = User;
             break;
-        case 'bookCollections':
+        case "bookCollections":
             Model = BookCollection;
             break;
-        case 'books':
+        case "books":
             Model = Book;
             break;
-        case 'authors':
+        case "authors":
             Model = Author;
             break;
-        case 'publishers':
+        case "publishers":
             Model = Publisher;
             break;
         default:
-            return res.status(400).json({ error: 'Invalid model name' });
+            return res.status(400).json({ error: "Invalid model name" });
     }
 
     try {
