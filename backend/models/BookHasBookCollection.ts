@@ -1,7 +1,7 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/SqlConfig';
-import Book from './Book';
-import BookCollection from './BookCollection';
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../config/SqlConfig";
+import Book from "./Book";
+import BookCollection from "./BookCollection";
 
 class BookHasBookCollection extends Model {}
 
@@ -12,7 +12,7 @@ BookHasBookCollection.init({
         primaryKey: true,
         references: {
             model: Book, // Reference to the Book model
-            key: 'id'
+            key: "id"
         }
     },
     book_collections_id: {
@@ -20,17 +20,17 @@ BookHasBookCollection.init({
         primaryKey: true,
         references: {
             model: BookCollection, // Reference to the BookCollection model
-            key: 'id'
+            key: "id"
         }
     },
     status: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'want to read' // Default value for the status field
+        defaultValue: "want to read" // Default value for the status field
     }
 }, {
     sequelize, // Pass the sequelize instance
-    tableName: 'books_has_bookcollection',
+    tableName: "books_has_bookcollection",
     timestamps: false // Disable timestamps if not needed
 });
 

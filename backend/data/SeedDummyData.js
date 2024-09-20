@@ -1,7 +1,6 @@
-import e from 'express';
-import sequelize from '../config/SqlConfig.ts';
-import { User, BookCollection, Book, Author, Publisher, BookHasBookCollection, BooksHasAuthors } from '../models/Associations.ts';
-import { configDotenv } from 'dotenv';
+import sequelize from "../config/SqlConfig.ts";
+import { User, BookCollection, Book, Author, Publisher, BookHasBookCollection, BooksHasAuthors } from "../models/Associations.ts";
+import { configDotenv } from "dotenv";
 
 configDotenv();
 
@@ -13,37 +12,37 @@ async function createDummyData() {
 
         // Create dummy users
         const users = await User.bulkCreate([
-            { name: 'Alice', email: 'Alice@mail.com' },
-            { name: 'Bob', email: 'Bob@mail.com'},
-            { name: 'Charlie' , email: 'Charlie@mail.com'}
+            { name: "Alice", email: "Alice@mail.com" },
+            { name: "Bob", email: "Bob@mail.com"},
+            { name: "Charlie" , email: "Charlie@mail.com"}
         ]);
 
         // Create dummy publishers
         const publishers = await Publisher.bulkCreate([
-            { name: 'Penguin Random House' },
-            { name: 'HarperCollins' },
-            { name: 'Simon & Schuster' }
+            { name: "Penguin Random House" },
+            { name: "HarperCollins" },
+            { name: "Simon & Schuster" }
         ]);
 
         // Create dummy books
         const books = await Book.bulkCreate([
-            { title: 'Book 1', publisher_id: publishers[0].id },
-            { title: 'Book 2', publisher_id: publishers[1].id },
-            { title: 'Book 3', publisher_id: publishers[2].id }
+            { title: "Book ", publisher_id: publishers[0].id },
+            { title: "Book ", publisher_id: publishers[1].id },
+            { title: "Book ", publisher_id: publishers[2].id }
         ]);
 
         // Create dummy authors
         const authors = await Author.bulkCreate([
-            { name: 'Author 1' },
-            { name: 'Author 2' },
-            { name: 'Author 3' }
+            { name: "Author 1" },
+            { name: "Author 2" },
+            { name: "Author 3" }
         ]);
 
         // Create dummy book collections
         const bookCollections = await BookCollection.bulkCreate([
-            { name: 'Collection 1', user_id: users[0].id },
-            { name: 'Collection 2', user_id: users[1].id },
-            { name: 'Collection 3', user_id: users[2].id }
+            { name: "Collection 1", user_id: users[0].id },
+            { name: "Collection 2", user_id: users[1].id },
+            { name: "Collection 3", user_id: users[2].id }
         ]);
 
         // Create dummy book-author associations
@@ -66,9 +65,9 @@ async function createDummyData() {
             { books_id: books[2].id, book_collections_id: bookCollections[2].id }
         ]);
 
-        console.log('Dummy data created successfully!');
+        console.log("Dummy data created successfully!");
     } catch (error) {
-        console.error('Error creating dummy data:', error);
+        console.error("Error creating dummy data:", error);
     } finally {
         await sequelize.close();
     }

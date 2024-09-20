@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response } from "express";
 
 export const handleCallback = (req: Request, res: Response): void => {
   res.redirect("/dashboard");

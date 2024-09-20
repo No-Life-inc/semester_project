@@ -1,5 +1,5 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../config/SqlConfig'; // Import the sequelize instance
+import { DataTypes, Model, Optional } from "sequelize";
+import sequelize from "../config/SqlConfig"; // Import the sequelize instance
 
 // Define the attributes for the Author model
 interface AuthorAttributes {
@@ -8,7 +8,7 @@ interface AuthorAttributes {
 }
 
 // Define a type for creation (since `id` will be auto-incremented and optional during creation)
-interface AuthorCreationAttributes extends Optional<AuthorAttributes, 'id'> {}
+interface AuthorCreationAttributes extends Optional<AuthorAttributes, "id"> {}
 
 // Define the Author model extending Sequelize's Model with typed attributes
 class Author extends Model<AuthorAttributes, AuthorCreationAttributes> {}
@@ -26,8 +26,8 @@ Author.init({
     }
 }, {
     sequelize, // Pass the sequelize instance
-    modelName: 'Author', // Name the model
-    tableName: 'authors', // Specify the table name
+    modelName: "Author", // Name the model
+    tableName: "authors", // Specify the table name
     timestamps: false // Disable timestamps if not needed
 });
 

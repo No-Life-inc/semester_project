@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { getDashboard, handleCallback } from "../controllers/userController";
 import pkg from "express-openid-connect";
 
-const { auth, requiresAuth } = pkg;
+const {  requiresAuth } = pkg;
 
 const router = express.Router();
 

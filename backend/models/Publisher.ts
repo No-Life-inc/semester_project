@@ -1,5 +1,5 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/SqlConfig';
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../config/SqlConfig";
 
 
 interface PublisherAttributes {
@@ -25,7 +25,7 @@ Publisher.init({
     }
 }, {
     sequelize,
-    tableName: 'publishers',
+    tableName: "publishers",
     timestamps: false
 });
 

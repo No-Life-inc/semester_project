@@ -1,12 +1,12 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../config/SqlConfig';
+import { DataTypes, Model, Optional } from "sequelize";
+import sequelize from "../config/SqlConfig";
 
 interface PublisherAttributes {
     id: number;
     name: string;
 }
 
-interface PublisherCreationAttributes extends Optional<PublisherAttributes, 'id'> {}
+interface PublisherCreationAttributes extends Optional<PublisherAttributes, "id"> {}
 
 class Publisher extends Model<PublisherAttributes, PublisherCreationAttributes> implements PublisherAttributes {
     public id!: number;
@@ -25,7 +25,7 @@ Publisher.init({
     },
 }, {
     sequelize,
-    tableName: 'publishers',
+    tableName: "publishers",
     timestamps: false,
 });
 

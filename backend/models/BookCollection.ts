@@ -1,5 +1,5 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/SqlConfig';
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../config/SqlConfig";
 
 class BookCollection extends Model {}
 
@@ -16,7 +16,7 @@ BookCollection.init({
     }
 }, {
     sequelize, // Pass the sequelize instance
-    tableName: 'book_collections',
+    tableName: "book_collections",
     timestamps: false // Disable timestamps if not needed
 });
 

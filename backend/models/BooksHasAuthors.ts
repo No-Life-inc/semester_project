@@ -1,7 +1,7 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/SqlConfig';
-import Book from './Book';
-import Author from './Author';
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../config/SqlConfig";
+import Book from "./Book";
+import Author from "./Author";
 
 class BooksHasAuthors extends Model {}
 
@@ -12,7 +12,7 @@ BooksHasAuthors.init({
         primaryKey: true,
         references: {
             model: Book, // Reference to the Book model
-            key: 'id'
+            key: "id"
         },
     },
     author_id: {
@@ -20,12 +20,12 @@ BooksHasAuthors.init({
         primaryKey: true,
         references: {
             model: Author, // Reference to the Author model
-            key: 'id'
+            key: "id"
         },
     }
 }, {
     sequelize, // Pass the sequelize instance
-    tableName: 'books_has_authors',
+    tableName: "books_has_authors",
     timestamps: false // Disable timestamps if not needed
 });
 

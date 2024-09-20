@@ -1,5 +1,5 @@
-import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
+import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
 
 dotenv.config(); // Load environment variables
 
@@ -10,7 +10,7 @@ const sequelize = new Sequelize(
     {
         host: process.env.SQL_HOST,
         port: process.env.SQL_PORT ? parseInt(process.env.SQL_PORT, 10) : undefined,
-        dialect: 'mssql',
+        dialect: "mssql",
         dialectOptions: {
             options: {
                 encrypt: true,
