@@ -9,12 +9,6 @@ services:
     environment:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - ./database/sql/create-db.sql:/create-db.sql
-      - ./database/sql/entrypoint.sh:/entrypoint.sh
-    command:
-      - /bin/bash
-      - /entrypoint.sh
     healthcheck:
       test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${DB_PASSWORD} -Q 'SELECT 1' || exit 1" ]
       interval: 10s
@@ -33,16 +27,16 @@ services:
     volumes:
       - ./backend:/usr/src/app
     environment:
-        - PORT=${BACKEND_PORT}
-        - SQL_HOST=${SQL_HOST}
-        - SQL_PORT=${SQL_PORT}
-        - SQL_NAME=${SQL_NAME}
-        - SQL_USER=${SQL_USER}
-        - SQL_PASSWORD=${DB_PASSWORD}
-        - CLIENT_ID=${CLIENT_ID}
-        - ISSUER_BASE_URL=${ISSUER_BASE_URL}
-        - AUTH0_SECRET=${AUTH0_SECRET}
-        - BASE_URL=${BASE_URL}
+      - PORT=${BACKEND_PORT}
+      - SQL_HOST=${SQL_HOST}
+      - SQL_PORT=${SQL_PORT}
+      - SQL_NAME=${SQL_NAME}
+      - SQL_USER=${SQL_USER}
+      - SQL_PASSWORD=${DB_PASSWORD}   #changing the env name from DB_PASSWORD to SQL_PASSWORD when passing to backend
+      - CLIENT_ID=${CLIENT_ID}
+      - ISSUER_BASE_URL=${ISSUER_BASE_URL}
+      - AUTH0_SECRET=${AUTH0_SECRET}
+      - BASE_URL=${BASE_URL}
 
   frontend:
     build:
