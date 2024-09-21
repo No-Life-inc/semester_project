@@ -5,13 +5,11 @@ import pkg from "express-openid-connect";
 import "./models/Associations";
 import V1Routes from "./routes/V1Routes";
 import { Auth0Config } from "./config/Auth0Config";
-import connectToDatabase from "./dbconnections/SequelizeConnection";
-import sequelize from "./config/SqlConfig";
+import setupDatabase from "./database/knex/createDatabase";
 import { initializeDatabase } from "./database/knex/setupDatabase";
-import setupDatabase from './database/knex/setupDatabase';  // Importér setupDatabase
 
-const { auth } = pkg;
 dotenv.config();
+const { auth } = pkg;
 const app = express();
 const port = process.env.PORT || 5000;
 const config = Auth0Config(process.env);
@@ -20,20 +18,15 @@ app.use(cors());
 app.use(express.json());
 app.use(auth(config));
 
-// Midlertidig debug log
-console.log('APPTS: SQL_HOST:', process.env.SQL_HOST);
-console.log('SQL_USER:', process.env.SQL_USER);
-console.log('SQL_PASSWORD:', process.env.SQL_PASSWORD);
-
 async function startServer() {
   try {
-    // Først sørger vi for, at databasen bliver oprettet, hvis den ikke allerede eksisterer
+    // Først opretter vi databasen, hvis den ikke eksisterer
     console.log("Setting up the database...");
-    await setupDatabase();  // Kør database setup her
+    await setupDatabase(); // Kør database setup
 
-    // Når databasen er oprettet, initialiser den med migrationer og seeding
+    // Når databasen er oprettet, initialiser med migrationer og seeding
     console.log("Initializing database...");
-    await initializeDatabase();
+    await initializeDatabase(); // Kør migrationer og seeds
 
     // Use the v1 routes with the /v1 prefix
     app.use("/v1", V1Routes);
@@ -44,8 +37,8 @@ async function startServer() {
     });
   } catch (error) {
     console.error("Failed to start the server:", error);
-    process.exit(1);  // Stop hvis der er en kritisk fejl
+    process.exit(1); // Stop hvis der er en kritisk fejl
   }
 }
 
-startServer();  // Kør serveropstart asynkront
+startServer(); // Kør serveropstart asynkront

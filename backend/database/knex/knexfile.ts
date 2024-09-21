@@ -8,10 +8,10 @@ const config: { [key: string]: Knex.Config } = {
     development: {
         client: 'mssql',
         connection: {
-            server: process.env.SQL_HOST || 'localhost',
+            server: process.env.SQL_HOST,
             user: process.env.SQL_USER,
             password: process.env.SQL_PASSWORD,
-            database: 'BookCollection',  // Her er databasenavnet
+            database: process.env.SQL_NAME || 'bookCollection',
             options: {
                 encrypt: true,
                 enableArithAbort: true,
@@ -19,11 +19,11 @@ const config: { [key: string]: Knex.Config } = {
             },
         },
         migrations: {
-            directory: './database/knex/migrations',  // Sørg for at denne sti er korrekt
+            directory: './database/knex/migrations',
             extension: 'ts',
         },
         seeds: {
-            directory: './seeds',
+            directory: './database/knex/seeds',
             extension: 'ts',
         },
         pool: {

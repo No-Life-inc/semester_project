@@ -1,60 +1,48 @@
-import knex from 'knex';  // Importér knex-funktionen
-import { Knex } from 'knex';  // Importér typen Knex til typesikkerhed
-import dotenv from 'dotenv';
+import knex from "knex";
+import { Knex } from "knex";
+import dotenv from "dotenv";
 dotenv.config();
 
 const config: Knex.Config = {
-    client: 'mssql',
-    connection: {
-        server: process.env.SQL_HOST || 'localhost',
-        user: process.env.SQL_USER,
-        password: process.env.SQL_PASSWORD,
-        options: {
-            encrypt: true,
-            enableArithAbort: true,
-        },
+  client: "mssql",
+  connection: {
+    server: process.env.SQL_HOST,
+    user: process.env.SQL_USER,
+    password: process.env.SQL_PASSWORD,
+    options: {
+      encrypt: true,
+      enableArithAbort: true,
+      trustServerCertificate: true,
     },
+  },
 };
 
-// Opret databaseforbindelse og returnér en Knex instans
-async function setupDatabase(): Promise<knex> {
-    const initialDb = knex(config);
-    const databaseName = 'BookCollection';
-    console.log("Checking if setupDatabase is being called...")
+async function setupDatabase(): Promise<void> {
+  const initialDb = knex(config);
+  const databaseName = "bookCollection";
 
-    // Tjek om databasen eksisterer ved at køre en SQL-forespørgsel
-    try {
-        // Tjek om databasen eksisterer ved at køre en SQL-forespørgsel
-        const result = await initialDb.raw(`SELECT name FROM sys.databases WHERE name = ?`, [databaseName]);
+  // Log konfigurationsdetaljer for at se, hvad der bliver brugt
+  console.log("Connecting to MSSQL with the following configuration:", config);
 
-        if (result.recordset.length === 0) {  // Hvis databasen ikke findes
-            await initialDb.raw(`CREATE DATABASE ${databaseName}`);
-            console.log(`Database ${databaseName} created!`);
-        } else {
-            console.log(`Database ${databaseName} already exists.`);
-        }
-    } catch (err) {
-        console.error('Error checking or creating database:', err);
-        throw err;
-    } finally {
-        await initialDb.destroy();  // Sørg for at lukke forbindelsen til den generiske database
+  try {
+    // Brug queryBuilder i stedet for raw
+    const result = await initialDb
+      .select("name")
+      .from("sys.databases")
+      .where("name", databaseName);
+
+    if (result.length === 0) {
+      await initialDb.raw(`CREATE DATABASE ${databaseName}`);
+      console.log(`Database ${databaseName} created!`);
+    } else {
+      console.log(`Database ${databaseName} already exists.`);
     }
-
-    const newConfig: Knex.Config = {
-        client: 'mssql',
-        connection: {
-            server: process.env.SQL_HOST || 'localhost',
-            user: process.env.SQL_USER,
-            password: process.env.SQL_PASSWORD,
-            database: databaseName, // Peger på den nye database
-            options: {
-                encrypt: true,
-                enableArithAbort: true,
-            },
-        },
-    };
-
-    return knex(newConfig); // Returnér den nye Knex-forbindelse (instans)
+  } catch (err) {
+    console.error("Error checking or creating database:", err);
+    throw err;
+  } finally {
+    await initialDb.destroy();
+  }
 }
 
 export default setupDatabase;

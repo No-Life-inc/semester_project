@@ -10,10 +10,12 @@ const db = knex(knexConfig.development);
 export async function initializeDatabase(): Promise<void> {
     try {
         console.log('Running migrations...');
-        await db.migrate.latest();
+        const migrations = await db.migrate.latest();
+        console.log('Migrations completed:', migrations);
 
         console.log('Running seeds...');
-        await db.seed.run();
+        const seedResults = await db.seed.run();
+        console.log('Seeding completed:', seedResults);
 
         console.log('Database is ready.');
     } catch (error) {
