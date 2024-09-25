@@ -20,25 +20,21 @@ app.use(auth(config));
 
 async function startServer() {
   try {
-    // Først opretter vi databasen, hvis den ikke eksisterer
     console.log("Setting up the database...");
-    await setupDatabase(); // Kør database setup
+    await setupDatabase();
 
-    // Når databasen er oprettet, initialiser med migrationer og seeding
     console.log("Initializing database...");
-    await initializeDatabase(); // Kør migrationer og seeds
+    await initializeDatabase();
 
-    // Use the v1 routes with the /v1 prefix
     app.use("/v1", V1Routes);
 
-    // Start serveren efter at databasen er klar
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });
   } catch (error) {
     console.error("Failed to start the server:", error);
-    process.exit(1); // Stop hvis der er en kritisk fejl
+    process.exit(1);
   }
 }
 
-startServer(); // Kør serveropstart asynkront
+startServer();
