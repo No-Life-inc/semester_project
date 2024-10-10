@@ -1,29 +1,29 @@
-// Import models without .js extension
 import User from "./User";
-import BookCollection from "./BookCollection";
 import Book from "./Book";
 import Author from "./Author";
 import Publisher from "./Publisher";
-import BookHasBookCollection from "./BookHasBookCollection";
-import BooksHasAuthors from "./BooksHasAuthors";
+import Tag from "./Tag";
+import UserBook from "./UserBook";
+import UserBookTag from "./UserBookTag";
 
-// Define model associations with TypeScript
+// Many-to-Many relationship between User and Book through UserBook
+User.belongsToMany(Book, { through: UserBook, foreignKey: "user_id", as: "books" });
+Book.belongsToMany(User, { through: UserBook, foreignKey: "book_id", as: "users" });
 
-// User - BookCollection relationship
-User.hasMany(BookCollection, { foreignKey: "user_id" });
-BookCollection.belongsTo(User, { foreignKey: "user_id" });
+// One-to-Many relationship between Publisher and Book
+Publisher.hasMany(Book, { foreignKey: "publisher_id", as: "books" });
+Book.belongsTo(Publisher, { foreignKey: "publisher_id", as: "publisher" });
 
-// Publisher - Book relationship
-Publisher.hasMany(Book, { foreignKey: "publisher_id" });
-Book.belongsTo(Publisher, { foreignKey: "publisher_id" });
+// Many-to-Many relationship between Book and Author
+Book.belongsToMany(Author, { through: "books_authors", foreignKey: "book_id", as: "authors" });
+Author.belongsToMany(Book, { through: "books_authors", foreignKey: "author_id", as: "books" });
 
-// Book - Author many-to-many relationship
-Book.belongsToMany(Author, { through: "BooksAuthors", as: "authors" });
-Author.belongsToMany(Book, { through: "BooksAuthors", as: "books" });
+// One-to-Many relationship between UserBook and UserBookTag
+UserBook.hasMany(UserBookTag, { foreignKey: "user_book_id", as: "tags" });
+UserBookTag.belongsTo(UserBook, { foreignKey: "user_book_id", as: "user_book" });
 
-// Book - BookCollection many-to-many relationship
-Book.belongsToMany(BookCollection, { through: BookHasBookCollection, foreignKey: "books_id" });
-BookCollection.belongsToMany(Book, { through: BookHasBookCollection, foreignKey: "book_collections_id" });
+// One-to-Many relationship between Tag and UserBookTag
+Tag.hasMany(UserBookTag, { foreignKey: "tag_id", as: "user_book_tags" });
+UserBookTag.belongsTo(Tag, { foreignKey: "tag_id", as: "tag" });
 
-// Export models
-export { User, BookCollection, Book, Author, Publisher, BookHasBookCollection, BooksHasAuthors };
+export { User, Book, Author, Publisher, Tag, UserBook, UserBookTag };

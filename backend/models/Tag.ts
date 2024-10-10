@@ -1,20 +1,20 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../config/SqlConfig";
 
-// Define the attributes for the Author model
-interface AuthorAttributes {
+// Define the attributes for the Tag model
+interface TagAttributes {
     id: number;
     name: string;
 }
 
 // Define a type for creation (since `id` will be auto-incremented and optional during creation)
-interface AuthorCreationAttributes extends Optional<AuthorAttributes, "id"> {}
+interface TagCreationAttributes extends Optional<TagAttributes, "id"> {}
 
-// Define the Author model extending Sequelize's Model with typed attributes
-class Author extends Model<AuthorAttributes, AuthorCreationAttributes> {}
+// Define the Tag model
+class Tag extends Model<TagAttributes, TagCreationAttributes> {}
 
 // Initialize the model
-Author.init(
+Tag.init(
     {
         id: {
             type: DataTypes.INTEGER,
@@ -28,10 +28,10 @@ Author.init(
     },
     {
         sequelize,
-        modelName: "Author",
-        tableName: "authors",
-        timestamps: false, // Disable timestamps if not needed
+        modelName: "Tag",
+        tableName: "tags",
+        timestamps: false,
     }
 );
 
-export default Author;
+export default Tag;
