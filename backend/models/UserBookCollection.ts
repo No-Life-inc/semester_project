@@ -2,13 +2,13 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/SqlConfig";
 
 // Define the attributes for the UserBookCollection model
-interface CollectionBookAttributes {
+interface UserBookCollectionAttributes {
     id: number;
     collection_id: number;
     user_book_id: number;
 }
 
-class UserBookCollection extends Model<CollectionBookAttributes> implements CollectionBookAttributes {
+class UserBookCollection extends Model<UserBookCollectionAttributes> implements UserBookCollectionAttributes {
     public id!: number;
     public collection_id!: number;
     public user_book_id!: number;
