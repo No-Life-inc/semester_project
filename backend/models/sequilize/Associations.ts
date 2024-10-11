@@ -9,15 +9,15 @@ import Collection from "./Collection";
 import UserCollection from "./UserCollection";
 import UserBookCollection from "./UserBookCollection";
 
-// Many-to-Many relationship between User and Book through UserBook
+// Many-to-Many relationship between User and BookModel.ts through UserBook
 User.belongsToMany(Book, { through: UserBook, foreignKey: "user_id", as: "books" });
 Book.belongsToMany(User, { through: UserBook, foreignKey: "book_id", as: "users" });
 
-// One-to-Many relationship between Publisher and Book
+// One-to-Many relationship between Publisher and BookModel.ts
 Publisher.hasMany(Book, { foreignKey: "publisher_id", as: "books" });
 Book.belongsTo(Publisher, { foreignKey: "publisher_id", as: "publisher" });
 
-// Many-to-Many relationship between Book and Author
+// Many-to-Many relationship between BookModel.ts and Author
 Book.belongsToMany(Author, { through: "books_authors", foreignKey: "book_id", as: "authors" });
 Author.belongsToMany(Book, { through: "books_authors", foreignKey: "author_id", as: "books" });
 

@@ -1,21 +1,21 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import sequelize from "../config/SqlConfig";
+import sequelize from "../../config/SqlConfig";
 
-interface PublisherAttributes {
+interface UserAttributes {
     id: number;
     name: string;
     email: string;
 }
 
-interface PublisherCreationAttributes extends Optional<PublisherAttributes, "id"> {}
+interface UserCreationAttributes extends Optional<UserAttributes, "id"> {}
 
-class Publisher extends Model<PublisherAttributes, PublisherCreationAttributes> implements PublisherAttributes {
+class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
     public id!: number;
     public name!: string;
     public email!: string;
 }
 
-Publisher.init({
+User.init({
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -31,8 +31,8 @@ Publisher.init({
     },
 }, {
     sequelize,
-    tableName: "publishers",
+    tableName: "users",
     timestamps: false,
 });
 
-export default Publisher;
+export default User;

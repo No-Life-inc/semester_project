@@ -22,18 +22,18 @@ The repository includes 3 main directories. The backend is created with Node.js,
 
 Create a .env in the root folder.
 
-#FRONTEND <br>
+#FRONTEND
 FRONTEND_PORT=3000
 
-#BACKEND<br>
+#BACKEND
 
 BACKEND_PORT=5000
 
-SQL_HOST=mssql-db
+SQL_HOST=mssql-server
 
 SQL_PORT=1433
 
-SQL_NAME=books
+SQL_NAME=bookCollection
 
 SQL_USER=SA
 
@@ -45,9 +45,14 @@ ISSUER_BASE_URL=https://dev-z127od7fd0csxf81.eu.auth0.com
 
 AUTH0_SECRET=LONG_RANDOM_STRING
 
+MONGODB_USERNAME=root
 
-#DATABASE<br>
+
+#DATABASE
 DB_PASSWORD=YourStrongPassword123
+
+MONGO_URI=mongodb://root:YourStrongPassword123@mongo-db:27017
+
 
 
 ## How To Run

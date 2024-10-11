@@ -1,42 +1,42 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import sequelize from "../config/SqlConfig";
+import sequelize from "../../config/SqlConfig";
 
-// Define the attributes for the UserBookTag model
-interface UserBookTagAttributes {
+// Define the attributes for the UserBook model
+interface UserBookAttributes {
     id: number;
-    user_book_id: number;
-    tag_id: number;
+    user_id: number;
+    book_id: number;
 }
 
 // Define a type for creation (since `id` will be auto-incremented and optional during creation)
-interface UserBookTagCreationAttributes extends Optional<UserBookTagAttributes, "id"> {}
+interface UserBookCreationAttributes extends Optional<UserBookAttributes, "id"> {}
 
-// Define the UserBookTag model
-class UserBookTag extends Model<UserBookTagAttributes, UserBookTagCreationAttributes> {}
+// Define the UserBook model
+class UserBook extends Model<UserBookAttributes, UserBookCreationAttributes> {}
 
 // Initialize the model
-UserBookTag.init(
+UserBook.init(
     {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
         },
-        user_book_id: {
+        user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        tag_id: {
+        book_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
     },
     {
         sequelize,
-        modelName: "UserBookTag",
-        tableName: "user_book_tags",
+        modelName: "UserBook",
+        tableName: "user_book",
         timestamps: false,
     }
 );
 
-export default UserBookTag;
+export default UserBook;

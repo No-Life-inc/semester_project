@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize";
-import sequelize from "../config/SqlConfig";
+import sequelize from "../../config/SqlConfig";
 
 // Define the attributes for the UserBookCollection model
 interface UserBookCollectionAttributes {
