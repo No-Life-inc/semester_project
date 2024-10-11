@@ -5,6 +5,9 @@ import Publisher from "./Publisher";
 import Tag from "./Tag";
 import UserBook from "./UserBook";
 import UserBookTag from "./UserBookTag";
+import Collection from "./Collection";
+import UserCollection from "./UserCollection";
+import UserBookCollection from "./UserBookCollection";
 
 // Many-to-Many relationship between User and Book through UserBook
 User.belongsToMany(Book, { through: UserBook, foreignKey: "user_id", as: "books" });
@@ -26,4 +29,10 @@ UserBookTag.belongsTo(UserBook, { foreignKey: "user_book_id", as: "user_book" })
 Tag.hasMany(UserBookTag, { foreignKey: "tag_id", as: "user_book_tags" });
 UserBookTag.belongsTo(Tag, { foreignKey: "tag_id", as: "tag" });
 
-export { User, Book, Author, Publisher, Tag, UserBook, UserBookTag };
+// Many-to-Many relationship between User and Collection through UserCollection
+User.belongsToMany(Collection, { through: UserCollection, foreignKey: "user_id", as: "collections" });
+Collection.belongsToMany(User, { through: UserCollection, foreignKey: "collection_id", as: "users" });
+
+// Many-to-Many relationship between Collection and UserBook through UserBookCollection
+Collection.belongsToMany(UserBook, { through: UserBookCollection, foreignKey: "collection_id", as: "user_books" });
+UserBook.belongsToMany(Collection, { through: UserBookCollection, foreignKey: "user_book_id", as: "collections" });

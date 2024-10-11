@@ -8,4 +8,4 @@ export async function seed(knex: Knex): Promise<void> {
     { name: "Jane Smith", email: "Jane@Smith.com" },
     { name: "Alice Johnson",email: "Alice@Johnson.com" },
   ]);
-}
+} 
