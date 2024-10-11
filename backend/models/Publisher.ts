@@ -12,7 +12,6 @@ class Publisher extends Model<PublisherAttributes> implements PublisherAttribute
     public name!: string;
 }
 
-
 Publisher.init({
     id: {
         type: DataTypes.INTEGER,

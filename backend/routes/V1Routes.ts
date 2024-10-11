@@ -1,9 +1,11 @@
 import express, { Request, Response } from "express";
-import User from "../models/User"; // Removed .js extension, as TS resolves it
-import BookCollection from "../models/BookCollection";
-import Book from "../models/Book";
 import Author from "../models/Author";
+import Book from "../models/Book";
 import Publisher from "../models/Publisher";
+import Tag from "../models/Tag";
+import User from "../models/User"; // Removed .js extension, as TS resolves it
+import UserBook from "../models/UserBook";
+import UserBookTag from "../models/UserBookTag";
 
 const router = express.Router();
 
@@ -18,20 +20,26 @@ router.get("/:model", async (req: Request, res: Response) => {
     let Model: any;
 
     switch (model) {
-        case "users":
-            Model = User;
-            break;
-        case "bookCollections":
-            Model = BookCollection;
+        case "authors":
+            Model = Author;
             break;
         case "books":
             Model = Book;
             break;
-        case "authors":
-            Model = Author;
-            break;
         case "publishers":
             Model = Publisher;
+            break;
+        case "tags":
+            Model = Tag;
+            break;
+        case "users":
+            Model = User;
+            break;
+        case "user_books":
+            Model = UserBook;
+            break;
+        case "user_book_tags":
+            Model = UserBookTag;
             break;
         default:
             return res.status(400).json({ error: "Invalid model name" });
@@ -52,20 +60,26 @@ router.get("/:model/:id", async (req: Request, res: Response) => {
     let Model: any;
 
     switch (model) {
-        case "users":
-            Model = User;
-            break;
-        case "bookCollections":
-            Model = BookCollection;
+        case "authors":
+            Model = Author;
             break;
         case "books":
             Model = Book;
             break;
-        case "authors":
-            Model = Author;
-            break;
         case "publishers":
             Model = Publisher;
+            break;
+        case "tags":
+            Model = Tag;
+            break;
+        case "users":
+            Model = User;
+            break;
+        case "user_books":
+            Model = UserBook;
+            break;
+        case "user_book_tags":
+            Model = UserBookTag;
             break;
         default:
             return res.status(400).json({ error: "Invalid model name" });

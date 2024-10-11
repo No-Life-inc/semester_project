@@ -6,9 +6,9 @@ const seedUsers = async () => {
 
         if (usersCount === 0) {
             await User.bulkCreate([
-                { book_collection_id: 1, email: "user1@example.com", name: "User One" },
-                { book_collection_id: 2, email: "user2@example.com", name: "User Two" },
-                { book_collection_id: 3, email: "user3@example.com", name: "User Three" },
+                { email: "user1@example.com", name: "User One" },
+                { email: "user2@example.com", name: "User Two" },
+                { email: "user3@example.com", name: "User Three" },
             ]);
 
             console.log("Dummy user data inserted successfully.");
