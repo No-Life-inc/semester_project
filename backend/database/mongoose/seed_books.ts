@@ -5,7 +5,7 @@ const seedBooks = async () => {
         const books = await Book.insertMany([
             {
                 author: { name: "George Orwell" },
-                publisher: { name: "Penguin Books" },
+                publisher: "Penguin Books" ,
                 title: "1984",
                 isbn: "1234567890",
                 genre: {
@@ -17,7 +17,7 @@ const seedBooks = async () => {
             },
             {
                 author: { name: "J.K. Rowling" },
-                publisher: { name: "Bloomsbury" },
+                publisher:  "Bloomsbury" ,
                 title: "Harry Potter and the Philosopher's Stone",
                 isbn: "0987654321",
                 genre: {

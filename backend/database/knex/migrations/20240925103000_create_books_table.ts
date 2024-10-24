@@ -3,7 +3,6 @@ import { Knex } from 'knex';
 export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable('books', (table) => {
         table.increments('id').primary();
-        table.integer('author_id').unsigned().references('id').inTable('authors').notNullable().onDelete('CASCADE');
         table.integer('publisher_id').unsigned().references('id').inTable('publishers').notNullable().onDelete('CASCADE');
         table.string('title').notNullable();
         table.string('edition');

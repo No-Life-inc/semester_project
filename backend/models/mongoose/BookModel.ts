@@ -4,9 +4,7 @@ interface IBook extends Document { // Udvid Document for automatisk at inkludere
     author: {
         name: string;
     };
-    publisher: {
-        name: string;
-    };
+    publisher: string;
     title: string;
     edition?: string;
     cover_id?: string;
@@ -24,9 +22,7 @@ const bookSchema = new Schema<IBook>({
     author: {
         name: { type: String, required: true }
     },
-    publisher: {
-        name: { type: String, required: true }
-    },
+    publisher: { type: String, required: true} ,
     title: { type: String, required: true },
     edition: { type: String },
     cover_id: { type: String },
