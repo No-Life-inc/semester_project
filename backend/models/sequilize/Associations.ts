@@ -8,6 +8,7 @@ import UserBookTag from "./UserBookTag";
 import Collection from "./Collection";
 import UserCollection from "./UserCollection";
 import UserBookCollection from "./UserBookCollection";
+import Genre from "./Genre";
 
 // Many-to-Many relationship between User and BookModel.ts through UserBook
 User.belongsToMany(Book, { through: UserBook, foreignKey: "user_id", as: "books" });
@@ -36,3 +37,8 @@ Collection.belongsToMany(User, { through: UserCollection, foreignKey: "collectio
 // Many-to-Many relationship between Collection and UserBook through UserBookCollection
 Collection.belongsToMany(UserBook, { through: UserBookCollection, foreignKey: "collection_id", as: "user_books" });
 UserBook.belongsToMany(Collection, { through: UserBookCollection, foreignKey: "user_book_id", as: "collections" });
+
+// Many-to-Many relationship between Book and Genre through book_genres
+Book.belongsToMany(Genre, { through: "book_genre", foreignKey: "book_id", as: "genres" });
+Genre.belongsToMany(Book, { through: "book_genre", foreignKey: "genre_id", as: "books" });
+

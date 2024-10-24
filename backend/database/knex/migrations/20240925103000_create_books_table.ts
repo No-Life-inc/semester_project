@@ -9,7 +9,6 @@ export async function up(knex: Knex): Promise<void> {
         table.string('edition');
         table.integer('cover_id').unsigned();
         table.string('isbn');
-        table.string('genre');
         table.string('language');
         table.integer('page_num');
         table.date('publication_date');

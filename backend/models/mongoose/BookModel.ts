@@ -11,7 +11,9 @@ interface IBook extends Document { // Udvid Document for automatisk at inkludere
     edition?: string;
     cover_id?: string;
     isbn: string;
-    genre?: string;
+    genre: {
+        name: string;
+    };
     language?: string;
     page_num?: number;
     publication_date?: Date;
@@ -29,7 +31,9 @@ const bookSchema = new Schema<IBook>({
     edition: { type: String },
     cover_id: { type: String },
     isbn: { type: String, unique: true },
-    genre: { type: String },
+    genre: {
+        name: { type: String, required: true }
+    },
     language: { type: String },
     page_num: { type: Number },
     publication_date: { type: Date }

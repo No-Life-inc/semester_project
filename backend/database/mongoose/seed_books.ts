@@ -8,7 +8,9 @@ const seedBooks = async () => {
                 publisher: { name: "Penguin Books" },
                 title: "1984",
                 isbn: "1234567890",
-                genre: "Dystopian",
+                genre: {
+                    name: "Dystopian",
+                },
                 language: "English",
                 page_num: 328,
                 publication_date: new Date("1949-06-08")
@@ -18,7 +20,9 @@ const seedBooks = async () => {
                 publisher: { name: "Bloomsbury" },
                 title: "Harry Potter and the Philosopher's Stone",
                 isbn: "0987654321",
-                genre: "Fantasy",
+                genre: {
+                    name: "Fantasy",
+                },
                 language: "English",
                 page_num: 223,
                 publication_date: new Date("1997-06-26")
