@@ -1,11 +1,11 @@
 import express, { Request, Response } from "express";
-import Author from "../models/Author";
-import Book from "../models/Book";
-import Publisher from "../models/Publisher";
-import Tag from "../models/Tag";
-import User from "../models/User"; // Removed .js extension, as TS resolves it
-import UserBook from "../models/UserBook";
-import UserBookTag from "../models/UserBookTag";
+import Author from "../models/sequilize/Author";
+import Book from "../models/sequilize/Book";
+import Publisher from "../models/sequilize/Publisher";
+import Tag from "../models/sequilize/Tag";
+import User from "../models/sequilize/User"; // Removed .js extension, as TS resolves it
+import UserBook from "../models/sequilize/UserBook";
+import UserBookTag from "../models/sequilize/UserBookTag";
 
 const router = express.Router();
 

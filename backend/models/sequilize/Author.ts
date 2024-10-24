@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import sequelize from "../config/SqlConfig";
+import sequelize from "../../config/SqlConfig";
 
 // Define the attributes for the Author model
 interface AuthorAttributes {

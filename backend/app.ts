@@ -2,11 +2,12 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import pkg from "express-openid-connect";
-import "./models/Associations";
+import "./models/sequilize/Associations";
 import V1Routes from "./routes/V1Routes";
 import { Auth0Config } from "./config/Auth0Config";
 import setupDatabase from "./database/knex/createDatabase";
 import { initializeDatabase } from "./database/knex/setupDatabase";
+import connectDB from "./dbconnections/MongoConnection"
 
 dotenv.config();
 const { auth } = pkg;
@@ -20,6 +21,9 @@ app.use(auth(config));
 
 async function startServer() {
   try {
+    console.log("Connecting to MongoDB...");
+    await connectDB();
+
     console.log("Setting up the database...");
     await setupDatabase();
 

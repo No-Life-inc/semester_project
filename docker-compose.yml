@@ -15,6 +15,15 @@ services:
       retries: 5
       timeout: 5s
 
+  mongo-db:
+    image: mongo:latest
+    container_name: mongo-db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+
   backend:
     build:
       context: backend
@@ -36,7 +45,7 @@ services:
       - CLIENT_ID=${CLIENT_ID}
       - ISSUER_BASE_URL=${ISSUER_BASE_URL}
       - AUTH0_SECRET=${AUTH0_SECRET}
-      - BASE_URL=${BASE_URL}
+      - MONGO_URI=${MONGO_URI}
     command: sh -c "npm install && npx ts-node ./app.ts"
 
   frontend:
