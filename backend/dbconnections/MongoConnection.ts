@@ -12,7 +12,7 @@ const connectDB = async () => {
         await mongoose.connect(uri);
         console.log('MongoDB connected');
 
-        await seedData();
+        // await seedData();
     } catch (error) {
         console.error('MongoDB connection error:', error);
         process.exit(1);
