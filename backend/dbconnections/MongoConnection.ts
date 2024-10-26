@@ -19,11 +19,11 @@ const connectDB = async () => {
     }
 };
 
-// Seed-funktion
-const seedData = async () => {
-    await seedBooks();
-    const books = await Book.find() as IBook[]
-    await seedUsers(books); // Send books til seedUsers
-};
+// // Seed-funktion
+// const seedData = async () => {
+//     await seedBooks();
+//     const books = await Book.find() as IBook[]
+//     await seedUsers(books); // Send books til seedUsers
+// };
 
 export default connectDB;

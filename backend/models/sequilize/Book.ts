@@ -19,6 +19,7 @@ interface BookAttributes {
     publicationDate: Date;
     dimensions: string;
     image: string;
+    synopsis: string;
 }
 
 // Define a type for creation (since `id` will be auto-incremented and optional during creation)
@@ -30,7 +31,7 @@ class Book extends Model<BookAttributes, BookCreationAttributes> implements Book
     public authorId!: number;
     public publisherId!: number;
     public title!: string;
-    public edition!: string;
+    public edition!: number;
     public coverId!: number;
     public isbn!: string;
     public language!: string;
@@ -42,6 +43,7 @@ class Book extends Model<BookAttributes, BookCreationAttributes> implements Book
     public binding!: string;
     public dimensions!: string;
     public image!: string;
+    public synopsis!: string;
 
 }
 
@@ -113,7 +115,11 @@ Book.init(
             type: DataTypes.STRING,
             allowNull: true,
         },
-        
+        synopsis: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+
     },
     {
         sequelize,
