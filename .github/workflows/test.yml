@@ -61,7 +61,7 @@ jobs:
           DB_NAME: bookCollection
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: localhost
-        run: npx ts-node --loader ts-node/esm node_modules/.bin/knex migrate:latest
+        run: npx ts-node ./knexfile.ts migrate:latest
 
 
       - name: Run seeds
