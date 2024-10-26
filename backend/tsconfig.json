@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "ESNext",
     "target": "es6",
     "outDir": "./dist",
     "rootDir": "./",
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["jest"]
   },
-  "include": ["./app.ts", "./config/**/*.ts", "./controllers/**/*.ts", "./routes/**/*.ts"]
+  "include": ["./app.ts", "./config/**/*.ts", "./controllers/**/*.ts", "./routes/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
