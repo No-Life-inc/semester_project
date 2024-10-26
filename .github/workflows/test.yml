@@ -51,6 +51,9 @@ jobs:
               sleep 5
           done
 
+      - name: Install ts-node
+        run: npm install -g ts-node
+
       - name: Run migrations
         working-directory: ./backend/database/knex
         env:
@@ -58,7 +61,8 @@ jobs:
           DB_NAME: bookCollection
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: localhost
-        run: npx knex migrate:latest
+          TS_NODE_REGISTER: true  # Sikrer at ts-node bruges ved kørsel af TS-filer
+        run: ts-node -r tsconfig-paths/register node_modules/.bin/knex migrate:latest
 
       - name: Run seeds
         working-directory: ./backend/database/knex
