@@ -10,6 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["jest"]
   },
-  "include": ["./app.ts", "./config/**/*.ts", "./controllers/**/*.ts", "./routes/**/*.ts"],
+  "include": ["./app.ts", "./config/**/*.ts", "./controllers/**/*.ts", "./routes/**/*.ts", "./database/knexfile.ts"],
   "exclude": ["node_modules", "dist"]
 }
