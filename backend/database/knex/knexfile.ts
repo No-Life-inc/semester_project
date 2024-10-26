@@ -1,35 +1,21 @@
-import { Knex } from "knex";
 import dotenv from "dotenv";
+import pkg from "knex";
+const { Knex } = pkg;
 dotenv.config();
 
-
-
-const config: { [key: string]: Knex.Config } = {
-    development: {
-        client: "mssql",
-        connection: {
-            server: process.env.SQL_HOST,
-            user: process.env.SQL_USER,
-            password: process.env.SQL_PASSWORD,
-            database: process.env.SQL_NAME,
-            options: {
-                encrypt: true,
-                enableArithAbort: true,
-                trustServerCertificate: true,
-            },
+const config = {
+    client: "mssql",
+    connection: {
+        server: process.env.SQL_HOST,
+        user: process.env.SQL_USER,
+        password: process.env.SQL_PASSWORD,
+        database: process.env.SQL_NAME,
+        migrations:{
+            directory: "./migrations"
         },
-        migrations: {
-            directory: "./database/knex/migrations",
-            extension: "ts",
-        },
-        seeds: {
-            directory: "./database/knex/seeds",
-            extension: "ts",
-        },
-        pool: {
-            min: 2,
-            max: 10,
-        },
+        seeds:{
+            directory: "./seeds"
+        }
     },
 };
 
