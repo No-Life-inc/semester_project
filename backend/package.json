@@ -2,6 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "app.ts",
+  "type": "module",
   "scripts": {
     "exec": "npx ts-node --transpile-only app.ts",
     "start": "nodemon --watch './**/*.ts' --exec 'npx ts-node' app.ts",
