@@ -61,7 +61,8 @@ jobs:
           DB_NAME: bookCollection
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: localhost
-          TS_NODE_REGISTER: true  # Sikrer at ts-node bruges ved kørsel af TS-filer
+          TS_NODE_REGISTER: true
+          KNEX_PATH: ./backend/database/knex/knexfile.ts
         run: ts-node -r tsconfig-paths/register node_modules/.bin/knex migrate:latest
 
       - name: Run seeds
