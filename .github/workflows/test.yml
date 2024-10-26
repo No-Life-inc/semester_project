@@ -63,7 +63,7 @@ jobs:
           DB_HOST: localhost
           TS_NODE_REGISTER: true
           KNEX_PATH: ./backend/database/knex/knexfile.ts
-        run: ts-node -r tsconfig-paths/register node_modules/.bin/knex migrate:latest
+        run: ts-node -r tsconfig-paths/register node_modules/.bin/knex --knexfile $KNEX_PATH migrate:latest
 
       - name: Run seeds
         working-directory: ./backend/database/knex
