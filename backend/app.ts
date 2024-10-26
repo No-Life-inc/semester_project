@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import pkg from "express-openid-connect";
 import "./models/sequilize/Associations";
-import V1Routes from "./routes/V1Routes";
+import V1Routes from "./routes/V1";
 import { Auth0Config } from "./config/Auth0Config";
 import setupDatabase from "./database/knex/createDatabase";
 import { initializeDatabase } from "./database/knex/setupDatabase";

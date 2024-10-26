@@ -3,7 +3,7 @@ import Publisher from "../../models/sequilize/Publisher";
 
 const router = express.Router();
 
-router.get("/publisher", async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
     /**
      * Query parameters:
      * - page: The page number to fetch (default: 1)
@@ -31,7 +31,7 @@ router.get("/publisher", async (req: Request, res: Response) => {
     }
 });
 
-router.get("/publisher/:id", async (req: Request, res: Response) => {
+router.get("/:id", async (req: Request, res: Response) => {
     /**
      * URL parameters:
      * - id: The ID of the publisher to fetch
@@ -56,3 +56,5 @@ router.get("/publisher/:id", async (req: Request, res: Response) => {
         res.status(500).json({ error: "An error occurred while fetching publisher" });
     }
 });
+
+export default router;

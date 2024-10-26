@@ -3,7 +3,7 @@ import Author from "../../models/sequilize/Author";
 
 const router = express.Router();
 
-router.get("/author", async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
     /**
      * Query parameters:
      * - page: The page number to fetch (default: 1)
@@ -31,7 +31,7 @@ router.get("/author", async (req: Request, res: Response) => {
     }
 });
 
-router.get("/author/:id", async (req: Request, res: Response) => {
+router.get("/:id", async (req: Request, res: Response) => {
     /**
      * URL parameters:
      * - id: The ID of the author to fetch
@@ -40,7 +40,7 @@ router.get("/author/:id", async (req: Request, res: Response) => {
      * 
      * This will fetch the author with ID 1
      */
-    
+
     const { id } = req.params;
 
     try {
@@ -55,4 +55,6 @@ router.get("/author/:id", async (req: Request, res: Response) => {
         console.error("Error fetching author:", error);
         res.status(500).json({ error: "An error occurred while fetching author" });
     }
-}
+});
+
+export default router;
