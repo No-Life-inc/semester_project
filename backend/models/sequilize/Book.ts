@@ -4,15 +4,21 @@ import sequelize from "../../config/SqlConfig";
 // Define the attributes for the BookModel.ts model
 interface BookAttributes {
     id: number;
-    author_id: number;
-    publisher_id: number;
+    authorId: number;
+    publisherId: number;
     title: string;
-    edition: string;
-    cover_id: number;
+    longTitle: string;
+    edition: number;
+    coverId: number;
     isbn: string;
+    isbn10: string;
+    isbn13: string;
+    binding: string;
     language: string;
-    page_num: number;
-    publication_date: Date;
+    pages: number;
+    publicationDate: Date;
+    dimensions: string;
+    image: string;
 }
 
 // Define a type for creation (since `id` will be auto-incremented and optional during creation)
@@ -21,15 +27,22 @@ interface BookCreationAttributes extends Optional<BookAttributes, "id"> {}
 // Define the BookModel.ts model extending Sequelize's Model with typed attributes
 class Book extends Model<BookAttributes, BookCreationAttributes> implements BookAttributes {
     public id!: number;
-    public author_id!: number;
-    public publisher_id!: number;
+    public authorId!: number;
+    public publisherId!: number;
     public title!: string;
     public edition!: string;
-    public cover_id!: number;
+    public coverId!: number;
     public isbn!: string;
     public language!: string;
-    public page_num!: number;
-    public publication_date!: Date;
+    public pages!: number;
+    public publicationDate!: Date;
+    public longTitle!: string;
+    public isbn10!: string;
+    public isbn13!: string;
+    public binding!: string;
+    public dimensions!: string;
+    public image!: string;
+
 }
 
 // Initialize the model
@@ -40,11 +53,11 @@ Book.init(
             primaryKey: true,
             autoIncrement: true,
         },
-        author_id: {
+        authorId: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        publisher_id: {
+        publisherId: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
@@ -56,7 +69,7 @@ Book.init(
             type: DataTypes.STRING,
             allowNull: true,
         },
-        cover_id: {
+        coverId: {
             type: DataTypes.INTEGER,
             allowNull: true,
         },
@@ -68,14 +81,39 @@ Book.init(
             type: DataTypes.STRING,
             allowNull: true,
         },
-        page_num: {
+        pages: {
             type: DataTypes.INTEGER,
             allowNull: true,
         },
-        publication_date: {
+        publicationDate: {
             type: DataTypes.DATE,
             allowNull: true,
         },
+        longTitle: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        isbn10: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        isbn13: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        binding: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        dimensions: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        image: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        
     },
     {
         sequelize,

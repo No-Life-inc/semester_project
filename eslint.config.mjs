@@ -28,10 +28,8 @@ export default [
       "@typescript-eslint": tsEslintPlugin,
     },
     rules: {
-      ...pluginJs.configs.recommended.rules,
-      ...tseslint.configs.recommended.rules,
-      ...pluginReact.configs.flat.recommended.rules,
-      "quotes": ["error", "double", { "avoidEscape": true, "allowTemplateLiterals": true }]
+      "camelcase": ["error", { "properties": "always" }],  // Enforce camelCase naming convention
+      // Add other rules here
     },
   },
 ];
