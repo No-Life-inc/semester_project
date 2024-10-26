@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { getDashboard, handleCallback } from "../controllers/userController";
+import { getDashboard, handleCallback } from "../../controllers/userController";
 import pkg from "express-openid-connect";
 
 const {  requiresAuth } = pkg;
