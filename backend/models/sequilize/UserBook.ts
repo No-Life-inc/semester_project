@@ -34,7 +34,7 @@ UserBook.init(
     {
         sequelize,
         modelName: "UserBook",
-        tableName: "user_book",
+        tableName: "user_books",
         timestamps: false,
     }
 );
