@@ -2,12 +2,12 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import pkg from "express-openid-connect";
-import "./models/sequilize/Associations";
+import "./models/sequelize/Associations";
 import V1Routes from "./routes/V1";
 import { Auth0Config } from "./config/Auth0Config";
 import setupDatabase from "./database/knex/createDatabase";
 import { initializeDatabase } from "./database/knex/setupDatabase";
-import connectDB from "./dbconnections/MongoConnection"
+import connectDB from "./dbconnections/MongoConnection";
 
 dotenv.config();
 const { auth } = pkg;

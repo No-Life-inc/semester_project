@@ -42,3 +42,6 @@ UserBook.belongsToMany(Collection, { through: UserBookCollection, foreignKey: "u
 Book.belongsToMany(Subject, { through: "book_subjects", foreignKey: "book_id", as: "subjects" });
 Subject.belongsToMany(Book, { through: "book_subjects", foreignKey: "subject_id", as: "books" });
 
+UserBook.belongsTo(Book, { foreignKey: "book_id", as: "book" }); // Define alias for accessing Book
+
+

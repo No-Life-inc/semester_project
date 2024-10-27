@@ -1,52 +1,61 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../config/SqlConfig";
+import User from "./User"; // Import the User model
+import UserBook from "./UserBook"; // Import the UserBook model
+import Author from "./Author"; // Import the Author model
+import Publisher from "./Publisher"; // Import the Publisher model
+import Subject from "./Subject"; // Import the Subject model
 
 // Define the attributes for the Book model
 interface BookAttributes {
     id: number;
-    publisherId: number;
     title: string;
-    longTitle: string;
+    publisherId: number;
     edition: number;
     coverId: number;
     isbn: string;
-    isbn10: string;
-    isbn13: string;
-    binding: string;
     language: string;
     pages: number;
     publicationDate: Date;
     dimensions: string;
     image: string;
     synopsis: string;
-    msrp: number; // Add msrp attribute
+    msrp: number;
+    isbn10: string;
+    isbn13: string;
+    binding: string;
+    users?: User[]; // Add users property for TypeScript
+    authors?: Author[]; // Add authors property for TypeScript
+    subjects?: Subject[]; // Add subjects property for TypeScript
+    publisher?: Publisher; // Add publisher property for TypeScript
 }
 
-// Define a type for creation (since `id` will be auto-incremented and optional during creation)
 interface BookCreationAttributes extends Optional<BookAttributes, "id"> {}
 
-// Define the Book model extending Sequelize's Model with typed attributes
 class Book extends Model<BookAttributes, BookCreationAttributes> implements BookAttributes {
     public id!: number;
-    public publisherId!: number;
     public title!: string;
-    public longTitle!: string;
+    public publisherId!: number;
     public edition!: number;
     public coverId!: number;
     public isbn!: string;
-    public isbn10!: string;
-    public isbn13!: string;
-    public binding!: string;
     public language!: string;
     public pages!: number;
     public publicationDate!: Date;
     public dimensions!: string;
     public image!: string;
     public synopsis!: string;
-    public msrp!: number; // Add msrp attribute
+    public msrp!: number;
+    public isbn10!: string;
+    public isbn13!: string;
+    public binding!: string;
+    public users?: User[]; // Add users property for TypeScript
+    public authors?: Author[]; // Add authors property for TypeScript
+    public subjects?: Subject[]; // Add subjects property for TypeScript
+    public publisher?: Publisher; // Add publisher property for TypeScript
 }
 
-// Initialize the model
+// Initialize the Book model
 Book.init(
     {
         id: {
@@ -54,19 +63,14 @@ Book.init(
             primaryKey: true,
             autoIncrement: true,
         },
-        publisherId: {
-            type: DataTypes.INTEGER,
-            allowNull: true, // Make nullable if publisher_id can be null
-            field: "publisher_id", // Map to the correct column name
-        },
         title: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        longTitle: {
-            type: DataTypes.STRING,
+        publisherId: {
+            type: DataTypes.INTEGER,
             allowNull: true,
-            field: "title_long", // Map to the correct column name
+            field: "publisher_id",
         },
         edition: {
             type: DataTypes.INTEGER,
@@ -75,21 +79,9 @@ Book.init(
         coverId: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            field: "cover_id", // Map to the correct column name
+            field: "cover_id",
         },
         isbn: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        isbn10: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        isbn13: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        binding: {
             type: DataTypes.STRING,
             allowNull: true,
         },
@@ -104,7 +96,7 @@ Book.init(
         publicationDate: {
             type: DataTypes.DATE,
             allowNull: true,
-            field: "publication_date", // Map to the correct column name
+            field: "publication_date",
         },
         dimensions: {
             type: DataTypes.STRING,
@@ -122,6 +114,18 @@ Book.init(
             type: DataTypes.FLOAT,
             allowNull: true,
         },
+        isbn10: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        isbn13: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        binding: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
     },
     {
         sequelize,
@@ -130,5 +134,6 @@ Book.init(
         timestamps: false,
     }
 );
+
 
 export default Book;
