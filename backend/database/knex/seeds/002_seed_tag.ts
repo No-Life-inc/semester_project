@@ -7,5 +7,8 @@ export async function seed(knex: Knex): Promise<void> {
         { name: "Favourites" },
         { name: "Moms smut" },
         { name: "Classic" },
+        { name: "Need to read" },
+        { name: "Must read" },
+        { name: "Later"},
     ]);
 }

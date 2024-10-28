@@ -1,6 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../config/SqlConfig";
-
+import Book from "./Book"; // Import the Book model
 
 interface PublisherAttributes {
     id: number;
@@ -10,6 +10,7 @@ interface PublisherAttributes {
 class Publisher extends Model<PublisherAttributes> implements PublisherAttributes {
     public id!: number;
     public name!: string;
+    public books?: Book[]; // Add books property for TypeScript
 }
 
 Publisher.init({

@@ -39,7 +39,7 @@ BookAuthor.init(
     {
         sequelize,
         modelName: "BookAuthor",
-        tableName: "book_author",
+        tableName: "book_authors",
         timestamps: false,
     }
 );
