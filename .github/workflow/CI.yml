@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - development
-      - ciJest
+      - ci_jest
       - ci
   pull_request:
     branches:
