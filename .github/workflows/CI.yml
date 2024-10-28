@@ -54,21 +54,17 @@ jobs:
       - name: Run migrations
         working-directory: ./backend
         env:
-          SQL_HOST: localhost:1433
+          SQL_HOST: localhost
           SQL_USER: sa
           SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
           SQL_NAME: bookCollection
-        run: |
-          echo "SQL_HOST=$SQL_HOST"
-          echo "SQL_USER=$SQL_USER"
-          echo "SQL_NAME=$SQL_NAME"
-          npx knex migrate:latest
+        run: npx knex migrate:latest
 
 
       - name: Run seeds
         working-directory: ./backend
         env:
-          SQL_HOST: localhost:1433
+          SQL_HOST: localhost
           SQL_USER: sa
           SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
           SQL_NAME: bookCollection
