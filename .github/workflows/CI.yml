@@ -54,27 +54,27 @@ jobs:
       - name: Run migrations
         working-directory: ./backend
         env:
-          DB_USER: sa
-          DB_NAME: bookCollection
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: localhost
+          SQL_HOST: localhost
+          SQL_USER: sa
+          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SQL_NAME: bookCollection
         run: npx knex migrate:latest
 
 
       - name: Run seeds
         working-directory: ./backend
         env:
-          DB_USER: sa
-          DB_NAME: bookCollection
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: localhost
+          SQL_USER: sa
+          SQL_NAME: bookCollection
+          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SQL_HOST: localhost
         run: npx knex seed:run
 
       - name: Run Backend tests
         run: npm test
         working-directory: ./backend
         env:
-          DB_USER: sa
-          DB_NAME: bookCollection
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: localhost
+          SQL_USER: sa
+          SQL_NAME: bookCollection
+          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SQL_HOST: localhost
