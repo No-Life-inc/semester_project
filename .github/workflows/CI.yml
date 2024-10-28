@@ -51,6 +51,11 @@ jobs:
       - name: Install ts-node
         run: npm install -g ts-node
 
+      - name: Create database
+        run: |
+          sqlcmd -S localhost -U sa -P ${{ secrets.DB_PASSWORD }} -Q "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'bookCollection') CREATE DATABASE bookCollection;"
+
+
       - name: Run migrations
         working-directory: ./backend
         env:
