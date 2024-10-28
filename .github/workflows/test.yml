@@ -55,7 +55,7 @@ jobs:
         run: npm install -g ts-node
 
       - name: Run migrations
-        working-directory: ./backend/database/knex
+        working-directory: ./backend
         env:
           DB_USER: sa
           DB_NAME: bookCollection
@@ -65,7 +65,7 @@ jobs:
 
 
       - name: Run seeds
-        working-directory: ./backend/database/knex
+        working-directory: ./backend
         env:
           DB_USER: sa
           DB_NAME: bookCollection
