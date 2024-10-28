@@ -2,7 +2,20 @@ import Knex from "knex";
 import dotenv from "dotenv";
 dotenv.config();
 
-const config: { [key: string]: Knex.Config } = {
+const config: {
+    development: {
+        client: string;
+        connection: {
+            server: string;
+            password: string;
+            database: string;
+            migrations: { extension: string; directory: string };
+            seeds: { extension: string; directory: string };
+            options: { encrypt: boolean; trustServerCertificate: boolean; enableArithAbort: boolean };
+            user: string
+        }
+    }
+} = {
     development: {
         client: "mssql",
         connection: {
