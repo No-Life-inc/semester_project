@@ -58,7 +58,7 @@ jobs:
           DB_NAME: bookCollection
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: localhost
-        run: npx ts-node -r ts-node/register node_modules/.bin/knex migrate:latest
+        run: npx knex migrate:latest
 
 
       - name: Run seeds
