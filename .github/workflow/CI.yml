@@ -3,10 +3,7 @@ name: Run tests
 on:
   push:
     branches:
-      - main
-      - development
-      - ci_jest
-      - ci
+      - '*'
   pull_request:
     branches:
       - main
