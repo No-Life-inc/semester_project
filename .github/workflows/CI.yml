@@ -51,24 +51,24 @@ jobs:
       - name: Install ts-node
         run: npm install -g ts-node
 
-      #- name: Run migrations
-      #  working-directory: ./backend
-      #  env:
-      #    SQL_HOST: localhost
-      #    SQL_USER: sa
-      #    SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      #    SQL_NAME: bookCollection
-      #  run: npx knex migrate:latest
+      - name: Run migrations
+        working-directory: ./backend
+        env:
+          SQL_HOST: localhost
+          SQL_USER: SA
+          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SQL_NAME: bookCollection
+        run: npx knex migrate:latest
 
 
-      #- name: Run seeds
-      #  working-directory: ./backend
-      #  env:
-      #    SQL_HOST: localhost
-      #    SQL_USER: sa
-      #    SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      #    SQL_NAME: bookCollection
-      #  run: npx knex seed:run
+      - name: Run seeds
+        working-directory: ./backend
+        env:
+          SQL_HOST: localhost
+          SQL_USER: SA
+          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SQL_NAME: bookCollection
+        run: npx knex seed:run
 
       - name: Run Backend tests
         run: npm test
