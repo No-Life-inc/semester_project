@@ -52,7 +52,7 @@ jobs:
           done
 
       - name: Install ts-node
-          npm install -D ts-node typescript
+        run: npm install -g ts-node
 
       - name: Run migrations
         working-directory: ./backend
