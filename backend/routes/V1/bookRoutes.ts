@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import Book from "../../models/sequelize/Book";
+import Author from '../../models/sequelize/Author';
 
 const router = express.Router();
 
@@ -23,6 +24,12 @@ router.get("/", async (req: Request, res: Response) => {
     const books = await Book.findAll({
       offset,
       limit: Number(limit),
+      include: [
+        {
+          model: Author,
+          as: "authors", // Use the alias specified in the association
+          through: { attributes: [] }, // Optional: Exclude join table attributes
+        },],
     });
     res.json(books);
   } catch (error) {
@@ -44,7 +51,15 @@ router.get("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const book = await Book.findByPk(id);
+    const book = await Book.findByPk(id, {
+      include: [
+        {
+          model: Author,
+          as: "authors", // Use the alias specified in the association
+          through: { attributes: [] },
+        },
+      ],
+    });
 
     if (!book) {
       return res.status(404).json({ error: "Book not found" });

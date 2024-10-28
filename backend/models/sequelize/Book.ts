@@ -1,10 +1,9 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../config/SqlConfig";
-import User from "./User"; // Import the User model
-import UserBook from "./UserBook"; // Import the UserBook model
-import Author from "./Author"; // Import the Author model
-import Publisher from "./Publisher"; // Import the Publisher model
-import Subject from "./Subject"; // Import the Subject model
+import User from "./User";
+import Author from "./Author"
+import Subject from "./Subject";
+import Publisher from "./Publisher";
 
 // Define the attributes for the Book model
 interface BookAttributes {
@@ -134,6 +133,5 @@ Book.init(
         timestamps: false,
     }
 );
-
 
 export default Book;

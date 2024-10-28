@@ -43,4 +43,5 @@ BookAuthor.init(
         timestamps: false,
     }
 );
-)
+
+export default BookAuthor;

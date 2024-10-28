@@ -11,7 +11,7 @@ const booksData = JSON.parse(fs.readFileSync(jsonFilePath, "utf-8"));
 export async function seed(knex: Knex): Promise<void> {
     // Clear existing data
     await knex("book_subjects").del();
-    await knex("book_author").del();
+    await knex("book_authors").del();
     await knex("subjects").del();
     await knex("authors").del();
     await knex("books").del();
@@ -61,7 +61,7 @@ export async function seed(knex: Knex): Promise<void> {
                 const insertedAuthor = await knex("authors").insert({ name: authorName }).returning("id");
                 authorId = insertedAuthor[0].id || insertedAuthor[0]; // Handle different return formats
             }
-            await knex("book_author").insert({ book_id: bookId, author_id: authorId });
+            await knex("book_authors").insert({ book_id: bookId, author_id: authorId });
         }
 
         // Insert subjects and create associations
