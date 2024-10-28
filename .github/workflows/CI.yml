@@ -54,7 +54,7 @@ jobs:
       - name: Run migrations
         working-directory: ./backend
         env:
-          SQL_HOST: localhost
+          SQL_HOST: localhost:1433
           SQL_USER: sa
           SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
           SQL_NAME: bookCollection
@@ -68,7 +68,7 @@ jobs:
       - name: Run seeds
         working-directory: ./backend
         env:
-          SQL_HOST: localhost
+          SQL_HOST: localhost:1433
           SQL_USER: sa
           SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
           SQL_NAME: bookCollection
