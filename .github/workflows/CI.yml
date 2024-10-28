@@ -16,7 +16,7 @@ jobs:
       mssql:
         image: mcr.microsoft.com/mssql/server:2019-latest
         env:
-          SA_PASSWORD: YourStrongPassword123
+          SA_PASSWORD: ${{ secrets.DB_PASSWORD }}
           ACCEPT_EULA: Y
         ports:
           - 1433:1433
@@ -41,7 +41,7 @@ jobs:
       - name: Wait for MSSQL to be ready
         run: |
           for i in {1..15}; do
-              if sqlcmd -S localhost -U sa -P YourStrongPassword123 -Q "SELECT 1" -b; then
+              if sqlcmd -S localhost -U sa -P ${{ secrets.DB_PASSWORD }} -Q "SELECT 1" -b; then
               echo "MSSQL is ready!"
               break
               fi
@@ -56,9 +56,13 @@ jobs:
         env:
           SQL_HOST: localhost
           SQL_USER: sa
-          SQL_PASSWORD: YourStrongPassword123
+          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
           SQL_NAME: bookCollection
-        run: npx knex migrate:latest
+        run: |
+          echo "SQL_HOST=$SQL_HOST"
+          echo "SQL_USER=$SQL_USER"
+          echo "SQL_NAME=$SQL_NAME"
+          npx knex migrate:latest
 
 
       - name: Run seeds
@@ -66,7 +70,7 @@ jobs:
         env:
           SQL_HOST: localhost
           SQL_USER: sa
-          SQL_PASSWORD: YourStrongPassword123
+          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
           SQL_NAME: bookCollection
         run: npx knex seed:run
 
@@ -76,5 +80,5 @@ jobs:
         env:
           SQL_USER: sa
           SQL_NAME: bookCollection
-          SQL_PASSWORD: YourStrongPassword123
+          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
           SQL_HOST: localhost
