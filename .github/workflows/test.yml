@@ -52,7 +52,7 @@ jobs:
           done
 
       - name: Install ts-node
-        run: npm install -g ts-node
+          npm install -D ts-node typescript
 
       - name: Run migrations
         working-directory: ./backend
@@ -61,7 +61,7 @@ jobs:
           DB_NAME: bookCollection
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: localhost
-        run: npx ts-node -r ts-node/register node_modules/.bin/knex migrate:latest
+        run: npx ts-node -r tsconfig-paths/register ./node_modules/.bin/knex migrate:latest --knexfile ./backend/knexfile.ts
 
 
       - name: Run seeds
