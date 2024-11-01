@@ -1,0 +1,85 @@
+name: Run tests
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - main
+      - development
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:2019-CU27-ubuntu-20.04
+        env:
+          SA_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          ACCEPT_EULA: Y
+        ports:
+          - 1433:1433
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.x
+
+      - name: Install backend dependencies
+        run: npm install
+        working-directory: ./backend
+
+      #- name: Install frontend dependencies
+      #  run: npm install
+      #  working-directory: ./frontend
+
+      - name: Wait for MSSQL to be ready
+        run: |
+          for i in {1..15}; do
+              if sqlcmd -S localhost -U sa -P ${{ secrets.DB_PASSWORD }} -Q "SELECT 1" -b; then
+              echo "MSSQL is ready!"
+              break
+              fi
+              echo "Waiting for MSSQL to be ready... attempt $i"
+              sleep 5
+          done
+      - name: Install ts-node
+        run: npm install -g ts-node
+
+      - name: Create database
+        run: |
+          sqlcmd -S localhost -U sa -P ${{ secrets.DB_PASSWORD }} -Q "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'bookCollection') CREATE DATABASE bookCollection;"
+
+
+      - name: Run migrations
+        working-directory: ./backend
+        env:
+          SQL_HOST: localhost
+          SQL_USER: SA
+          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SQL_NAME: bookCollection
+        run: npx knex migrate:latest
+
+
+      - name: Run seeds
+        working-directory: ./backend
+        env:
+          SQL_HOST: localhost
+          SQL_USER: SA
+          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SQL_NAME: bookCollection
+        run: npx knex seed:run
+
+      - name: Run Backend tests
+        run: npm test
+        working-directory: ./backend
+        env:
+          SQL_USER: sa
+          SQL_NAME: bookCollection
+          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SQL_HOST: localhost

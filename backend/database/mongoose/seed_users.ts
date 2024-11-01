@@ -5,14 +5,14 @@ import { IBook } from '../../models/mongoose/BookModel';
 const seedUsers = async (books: HydratedDocument<IBook>[]) => {
     const userCount = await User.countDocuments();
     if (userCount === 0) {
-        if (books.length > 0) {
+        if (books && books.length > 0) {
             await User.insertMany([
                 {
                     name: "Alice",
                     email: "alice@example.com",
-                    books: books.map(book => ({ book_id: book._id, tags: ["classic", "must-read"] })),
+                    books: books.map(book => book && book._id ? { book_id: book._id, tags: ["classic", "must-read"] } : null).filter(Boolean),
                     collections: [
-                        { name: "Favorites", books: books.map(book => book._id) }
+                        { name: "Favorites", books: books.map(book => book && book._id).filter(Boolean) }
                     ]
                 },
             ]);

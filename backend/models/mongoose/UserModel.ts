@@ -1,16 +1,17 @@
 import { Schema, model, Document, Types } from 'mongoose';
 
 interface IUserBook {
-    book_id: Types.ObjectId; // Reference til Book-model
-    tags: string[]; // Array af tags
+    book_id: Types.ObjectId;
+    tags: string[];
 }
 
 interface ICollection {
     name: string;
-    books: Types.ObjectId[]; // Array af book_ids, referencer til Book-model
+    books: Types.ObjectId[];
 }
 
 interface IUser extends Document {
+    _id: Types.ObjectId;
     name: string;
     email: string;
     books: IUserBook[];
@@ -18,6 +19,7 @@ interface IUser extends Document {
 }
 
 const userSchema = new Schema<IUser>({
+    _id: { type: Schema.Types.ObjectId, auto: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     books: [
