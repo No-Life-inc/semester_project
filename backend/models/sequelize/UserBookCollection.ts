@@ -30,7 +30,7 @@ UserBookCollection.init(
     {
         sequelize,
         modelName: "UserBookCollection",
-        tableName: "user_collections",
+        tableName: "collection_books",
         timestamps: false,
     }
 );
