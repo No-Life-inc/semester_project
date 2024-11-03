@@ -21,8 +21,8 @@ app.use(auth(config));
 
 async function startServer() {
   try {
-    console.log("Connecting to MongoDB...");
-    await connectDB();
+    // console.log("Connecting to MongoDB...");
+    // await connectDB();
 
     console.log("Setting up the database...");
     await setupDatabase();

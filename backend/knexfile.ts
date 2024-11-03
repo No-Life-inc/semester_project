@@ -31,6 +31,28 @@ const config: { [key: string]: Knex.Config } = {
             max: 10,
         },
     },
+        test: {
+            client: "mssql",
+            connection: {
+              host: process.env.SQL_HOST,
+              user: process.env.SQL_USER,
+              password: process.env.SQL_PASSWORD,
+              database: process.env.TEST_SQL_NAME,
+            },
+            migrations: {
+                directory: "./database/knex/migrations",
+                extension: "ts",
+            },
+            seeds: {
+                directory: "./database/knex/test_seeds",
+                extension: "ts",
+            },
+            pool: {
+                min: 2,
+                max: 10,
+            },
+    },
+
 };
 
 export default config;

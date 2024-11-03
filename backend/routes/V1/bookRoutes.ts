@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import Book from "../../models/sequelize/Book";
+import { getBooks, getBookById } from "../../controllers/bookController";
 
 const router = express.Router();
 
@@ -17,13 +18,9 @@ router.get("/", async (req: Request, res: Response) => {
 
   const { page = 1, limit = 50 } = req.query; // Default to page 1 and limit 50
 
-  const offset = (Number(page) - 1) * Number(limit);
-
   try {
-    const books = await Book.findAll({
-      offset,
-      limit: Number(limit),
-    });
+    const books = await getBooks(Number(page), Number(limit));
+
     res.json(books);
   } catch (error) {
     console.error("Error fetching books:", error);
@@ -44,16 +41,12 @@ router.get("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const book = await Book.findByPk(id);
-
-    if (!book) {
-      return res.status(404).json({ error: "Book not found" });
-    }
+    const book = await getBookById(Number(id));
 
     res.json(book);
   } catch (error) {
-    console.error("Error fetching book:", error);
-    res.status(500).json({ error: "An error occurred while fetching book" });
+    console.error("Error fetching book by ID:", error);
+    res.status(500).json({ error: "An error occurred while fetching the book" });
   }
 });
 

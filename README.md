@@ -35,6 +35,8 @@ SQL_PORT=1433
 
 SQL_NAME=bookCollection
 
+TEST_SQL_NAME=bookCollectionTest
+
 SQL_USER=SA
 
 BASE_URL=http://localhost:5000
