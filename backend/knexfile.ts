@@ -1,7 +1,7 @@
 import { Knex } from "knex";
-import dotenv from "dotenv";
-dotenv.config();
+import * as dotenv from "dotenv";
 
+dotenv.config();
 
 
 const config: { [key: string]: Knex.Config } = {
@@ -40,11 +40,11 @@ const config: { [key: string]: Knex.Config } = {
               database: process.env.TEST_SQL_NAME,
             },
             migrations: {
-                directory: "./database/knex/migrations",
+                directory: "./backend/database/knex/migrations",
                 extension: "ts",
             },
             seeds: {
-                directory: "./database/knex/test_seeds",
+                directory: "./backend/database/knex/test_seeds",
                 extension: "ts",
             },
             pool: {

@@ -1,7 +1,7 @@
 import Knex from "knex";
 import knexConfig from "../../knexfile";
 import { Model } from "objection";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 
 dotenv.config();
 
@@ -49,7 +49,7 @@ const databaseName = process.env.TEST_SQL_NAME;
 
 export const setupTestDB = async () => {
   // Create the database if it doesn't exist
-  // await createDatabaseIfNotExists();
+  //await createDatabaseIfNotExists();
 
   // Run migrations
   await knex.migrate.latest();

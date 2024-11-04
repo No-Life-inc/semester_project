@@ -5,7 +5,7 @@
   "scripts": {
     "exec": "npx ts-node --transpile-only app.ts",
     "start": "cross-env nodemon --watch './**/*.ts' --exec 'ts-node' app.ts",
-    "test": "jest --config jest.config.ts"
+    "test": "jest --config ../jest.config.ts"
   },
   "dependencies": {
     "@types/cors": "^2.8.17",

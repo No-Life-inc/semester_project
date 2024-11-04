@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 
-dotenv.config(); // Load environment variables
+dotenv.config();
 
 const sequelize = new Sequelize(
     process.env.SQL_NAME as string,

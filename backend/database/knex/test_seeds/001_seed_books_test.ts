@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 // Path to the JSON file
-const jsonFilePath = path.join("database", "dump", "books.json");
+const jsonFilePath = path.join("backend", "database", "dump", "books.json");
 
 // Read and parse the JSON file
 const booksData = JSON.parse(fs.readFileSync(jsonFilePath, "utf-8"));
