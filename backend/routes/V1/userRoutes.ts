@@ -11,18 +11,13 @@ router.get("/callback", handleCallback);
 router.get("/dashboard", requiresAuth(), getDashboard);
 
 router.get("/login", requiresAuth(), (req: Request, res: Response) => {
-  res.redirect("/api/dashboard");
+  res.redirect("/v1/user/dashboard");
 });
 
-//TODO
-// Logger ikke ud korrekt, skal fikses
-// router.get("/logout", (req: Request, res: Response) => {
-//   req.oidc.logout({ returnTo: "http://localhost:5000/api" });
-// });
+router.get("/logout", (req: Request, res: Response) => {
+  res.oidc.logout({ returnTo: process.env.BASE_URL || "http://localhost:5000" });
+});
 
-// router.get("/logout", (req: Request, res: Response) => {
-//   const logoutUrl = `https://${process.env.ISSUER_BASE_URL}/v2/logout?returnTo=http://localhost:5000`;
-//   res.redirect(logoutUrl);
-// });
+
 
 export default router;

@@ -64,18 +64,14 @@ export async function seed(knex: Knex): Promise<void> {
     // Create collection associations with only the user’s own books
     const collectionBooks = [];
     insertedUserBooks.forEach((userBook) => {
-        // Find a collection belonging to the same user
-        const userCollection = userCollections.find(
-            (uc) => uc.user_id === userBook.user_id
-        );
-
-        if (userCollection) {
+        // Associaciate every userBook with every available collections
+        collections.forEach((collection) => {
             collectionBooks.push({
-                collection_id: userCollection.collection_id, // Use the matching user's collection
-                user_book_id: userBook.id, // Associate with user_book, ensuring only the user’s books go in their collection
+                collection_id: collection.id,
+                user_book_id: userBook.id,
             });
-        }
         });
+    });
 
 
     // Insert associations into the collection_books table

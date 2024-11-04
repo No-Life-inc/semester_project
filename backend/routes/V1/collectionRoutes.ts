@@ -3,6 +3,7 @@ import User from "../../models/sequelize/User";
 import Collection from "../../models/sequelize/Collection";
 import UserBook from "../../models/sequelize/UserBook";
 import Book from "../../models/sequelize/Book";
+import * as CollectionController from "../../controllers/collectionController";
 
 const router = Router();
 
@@ -44,5 +45,7 @@ router.get("/:userId/", async (req: Request, res: Response) => {
         res.status(500).json({ error: "An error occurred while fetching collections" });
     }
 });
+
+router.post("/", CollectionController.createCollection);
 
 export default router;
