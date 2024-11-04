@@ -7,45 +7,48 @@ import * as CollectionController from "../../controllers/collectionController";
 
 const router = Router();
 
-// Endpoint to get collections belonging to a user along with associated books
-router.get("/:userId/", async (req: Request, res: Response) => {
-    const { userId } = req.params;
+// // Endpoint to get collections belonging to a user along with associated books
+// router.get("/:userId/", async (req: Request, res: Response) => {
+//     const { userId } = req.params;
 
-    try {
-        // Fetch collections belonging to the user and include associated books via UserBook
-        const user = await User.findByPk(userId, {
-            include: [
-                {
-                    model: Collection,
-                    as: "collections",
-                    through: { attributes: [] },
-                    include: [
-                        {
-                            model: UserBook,
-                            as: "user_books",
-                            include: [
-                                {
-                                    model: Book,
-                                    as: "book" // Ensure this matches the alias defined in the association
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        });
+//     try {
+//         // Fetch collections belonging to the user and include associated books via UserBook
+//         const user = await User.findByPk(userId, {
+//             include: [
+//                 {
+//                     model: Collection,
+//                     as: "collections",
+//                     through: { attributes: [] },
+//                     include: [
+//                         {
+//                             model: UserBook,
+//                             as: "user_books",
+//                             include: [
+//                                 {
+//                                     model: Book,
+//                                     as: "book" // Ensure this matches the alias defined in the association
+//                                 }
+//                             ]
+//                         }
+//                     ]
+//                 }
+//             ]
+//         });
 
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
+//         if (!user) {
+//             return res.status(404).json({ error: "User not found" });
+//         }
 
-        res.json(user.collections);
-    } catch (error) {
-        console.error("Error fetching collections:", error);
-        res.status(500).json({ error: "An error occurred while fetching collections" });
-    }
-});
+//         res.json(user.collections);
+//     } catch (error) {
+//         console.error("Error fetching collections:", error);
+//         res.status(500).json({ error: "An error occurred while fetching collections" });
+//     }
+// });
 
+router.get("/:userId/", CollectionController.getUserCollections);
 router.post("/", CollectionController.createCollection);
+router.put("/:userId/:id", CollectionController.updateCollection);
+router.delete("/:userId/:id", CollectionController.deleteCollection);
 
 export default router;
