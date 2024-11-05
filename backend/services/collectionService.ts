@@ -41,15 +41,19 @@ export const getUserCollections = async (userId: number) => {
 };
 
 export const updateCollection = async (id: number, name: string) => {
-    const updatedCollection = await Collection.update(
-        { name },
-        { where: { id } }
-    );
-    if (updatedCollection[0] === 0) throw new Error("Collection not found");
+    const collection = await Collection.findByPk(id);
+    if (!collection) throw new Error("Collection not found");
+
+    const updatedCollection = await collection.update({ name });
     return updatedCollection;
 };
 
 export const deleteCollection = async (id: number, userId: number) => {
+    if (!userId || typeof userId !== 'number') throw new Error("Invalid user ID");
+
+    const collection = await Collection.findByPk(id);
+    if (!collection) throw new Error("Collection not found");
+
     const ownership = await UserCollection.findOne({
         where: { user_id: userId, collection_id: id },
     });
@@ -58,7 +62,6 @@ export const deleteCollection = async (id: number, userId: number) => {
     await UserBookCollection.destroy({ where: { collection_id: id } });
     await UserCollection.destroy({ where: { collection_id: id } });
     const deletedCollection = await Collection.destroy({ where: { id } });
-    if (!deletedCollection) throw new Error("Collection not found");
 
     return deletedCollection;
 };

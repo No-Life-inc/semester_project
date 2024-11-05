@@ -1,3 +1,4 @@
+import "../../models/sequelize/Associations";
 import Knex from "knex";
 import knexConfig from "../../knexfile";
 import { Model } from "objection";

@@ -33,6 +33,12 @@ Collection.init(
         name: {
             type: DataTypes.STRING,
             allowNull: false,
+            validate: {
+                notEmpty: true,
+                notNull: {
+                    msg: "Name cannot be null",
+                }
+            }
         },
     },
     {
