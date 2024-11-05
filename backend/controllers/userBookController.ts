@@ -1,3 +1,4 @@
+import "../models/sequelize/Associations"
 import Book from "../models/sequelize/Book"; // Adjust the path to your Book model
 import UserBook from "../models/sequelize/UserBook";
 import User from "../models/sequelize/User";
@@ -16,7 +17,11 @@ import User from "../models/sequelize/User";
  * // This will fetch the first 50 user books and their associated book details.
  */
 export const getUserBooks = async (userId: number, page: number = 1, limit: number = 50): Promise<{ userBooks: UserBook[], books: Book[] }> => {
-    // Validate page and limit
+    
+    if (isNaN(userId) || userId < 1) {
+        throw new Error("Invalid user id. User id must be a number greater than or equal to 1.");
+    }
+
     if (isNaN(page) || page < 1) {
         throw new Error("Invalid page number. Page must be a number greater than or equal to 1.");
     }

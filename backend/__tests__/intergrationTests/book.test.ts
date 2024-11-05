@@ -193,4 +193,53 @@ describe("getUserBooks function positive tests", () => {
       const userBooks = await getUserBooks(1, 1, 100);
       expect(userBooks.userBooks.length).toBeGreaterThan(0);
     });
+  
+  it("should fetch books for a user", async () => {
+      const userBooks = await getUserBooks(1, 1, 99);
+      expect(userBooks.userBooks.length).toBeGreaterThan(0);
+    });
+
+    it("should fetch books for a user", async () => {
+        const userBooks = await getUserBooks(1, 1, 50);
+        expect(userBooks.userBooks.length).toBeGreaterThan(0);
+      });
+
+      it("should fetch books for a user", async () => {
+        const userBooks = await getUserBooks(5000, 1, 50);
+        expect(userBooks.userBooks.length).toBe(0);
+      });
+});
+
+describe("getUserBooks function negative tests", () => {
+it("should throw an error for negative user id", async () => {
+    await expect(getUserBooks(-1, 1, 1)).rejects.toThrow("Invalid user id. User id must be a number greater than or equal to 1.");
+});
+
+it("should throw an error for non-numeric user id", async () => {
+    await expect(getUserBooks(NaN, 1, 1)).rejects.toThrow("Invalid user id. User id must be a number greater than or equal to 1.");
+});
+
+it("should throw an error for negative page number", async () => {
+    await expect(getUserBooks(1, -1, 1)).rejects.toThrow("Invalid page number. Page must be a number greater than or equal to 1.");
+});
+
+it("should throw an error for non-numeric page number", async () => {
+    await expect(getUserBooks(1, NaN, 1)).rejects.toThrow("Invalid page number. Page must be a number greater than or equal to 1.");
+});
+
+it("should throw an error for negative limit", async () => {
+    await expect(getUserBooks(1, 1, -1)).rejects.toThrow("Invalid limit. Limit must be a number greater than or equal to 1.");
+});
+
+it("should throw an error for non-numeric limit", async () => {
+    await expect(getUserBooks(1, 1, NaN)).rejects.toThrow("Invalid limit. Limit must be a number greater than or equal to 1.");
+});
+
+it("should throw an error for limit greater than 100", async () => {
+    await expect(getUserBooks(1, 1, 101)).rejects.toThrow("Invalid limit. Limit must be a number less than or equal to 100.");
+});
+
+
+  
+
 });
