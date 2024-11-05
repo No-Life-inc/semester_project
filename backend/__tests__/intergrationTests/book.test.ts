@@ -4,7 +4,7 @@ import { setupTestDB, teardownTestDB } from "./setupTestDB";
 import knex from "knex";
 import knexConfig from "../../knexfile";
 import {getBooks, getBookById} from "../../controllers/bookController";
-
+import {addBookToUser} from "../../controllers/userBookController";
 
 // Initialize Knex
 const testKnex = knex(knexConfig.test);
@@ -112,4 +112,32 @@ it("should throw an error for non-numeric book id", async () => {
 it("should throw an error for non-existent book id", async () => {
     await expect(getBookById(5000)).rejects.toThrow("Book not found");
 });
+});
+
+
+describe("addBookToUser function positive tests", () => {
+  it("should add a book to a user", async () => {
+    const userBook = await addBookToUser(1, 1);
+    expect(userBook).toBeDefined();
+  });
+
+  it("should add a book to a user", async () => {
+      const userBook = await addBookToUser(1, 2);
+      expect(userBook).toBeDefined();
+    });
+
+  it("should add a book to a user", async () => {
+      const userBook = await addBookToUser(3, 100);
+      expect(userBook).toBeDefined();
+    });
+
+  it("should add a book to a user", async () => {
+      const userBook = await addBookToUser(3, 99);
+      expect(userBook).toBeDefined();
+    });
+
+  it("should add a book to a user", async () => {
+      const userBook = await addBookToUser(2, 50);
+      expect(userBook).toBeDefined();
+    });
 });

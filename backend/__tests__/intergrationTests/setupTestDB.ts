@@ -49,6 +49,8 @@ const knex = Knex(knexConfig.test);
 // Database name
 const databaseName = process.env.TEST_SQL_NAME;
 
+Model.knex(knex);
+
 export const setupTestDB = async () => {
   console.log("Setting up test database:", process.env.TEST_SQL_NAME);
   // Create the database if it doesn't exist

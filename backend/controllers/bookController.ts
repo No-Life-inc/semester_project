@@ -1,17 +1,19 @@
 import { Request, Response } from "express";
 import Book from "../models/sequelize/Book"; // Adjust the path to your Book model
 
+/**
+ * Fetches all books from the database.
+ * 
+ * @param {number} page - The page number to fetch (default: 1)
+ * @param {number} limit - The number of records to fetch per page (default: 50)
+ * @returns {Promise<Book[]>} - A promise that resolves to an array of Book instances.
+ * 
+ * @example
+ * getBooks(1, 50)
+ * // This will fetch the first 50 books
+ */
 export const getBooks = async (page: number = 1, limit: number = 50) => {
-    /**
-   * getBooks parameters:
-   * - page: The page number to fetch (default: 1)
-   * - limit: The number of records to fetch per page (default: 50)
-   *
-   * Example: getBooks(1, 50) or getBooks()
-   *
-   * This will fetch the first 50 books from the database
-   *
-   */
+
 
     if (page === undefined) {
         page = 1;
@@ -48,16 +50,19 @@ export const getBooks = async (page: number = 1, limit: number = 50) => {
     }
   };
 
+/**
+ * Fetches a book by its ID.
+ * 
+ * @param {number} id - The ID of the book to fetch
+ * @returns {Promise<Book>} - A promise that resolves to a Book instance.
+ * 
+ * @example
+ * getBookById(1)
+ * // This will fetch the book with ID 1
+*/
+
 export const getBookById = async (id: number) => {
 
-    /**
-   * getBookById parameters:
-   * - id: The ID of the book to fetch
-   *
-   * Example: getBookById(1)
-   *
-   * This will fetch the book with ID 1
-   */
 
     try {
         if (isNaN(id) || id < 1) {

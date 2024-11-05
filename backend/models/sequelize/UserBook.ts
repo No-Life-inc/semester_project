@@ -1,15 +1,25 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../config/SqlConfig";
 import User from "./User";
 import Book from "./Book";
 
-class UserBook extends Model {
-    public user_id!: number;
-    public book_id!: number;
+interface UserBookAttributes {
+    id?: number;
+    user_id: number;
+    book_id: number;
+    book?: Book;
 }
+
+class UserBook extends Model<UserBookAttributes> {}
+
 
 UserBook.init(
     {
+        id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+        },
         user_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
