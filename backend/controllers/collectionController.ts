@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Collection from "../models/sequelize/Collection";
 import UserCollection from "../models/sequelize/UserCollection";
 import UserBook from "../models/sequelize/UserBook";
+import UserBookCollection from "../models/sequelize/UserBookCollection";
 import User from "../models/sequelize/User";
 import Book from "../models/sequelize/Book";
 
@@ -88,8 +89,21 @@ export const updateCollection = async (req: Request, res: Response) => {
 };
 
 export const deleteCollection = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { id, userId } = req.params;
   try {
+    const ownership = await UserCollection.findOne({
+      where: { user_id: userId, collection_id: id },
+    });
+
+    if (!ownership) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this collection" });
+    }
+
+    await UserBookCollection.destroy({ where: { collection_id: id } });
+    await UserCollection.destroy({ where: { collection_id: id } });
+
     const deletedCollection = await Collection.destroy({ where: { id } });
     if (deletedCollection) {
       res.json({ message: "Collection deleted successfully" });
