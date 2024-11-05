@@ -110,6 +110,6 @@ it("should throw an error for non-numeric book id", async () => {
 }); 
 
 it("should throw an error for non-existent book id", async () => {
-    await expect(getBookById(999)).rejects.toThrow("Book not found");
+    await expect(getBookById(5000)).rejects.toThrow("Book not found");
 });
 });
