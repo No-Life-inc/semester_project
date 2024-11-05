@@ -4,7 +4,7 @@ import { setupTestDB, teardownTestDB } from "./setupTestDB";
 import knex from "knex";
 import knexConfig from "../../knexfile";
 import {getBooks, getBookById} from "../../controllers/bookController";
-import {addBookToUser} from "../../controllers/userBookController";
+import {addBookToUser, getUserBooks} from "../../controllers/userBookController";
 
 // Initialize Knex
 const testKnex = knex(knexConfig.test);
@@ -139,5 +139,58 @@ describe("addBookToUser function positive tests", () => {
   it("should add a book to a user", async () => {
       const userBook = await addBookToUser(2, 50);
       expect(userBook).toBeDefined();
+    });
+});
+
+describe("addBookToUser function negative tests", () => {
+it("should throw an error for negative user id", async () => {
+    await expect(addBookToUser(-1, 1)).rejects.toThrow("Invalid user id. User id must be a number greater than or equal to 1.");
+});
+
+it("should throw an error for non-numeric user id", async () => {
+    await expect(addBookToUser(NaN, 1)).rejects.toThrow("Invalid user id. User id must be a number greater than or equal to 1.");
+});
+
+it("should throw an error for negative book id", async () => {
+    await expect(addBookToUser(1, -1)).rejects.toThrow("Invalid book id. Book id must be a number greater than or equal to 1.");
+});
+
+it("should throw an error for non-numeric book id", async () => {
+    await expect(addBookToUser(1, NaN)).rejects.toThrow("Invalid book id. Book id must be a number greater than or equal to 1.");
+});
+
+it("should throw an error for non-existent book id", async () => {
+    await expect(addBookToUser(1, 5000)).rejects.toThrow("Book not found");
+});
+
+it("should throw an error for non-existent user id", async () => {
+    await expect(addBookToUser(5000, 1)).rejects.toThrow("User not found");
+});
+});
+
+describe("getUserBooks function positive tests", () => {
+  it("should fetch books for a user", async () => {
+    const userBooks = await getUserBooks(1);
+    expect(userBooks.userBooks.length).toBeGreaterThan(0);
+  });
+
+  it("should fetch books for a user", async () => {
+      const userBooks = await getUserBooks(2);
+      expect(userBooks.userBooks.length).toBeGreaterThan(0);
+    });
+
+  it("should fetch books for a user", async () => {
+      const userBooks = await getUserBooks(3);
+      expect(userBooks.userBooks.length).toBeGreaterThan(0);
+    });
+
+  it("should fetch books for a user", async () => {
+      const userBooks = await getUserBooks(1, 1, 1);
+      expect(userBooks.userBooks.length).toBeGreaterThan(0);
+    });
+
+  it("should fetch books for a user", async () => {
+      const userBooks = await getUserBooks(1, 1, 100);
+      expect(userBooks.userBooks.length).toBeGreaterThan(0);
     });
 });
