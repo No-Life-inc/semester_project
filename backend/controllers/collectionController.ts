@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import * as CollectionService from "../services/collectionService";
 
-//TODO - smid kommentarer ind på alle funktioner i form af parametre og returtyper
+//TODO - add docstrings to all functions
+//TODO - create a function that adds a book to a collection
+//TODO - create a function that removes a book from a collection
 export const createCollection = async (req: Request, res: Response) => {
   const { name, userId } = req.body;
   try {
