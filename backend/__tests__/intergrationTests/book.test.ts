@@ -32,7 +32,7 @@ describe("getBooks function positive tests", () => {
     "should fetch books (page: %i, limit: %i)",
     async (page, limit, expectedLength) => {
       const books = await getBooks(page, limit);
-      expect(books?.length).toBeLessThanOrEqual(expectedLength);
+      expect(books?.length).toBeLessThanOrEqual(expectedLength ?? 0);
     }
   );
 });
@@ -49,7 +49,7 @@ describe("getBooks function negative tests", () => {
   test.each(negativeTestCases)(
     "should throw an error (page: %i, limit: %i, errorMessage: %s)",
     async (page, limit, errorMessage) => {
-      await expect(getBooks(page, limit)).rejects.toThrow(errorMessage);
+      await expect(getBooks(Number(page), Number(limit))).rejects.toThrow(errorMessage);
     }
   );
 });

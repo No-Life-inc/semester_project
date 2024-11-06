@@ -48,8 +48,8 @@ describe("addBookToUser function negative tests", () => {
 
   test.each(negativeTestCases)(
     "should throw an error (userId: %i, bookId: %i, errorMessage: %s)",
-    async (userId, bookId, errorMessage) => {
-      await expect(addBookToUser(userId, bookId)).rejects.toThrow(errorMessage);
+    async (userId: number, bookId: number, errorMessage: string) => {
+      await expect(addBookToUser(Number(userId), Number(bookId))).rejects.toThrow(errorMessage);
     }
   );
 });
