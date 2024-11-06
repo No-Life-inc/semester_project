@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as CollectionService from "../services/collectionService";
 
+//TODO - smid kommentarer ind på alle funktioner i form af parametre og returtyper
 export const createCollection = async (req: Request, res: Response) => {
   const { name, userId } = req.body;
   try {

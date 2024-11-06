@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 
-jest.setTimeout(120000); //
+jest.setTimeout(120000);
 
 import { setupTestDB, teardownTestDB } from "./setupTestDB";
 import {
@@ -29,7 +29,7 @@ describe("Collection Service Tests", () => {
     it("should fetch collections for a valid user", async () => {
       const collections = await getUserCollections(1);
       expect(Array.isArray(collections)).toBe(true);
-      expect(collections.length).toBeGreaterThanOrEqual(0);
+      expect(collections?.length).toBeGreaterThanOrEqual(0);
     });
 
     it("should update a collection with a valid id", async () => {
@@ -39,7 +39,7 @@ describe("Collection Service Tests", () => {
       const collections = await getUserCollections(1);
 
       expect(
-        collections.find((col) => col.name === "Updated Collection Name")
+        collections?.find((col) => col.name === "Updated Collection Name")
       ).toBeDefined();
     });
 
@@ -49,7 +49,7 @@ describe("Collection Service Tests", () => {
 
       const collections = await getUserCollections(1);
       expect(
-        collections.find((col) => col.id === collection.id)
+        collections?.find((col) => col.id === collection.id)
       ).toBeUndefined();
     });
   });
