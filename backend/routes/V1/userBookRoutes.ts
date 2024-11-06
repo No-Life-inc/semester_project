@@ -1,18 +1,10 @@
-import express, { Request, Response } from "express";
-import { addBookToUser } from "../../controllers/userBookController";
-
+import express from "express";
+import { getUserBooksController, addBookToUserController, removeBookFromUserController } from "./controllers/userBookController";
 
 const router = express.Router();
 
-router.post("/:userId/:bookId", async (req: Request, res: Response) => {
-  const { userId, bookId } = req.params;
+router.get("/userBooks", getUserBooksController);
+router.post("/userBooks", addBookToUserController);
+router.delete("/userBooks/:userBookId", removeBookFromUserController);
 
-  try {
-    const book = await addBookToUser(Number(userId), Number(bookId));
-
-    res.json(book);
-  } catch (error) {
-    console.error("Error adding book to user:", error);
-    res.status(500).json({ error: "An error occurred while adding the book to the user" });
-  }
-});
+export default router;
