@@ -1,8 +1,4 @@
-import { Router, Request, Response } from "express";
-import User from "../../models/sequelize/User";
-import Collection from "../../models/sequelize/Collection";
-import UserBook from "../../models/sequelize/UserBook";
-import Book from "../../models/sequelize/Book";
+import { Router} from "express";
 import * as CollectionController from "../../controllers/collectionController";
 
 const router = Router();
