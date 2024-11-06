@@ -5,7 +5,7 @@ jest.setTimeout(30000); // Sets timeout to 30 seconds
 import { setupTestDB, teardownTestDB } from "./setupTestDB";
 import knex from "knex";
 import knexConfig from "../../knexfile";
-import { getBooks, getBookById } from "../../controllers/bookController";
+import { getBooks, getBookById } from "../../services/bookService";
 
 // Initialize Knex
 const testKnex = knex(knexConfig.test);
@@ -74,7 +74,7 @@ describe("getBookById function positive tests", () => {
 });
 
 describe("getBookById function negative tests", () => {
-  const negativeTestCases = [
+  const negativeTestCases: [number, string][] = [
     [-1, "Invalid book id. Book id must be a number greater than or equal to 1."],
     [NaN, "Invalid book id. Book id must be a number greater than or equal to 1."],
     [5000, "Book not found"],
@@ -82,7 +82,7 @@ describe("getBookById function negative tests", () => {
 
   test.each(negativeTestCases)(
     "should throw an error (bookId: %i, errorMessage: %s)",
-    async (bookId, errorMessage) => {
+    async (bookId: number, errorMessage: string) => {
       await expect(getBookById(bookId)).rejects.toThrow(errorMessage);
     }
   );

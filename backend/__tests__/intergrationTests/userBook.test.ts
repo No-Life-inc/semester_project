@@ -71,9 +71,9 @@ describe("getUserBooks function positive tests", () => {
     async (userId, page = 1, limit = 50) => {
       const userBooks = await getUserBooks(userId, page, limit);
       if (userId === 5000) {
-        expect(userBooks.userBooks.length).toBe(0);
+        expect(userBooks.length).toBe(0);
       } else {
-        expect(userBooks.userBooks.length).toBeGreaterThan(0);
+        expect(userBooks.length).toBeGreaterThan(0);
       }
     }
   );
@@ -92,7 +92,7 @@ describe("getUserBooks function negative tests", () => {
 
   test.each(negativeTestCases)(
     "should throw an error (userId: %i, page: %i, limit: %i, errorMessage: %s)",
-    async (userId, page, limit, errorMessage) => {
+    async (userId: number, page: number, limit:number, errorMessage: string) => {
       await expect(getUserBooks(userId, page, limit)).rejects.toThrow(errorMessage);
     }
   );

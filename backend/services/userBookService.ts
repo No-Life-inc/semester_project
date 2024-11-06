@@ -10,14 +10,13 @@ import User from "../models/sequelize/User";
  * @param {number} userId - The ID of the user to fetch books for.
  * @param {number} page - The page number to fetch (default: 1)
  * @param {number} limit - The number of records to fetch per page (default: 50)
- * @returns {Promise<{ userBooks: UserBook[], books: Book[] }>} - A promise that resolves to an object containing user books and their associated book details.
+ * @returns {Promise<{ userBooks: UserBook[]}>} - A promise that resolves to an object containing user books and their associated book details.
  * 
  * @example
  * getUserBooks(1, 50)
  * // This will fetch the first 50 user books and their associated book details.
  */
-export const getUserBooks = async (userId: number, page: number = 1, limit: number = 50): Promise<{ userBooks: UserBook[], books: Book[] }> => {
-    
+export const getUserBooks = async (userId: number, page: number = 1, limit: number = 50): Promise<UserBook[]> => {
     if (isNaN(userId) || userId < 1) {
         throw new Error("Invalid user id. User id must be a number greater than or equal to 1.");
     }
@@ -49,9 +48,7 @@ export const getUserBooks = async (userId: number, page: number = 1, limit: numb
             ],
         });
 
-        const books = userBooks.map(userBook => (userBook as UserBook & { book: Book }).book);
-
-        return { userBooks, books };
+        return userBooks;
     } catch (error) {
         console.error("Error fetching userBooks:", error);
         throw error;
