@@ -1,83 +1,53 @@
 import { Request, Response } from "express";
-import Book from "../models/sequelize/Book"; // Adjust the path to your Book model
+import { getBooks, getBookById } from "../services/bookService";
 
 /**
- * Fetches all books from the database.
+ * Fetches books from the database.
  * 
- * @param {number} page - The page number to fetch (default: 1)
- * @param {number} limit - The number of records to fetch per page (default: 50)
- * @returns {Promise<Book[]>} - A promise that resolves to an array of Book instances.
+ * @param {Request} request - The request object.
+ * @param {Response} response - The response object.
+ * 
+ * @returns {Promise<void>} - A promise that resolves to void.
  * 
  * @example
- * getBooks(1, 50)
+ * // GET /book?page=1&limit=50
+ * getBooksController(request, response)
  * // This will fetch the first 50 books
  */
-export const getBooks = async (page: number = 1, limit: number = 50) => {
+export const getBooksController = async (request: Request, response: Response) => {
+    const { page = 1, limit = 50 } = request.query;
 
-
-    if (page === undefined) {
-        page = 1;
-    }
-
-    if (limit === undefined) {
-        limit = 50;
-    }
-
-    // Validate page and limit
-    if (isNaN(page) || page < 1) {
-        throw new Error("Invalid page number. Page must be a number greater than or equal to 1.");
-    }
-
-    if(isNaN(limit) || limit < 1) {
-        throw new Error("Invalid limit. Limit must be a number greater than or equal to 1.");
-    }
-
-    if (limit > 100) {
-        throw new Error("Invalid limit. Limit must be a number less than or equal to 100.");
-    }
-  
-    const offset = (Number(page) - 1) * Number(limit);
-  
     try {
-      const books = await Book.findAll({
-        offset,
-        limit: Number(limit),
-      });
-     return books;
+        const books = await getBooks(Number(page), Number(limit));
+        response.json(books);
     } catch (error) {
-      console.error("Error fetching books:", error);
-      throw error;
+        console.error("Error fetching books:", error);
+        response.status(500).json({ error: "An error occurred while fetching books" });
     }
+
   };
 
 /**
  * Fetches a book by its ID.
  * 
- * @param {number} id - The ID of the book to fetch
- * @returns {Promise<Book>} - A promise that resolves to a Book instance.
+ * @param {Request} request - The request object.
+ * @param {Response} response - The response object.
+ * 
+ * @returns {Promise<void>} - A promise that resolves to void.
  * 
  * @example
- * getBookById(1)
+ * // GET /book/1
+ * getBookByIdController(request, response)
  * // This will fetch the book with ID 1
-*/
-
-export const getBookById = async (id: number) => {
-
-
+ */
+export const getBookByIdController = async (request: Request, response: Response) => {
+    const { id } = request.params;
+    
     try {
-        if (isNaN(id) || id < 1) {
-            throw new Error("Invalid book id. Book id must be a number greater than or equal to 1.");
-        }
-
-        const book = await Book.findByPk(id);
-        
-        if (!book) {
-            throw new Error("Book not found");
-        }
-
-        return book;
+        const book = await getBookById(Number(id));
+        response.json(book);
     } catch (error) {
-        console.error("Error fetching book by id:", error);
-        throw error;
+        console.error("Error fetching book:", error);
+        response.status(500).json({ error: "An error occurred while fetching book" });
     }
-}
+    };
