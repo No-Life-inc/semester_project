@@ -124,7 +124,7 @@
 //     });
 //   });
 // });
-console.log("NODE_ENV at start of collection test:", process.env.NODE_ENV);
+
 
 import { afterAll, beforeAll, describe, expect, jest, test } from "@jest/globals";
 
@@ -295,7 +295,7 @@ describe("deleteCollection function negative tests", () => {
 // Positive test cases for addBookToCollection
 type AddBookToCollectionTestCase = [number, number, number];
 const addBookToCollectionPositiveCases: AddBookToCollectionTestCase[] = [
-  [1, 1, 1],
+  [1, 2, 3],
   [2, 1, 2],
 ];
 
@@ -303,6 +303,7 @@ describe("addBookToCollection function positive tests", () => {
   test.each(addBookToCollectionPositiveCases)(
     "should add a book to a collection (userId: %i, collectionId: %i, bookId: %i)",
     async (userId: number, collectionId: number, bookId: number) => {
+      // Test at tilføje bogen til samlingen
       await expect(addBookToCollection(userId, collectionId, bookId)).resolves.not.toThrow();
     }
   );
@@ -335,6 +336,16 @@ describe("removeBookFromCollection function positive tests", () => {
   test.each(removeBookFromCollectionPositiveCases)(
     "should remove a book from a collection (collectionId: %i, userId: %i, bookId: %i)",
     async (collectionId: number, userId: number, bookId: number) => {
+      // Tilføj bogen først for at sikre, at den er til stede
+      try {
+        await addBookToCollection(userId, collectionId, bookId);
+      } catch (error) {
+        if (error.message !== "Book already exists in the collection") {
+          throw error; // Kun kast fejl, hvis det er en anden fejl
+        }
+      }
+
+      // Test at fjerne bogen fra samlingen
       await expect(removeBookFromCollection(collectionId, userId, bookId)).resolves.not.toThrow();
     }
   );
