@@ -1,6 +1,4 @@
 import Tag from '../models/sequelize/Tag';
-import UserBookTag from '../models/sequelize/UserBookTag';
-import {getBookById} from "./bookService";
 
 /**
  * Fetches all tags from the database.
@@ -13,7 +11,6 @@ import {getBookById} from "./bookService";
  * getAllTags(1, 10)
  * // This will fetch the first 10 tags
  */
-
 export const getAllTags = async (page: number, limit: number) => {
     const offset = (page - 1) * limit;
     return await Tag.findAll({
@@ -59,7 +56,6 @@ export const addTag = async (name: string) => {
     }
 }
 
-
 /**
  * Delete a tag by its ID.
  *
@@ -79,29 +75,3 @@ export const deleteTagById = async (id: string) => {
         throw new Error("An error occurred while deleting tag");
     }
 };
-
-export const addTagToBook = async (tagId: number, bookId: number) => {
-    try{
-        const tag = await getTagById(tagId);
-        const book = await getBookById(bookId);
-
-        if(!tag || !book){
-            throw new Error("Tag or book not found");
-        }
-
-        return await UserBookTag.create({tag_id: tagId, user_book_id: bookId});
-
-    } catch (error) {
-        console.error("Error adding tag to book:", error);
-        throw new Error("An error occurred while adding tag to book");
-    }
-}
-
-export const deleteTagFromBook = async (tagId: number, bookId: number) => {
-    try{
-        return await UserBookTag.destroy({where: {tag_id: tagId, user_book_id: bookId}});
-    } catch (error) {
-        console.error("Error deleting tag from book:", error);
-        throw new Error("An error occurred while deleting tag from book");
-    }
-}

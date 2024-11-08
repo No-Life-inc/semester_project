@@ -1,7 +1,5 @@
-import express, { Request, Response } from "express";
-import {addTag, addTagToBook, deleteTagById, deleteTagFromBook, getAllTags, getTagById} from "../services/tagService";
-
-const router = express.Router();
+import  { Request, Response } from "express";
+import {addTag, deleteTagById, getAllTags, getTagById} from "../services/tagService";
 
 /**
  * Fetches all tags from the database.
@@ -101,7 +99,7 @@ export const deleteTagByIdController = async (request: Request, response: Respon
     const { id } = request.params;
 
     try {
-        const tag = await deleteTagById(id);
+        await deleteTagById(id);
         response.json({ message: "Tag deleted successfully" });
     } catch (error) {
         console.error("Error deleting tag:", error);
@@ -112,54 +110,3 @@ export const deleteTagByIdController = async (request: Request, response: Respon
         response.status(500).json({ error: "An error occurred while deleting tag" });
     }
 }
-
-/**
- * Adds a tag to a book.
- *
- * @param {Request} request - The request object.
- * @param {Response} response - The response object.
- *
- * @returns {Promise<void>} - A promise that resolves to void.
- *
- * @example
- * // POST /tag/addTagToBook
- * // body: { user_book_id: 1, tag_id: 1 }
- *
- * This will add the tag with ID 1 to the book with ID 1
- */
-export const addTagToBookController = async (request: Request, response: Response) => {
-    const { user_book_id, tag_id } = request.body;
-
-    try {
-        const book = await addTagToBook(user_book_id, tag_id);
-        response.json(book);
-    } catch (error) {
-        console.error("Error adding tag to book:", error);
-        response.status(500).json({ error: "An error occurred while adding tag to book" });
-    }
-}
-
-export const deleteTagFromBookController = async (request: Request, response: Response) => {
-    const { user_book_id, tag_id } = request.body;
-
-    // Konverter værdierne til tal
-    const bookId = Number(user_book_id);
-    const tagId = Number(tag_id);
-
-    if (isNaN(bookId) || isNaN(tagId)) {
-        return response.status(400).json({ error: "Invalid user_book_id or tag_id" });
-    }
-
-    try {
-        const rowsDeleted = await deleteTagFromBook(tagId, bookId);
-        if (rowsDeleted === 0) {
-            return response.status(404).json({ error: "Tag or association not found" });
-        }
-        response.json({ message: "Tag deleted from book successfully" });
-    } catch (error) {
-        console.error("Error deleting tag from book:", error);
-        response.status(500).json({ error: "An error occurred while deleting tag from book" });
-    }
-};
-
-
