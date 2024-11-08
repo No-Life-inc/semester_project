@@ -91,7 +91,6 @@ export const addBookToCollection = async (req: Request, res: Response): Promise<
   let { userId, collectionId, bookId } = req.body;
 
   try {
-      // Konverter til tal for at sikre korrekt type
       userId = Number(userId);
       collectionId = Number(collectionId);
       bookId = Number(bookId);
@@ -119,7 +118,6 @@ export const removeBookFromCollection = async (req: Request, res: Response): Pro
   let { userId, collectionId, bookId } = req.body;
 
   try {
-      // Konverter til tal for at sikre korrekt type
       userId = Number(userId);
       collectionId = Number(collectionId);
       bookId = Number(bookId);
