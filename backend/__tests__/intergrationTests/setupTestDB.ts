@@ -81,6 +81,8 @@ export const teardownTestDB = async () => {
   // Rollback migrations
   await knex.migrate.rollback({}, true);
 
+  Model.knex(undefined);
+
   // Destroy the Knex instance
   await knex.destroy();
 };
