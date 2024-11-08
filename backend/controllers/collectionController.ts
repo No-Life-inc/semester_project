@@ -1,10 +1,14 @@
 import { Request, Response } from "express";
 import * as CollectionService from "../services/collectionService";
 
-
-//TODO - add docstrings to all functions
-//TODO - create a function that adds a book to a collection
-//TODO - create a function that removes a book from a collection
+/**
+ * Creates a new collection for a user.
+ *
+ * @param {string} name - The name of the collection.
+ * @param {number} userId - The ID of the user.
+ * @returns {Promise<Collection>} - A promise that resolves to the newly created collection.
+ * @throws {Error} - Throws an error if the user is not found.
+ */
 export const createCollection = async (req: Request, res: Response) => {
   const { name, userId } = req.body;
   try {
@@ -18,6 +22,12 @@ export const createCollection = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Handles retrieving collections for a user via an HTTP request.
+ *
+ * @param {Request} req - The request object containing the user ID as a parameter.
+ * @param {Response} res - The response object used to send the result or error.
+ */
 export const getUserCollections = async (req: Request, res: Response) => {
   const { userId } = req.params;
   try {
@@ -30,6 +40,15 @@ export const getUserCollections = async (req: Request, res: Response) => {
   }
 };
 
+
+/**
+ * Updates the name of a collection.
+ *
+ * @param {number} id - The ID of the collection.
+ * @param {string} name - The new name for the collection.
+ * @returns {Promise<Collection>} - A promise that resolves to the updated collection.
+ * @throws {Error} - Throws an error if the collection is not found.
+ */
 export const updateCollection = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name } = req.body;
@@ -41,6 +60,14 @@ export const updateCollection = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Deletes a collection for a specific user.
+ *
+ * @param {number} id - The ID of the collection.
+ * @param {number} userId - The ID of the user.
+ * @returns {Promise<number>} - A promise that resolves to the number of deleted records.
+ * @throws {Error} - Throws an error if the user ID is invalid, the collection is not found, or the user is not authorized to delete the collection.
+ */
 export const deleteCollection = async (req: Request, res: Response) => {
   const { id, userId } = req.params;
   try {
@@ -52,10 +79,13 @@ export const deleteCollection = async (req: Request, res: Response) => {
 };
 
 /**
- * Adds a book to a user's collection.
- * 
- * @param {Request} req - The request object.
- * @param {Response} res - The response object.
+ * Adds a book to a collection for a user.
+ *
+ * @param {number} userId - The ID of the user.
+ * @param {number} collectionId - The ID of the collection.
+ * @param {number} bookId - The ID of the book.
+ * @returns {Promise<void>} - A promise that resolves when the book is added to the collection.
+ * @throws {Error} - Throws an error if the userBook entry is not found or the book already exists in the collection.
  */
 export const addBookToCollection = async (req: Request, res: Response): Promise<void> => {
   let { userId, collectionId, bookId } = req.body;
@@ -79,10 +109,11 @@ export const addBookToCollection = async (req: Request, res: Response): Promise<
 };
 
 /**
- * Removes a book from a user's collection.
- * 
- * @param {Request} req - The request object.
- * @param {Response} res - The response object.
+ * Handles removing a book from a user's collection via an HTTP request.
+ *
+ * @param {Request} req - The request object containing the user ID, collection ID, and book ID in the body.
+ * @param {Response} res - The response object used to send the result or error.
+ * @returns {Promise<void>} - A promise that resolves when the book is removed from the collection.
  */
 export const removeBookFromCollection = async (req: Request, res: Response): Promise<void> => {
   let { userId, collectionId, bookId } = req.body;
