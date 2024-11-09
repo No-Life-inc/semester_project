@@ -11,6 +11,7 @@ interface CollectionAttributes {
     name: string;
     users?: User[]; // Add users property for TypeScript
     userBooks?: UserBook[]; // Add user_books property for TypeScript
+    createdAt?: Date;
 }
 
 interface CollectionCreationAttributes extends Optional<CollectionAttributes, "id"> {}
@@ -20,6 +21,7 @@ class Collection extends Model<CollectionAttributes, CollectionCreationAttribute
     public name!: string;
     public users?: User[]; // Add users property for TypeScript
     public userBooks?: UserBook[]; // Add user_books property for TypeScript
+    public createdAt?: Date;
 }
 
 // Initialize the Collection model
@@ -40,12 +42,20 @@ Collection.init(
                 }
             }
         },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            defaultValue: DataTypes.NOW,
+            field: "created_at",
+        },
     },
     {
         sequelize,
         modelName: "Collection",
         tableName: "collections",
-        timestamps: false,
+        timestamps: true,
+        createdAt: "created_at",
+        updatedAt: false,
     }
 );
 

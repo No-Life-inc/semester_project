@@ -19,8 +19,8 @@ Publisher.hasMany(Book, { foreignKey: "publisher_id", as: "books" });
 Book.belongsTo(Publisher, { foreignKey: "publisher_id", as: "publisher" });
 
 // Many-to-Many relationship between BookModel and Author
-Book.belongsToMany(Author, { through: "books_authors", foreignKey: "book_id", as: "authors" });
-Author.belongsToMany(Book, { through: "books_authors", foreignKey: "author_id", as: "books" });
+Book.belongsToMany(Author, { through: "book_authors", foreignKey: "book_id", as: "authors" });
+Author.belongsToMany(Book, { through: "book_authors", foreignKey: "author_id", as: "books" });
 
 // One-to-Many relationship between UserBook and UserBookTag
 UserBook.hasMany(UserBookTag, { foreignKey: "user_book_id", as: "tags" });

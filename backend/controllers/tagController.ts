@@ -1,5 +1,6 @@
 import  { Request, Response } from "express";
 import {addTag, deleteTagById, getAllTags, getTagById} from "../services/tagService";
+import { parse } from "dotenv";
 
 /**
  * Fetches all tags from the database.
@@ -99,7 +100,7 @@ export const deleteTagByIdController = async (request: Request, response: Respon
     const { id } = request.params;
 
     try {
-        await deleteTagById(id);
+        await deleteTagById(parseInt(id));
         response.json({ message: "Tag deleted successfully" });
     } catch (error) {
         console.error("Error deleting tag:", error);

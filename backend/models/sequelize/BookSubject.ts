@@ -5,6 +5,7 @@ interface BookSubjectAttributes {
     id: number;
     book_id: number;
     subject_id: number;
+    createdAt?: Date;
 }
 
 interface BookSubjectCreationAttributes extends Optional<BookSubjectAttributes, "id"> {}
@@ -13,6 +14,7 @@ class BookSubject extends Model<BookSubjectAttributes, BookSubjectCreationAttrib
     public id!: number;
     public book_id!: number;
     public subject_id!: number;
+    public createdAt?: Date;
 }
 
 BookSubject.init({
@@ -33,11 +35,19 @@ BookSubject.init({
         references: { model: 'subjects', key: 'id' }, // Update the reference model name
         onDelete: 'CASCADE',
     },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: DataTypes.NOW,
+        field: "created_at",
+    },
 }, {
     sequelize,
     modelName: "BookSubject",
     tableName: "book_subjects", // Update the table name if necessary
-    timestamps: false,
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: false,
 });
 
 export default BookSubject;

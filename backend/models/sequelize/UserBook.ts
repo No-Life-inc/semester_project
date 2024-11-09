@@ -7,6 +7,7 @@ class UserBook extends Model {
   public id!: number;
   public user_id!: number;
   public book_id!: number;
+  public createdAt?: Date;
 }
 
 UserBook.init(
@@ -32,12 +33,20 @@ UserBook.init(
         key: "id",
       },
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+      field: "created_at",
+  },
   },
   {
     sequelize,
     modelName: "UserBook",
     tableName: "user_books",
-    timestamps: false,
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: false,
   }
 );
 

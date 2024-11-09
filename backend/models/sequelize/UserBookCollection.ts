@@ -6,6 +6,7 @@ import Collection from "./Collection";
 class UserBookCollection extends Model {
     public user_book_id!: number;
     public collection_id!: number;
+    public createdAt?: Date;
 }
 
 UserBookCollection.init(
@@ -26,12 +27,20 @@ UserBookCollection.init(
                 key: "id",
             },
         },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            field: "created_at",
+        },
     },
     {
         sequelize,
         modelName: "UserBookCollection",
         tableName: "collection_books",
-        timestamps: false,
+        timestamps: true,
+        createdAt: "created_at",
+        updatedAt: false,
     }
 );
 
