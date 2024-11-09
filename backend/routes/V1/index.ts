@@ -5,6 +5,8 @@ import publisherRouter from "./publisherRoutes";
 import collectionRouter from "./collectionRoutes";
 import userRouter from "./userRoutes";
 import userBookRouter from "./userBookRoutes";
+import tagRouter from "./tagRoutes";
+import userBookTagRouter from "./userBookTagRoutes";
 
 
 const router = Router();
@@ -15,5 +17,7 @@ router.use("/publisher", publisherRouter);
 router.use("/collection", collectionRouter);
 router.use("/user", userRouter);
 router.use("/userBook", userBookRouter);
+router.use("/tag", tagRouter);
+router.use("/userBookTag", userBookTagRouter);
 
 export default router;
