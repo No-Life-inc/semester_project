@@ -30,6 +30,11 @@ export const getAllTags = async (page: number, limit: number) => {
  * // This will fetch the tag with ID 1
  */
 export const getTagById = async (id: number) => {
+
+    if (isNaN(id) || id < 1) {
+        throw new Error("Invalid tag id. Tag id must be a number greater than or equal to 1.");
+    }
+
     const tag = await Tag.findByPk(id);
     if (!tag) {
         throw new Error("Tag not found");
@@ -48,6 +53,9 @@ export const getTagById = async (id: number) => {
  * // This will create a new tag with the name "Fantasy"
  */
 export const addTag = async (name: string) => {
+    if (!name) {
+        throw new Error("Tag name is required");
+    }
     try{
         return await Tag.create({name});
     } catch (error) {
@@ -59,7 +67,7 @@ export const addTag = async (name: string) => {
 /**
  * Delete a tag by its ID.
  *
- * @param {string} id - The ID of the tag to delete.
+ * @param {number} id - The ID of the tag to delete.
  * @returns {Promise<number>} - A promise that resolves to the number of deleted tags.
  *
  * @example
@@ -67,9 +75,13 @@ export const addTag = async (name: string) => {
  * // This will delete the tag with ID 1
  *
  */
-export const deleteTagById = async (id: string) => {
-    try{
-        return await Tag.destroy({where: {id}});
+export const deleteTagById = async (id: number) => {
+    try {
+        const deletedCount = await Tag.destroy({ where: { id } });
+        if (deletedCount === 0) {
+            throw new Error("Tag not found");
+        }
+        return deletedCount;
     } catch (error) {
         console.error("Error deleting tag:", error);
         throw new Error("An error occurred while deleting tag");

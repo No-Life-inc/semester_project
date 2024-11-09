@@ -11,7 +11,10 @@ interface TagAttributes {
 interface TagCreationAttributes extends Optional<TagAttributes, "id"> {}
 
 // Define the Tag model
-class Tag extends Model<TagAttributes, TagCreationAttributes> {}
+class Tag extends Model<TagAttributes, TagCreationAttributes> {
+    public id!: number;
+    public name!: string;
+}
 
 // Initialize the model
 Tag.init(
