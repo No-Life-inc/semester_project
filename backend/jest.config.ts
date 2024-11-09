@@ -1,5 +1,6 @@
 export default {
     preset: 'ts-jest',
     testEnvironment: 'node',
-    testMatch: ['**/*.test.ts'],
+    testMatch: ['**/__tests__/**/*.test.ts'],
+    moduleFileExtensions: ['ts', 'js', 'json'],
 };
