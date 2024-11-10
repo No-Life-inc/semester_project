@@ -46,6 +46,8 @@ services:
       - ISSUER_BASE_URL=${ISSUER_BASE_URL}
       - AUTH0_SECRET=${AUTH0_SECRET}
       - MONGO_URI=${MONGO_URI}
+      - ISBNDB_API_KEY=${ISBNDB_API_KEY}
+
     command: sh -c "npm install && npx ts-node ./app.ts"
 
   frontend:

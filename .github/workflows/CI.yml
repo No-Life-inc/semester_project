@@ -61,4 +61,5 @@ jobs:
           SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
           SQL_HOST: localhost
           TEST_SQL_NAME: bookCollectionTest
+          ISBNDB_API_KEY: ${{ secrets.ISBNDB_API_KEY }}
           NODE_ENV: test
