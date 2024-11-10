@@ -1,10 +1,10 @@
 // routes/subjectRoutes.ts
 import { Router } from 'express';
-import { getSubjectsController, getSubjectByIdController } from '../../controllers/subjectController';
+import { getAllSubjectsController, getSubjectByIdController } from '../../controllers/subjectController';
 
 const router = Router();
 
-router.get('/subjects', getSubjectsController);
+router.get('/subjects', getAllSubjectsController);
 router.get('/subjects/:id', getSubjectByIdController);
 
 export default router;
