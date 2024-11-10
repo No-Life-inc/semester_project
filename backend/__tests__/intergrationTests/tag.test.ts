@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, test } from "@jest/globals";
+import { afterAll, beforeAll, describe, expect, jest, test } from "@jest/globals";
 import { setupTestDB, teardownTestDB } from "./setupTestDB";
 import knex from "knex";
 import knexConfig from "../../knexfile";

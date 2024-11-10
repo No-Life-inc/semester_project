@@ -12,13 +12,40 @@ afterAll(async () => {
   await teardownTestDB();
 });
   
-describe("getAllSubjects function", () => {
-it("should fetch all subjects", async () => {
-    const subjects = await getAllSubjects();
-    expect(Array.isArray(subjects)).toBe(true);
-    expect(subjects.length).toBeGreaterThanOrEqual(0);
+describe("getAllSubjects function positive tests", () => {
+const positiveTestCases = [
+    [1, 1, 1],
+    [1, 2, 2],
+    [1, 100, 100],
+    [1, 99, 99],
+    [1, 50, 50],
+];
+
+test.each(positiveTestCases)(
+    "should fetch subjects (page: %i, limit: %i)",
+    async (page, limit, expectedLength) => {
+      const subjects = await getAllSubjects(page, limit);
+      expect(subjects?.length).toBeLessThanOrEqual(expectedLength ?? 0);
+    }
+  );
 });
-});
+
+describe("getAllSubjects function negative tests", () => {
+    const negativeTestCases = [
+      [-1, 10, "Invalid page number. Page must be a number greater than or equal to 1."],
+      [NaN, 10, "Invalid page number. Page must be a number greater than or equal to 1."],
+      [1, -10, "Invalid limit. Limit must be a number greater than or equal to 1."],
+      [1, NaN, "Invalid limit. Limit must be a number greater than or equal to 1."],
+      [1, 101, "Invalid limit. Limit must be a number less than or equal to 100."],
+    ];
+  
+    test.each(negativeTestCases)(
+      "should throw an error (page: %i, limit: %i, errorMessage: %s)",
+      async (page, limit, errorMessage) => {
+        await expect(getAllSubjects(Number(page), Number(limit))).rejects.toThrow(errorMessage);
+      }
+    );
+  });
 
 describe("getSubjectById function positive tests", () => {
 const positiveTestCases = [

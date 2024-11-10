@@ -9,15 +9,18 @@ import { getAllSubjects, getSubjectById } from "../services/subjectService";
  * 
  * @returns {Promise<void>} - A promise that resolves to void.
  */
-export const getAllSubjectsController = async (req: Request, res: Response): Promise<void> => {
+export const getAllSubjectsController = async (request: Request, response: Response) => {
+    const { page = 1, limit = 50 } = request.query;
+
     try {
-        const subjects = await getAllSubjects();
-        res.json(subjects);
+        const subjects = await getAllSubjects(Number(page), Number(limit));
+        response.json(subjects);
     } catch (error) {
         console.error("Error fetching subjects:", error);
-        res.status(500).json({ error: "An error occurred while fetching subjects" });
+        response.status(500).json({ error: "An error occurred while fetching subjects" });
     }
-};
+
+  };
 
 
 /**
