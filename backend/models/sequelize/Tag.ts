@@ -5,13 +5,18 @@ import sequelize from "../../config/SqlConfig";
 interface TagAttributes {
     id: number;
     name: string;
+    createdAt?: Date;
 }
 
 // Define a type for creation (since `id` will be auto-incremented and optional during creation)
 interface TagCreationAttributes extends Optional<TagAttributes, "id"> {}
 
 // Define the Tag model
-class Tag extends Model<TagAttributes, TagCreationAttributes> {}
+class Tag extends Model<TagAttributes, TagCreationAttributes> {
+    public id!: number;
+    public name!: string;
+    public createdAt?: Date;
+}
 
 // Initialize the model
 Tag.init(
@@ -25,12 +30,20 @@ Tag.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            field: "created_at",
+        },
     },
     {
         sequelize,
         modelName: "Tag",
         tableName: "tags",
-        timestamps: false,
+        timestamps: true,
+        createdAt: "created_at",
+        updatedAt: false,
     }
 );
 

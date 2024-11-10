@@ -1,10 +1,10 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
 
-dotenv.config(); // Load environment variables
+dotenv.config();
 
 const sequelize = new Sequelize(
-    process.env.SQL_NAME as string,
+    process.env.NODE_ENV === 'test' ? process.env.TEST_SQL_NAME : process.env.SQL_NAME,
     process.env.SQL_USER as string,
     process.env.SQL_PASSWORD as string,
     {
@@ -21,4 +21,4 @@ const sequelize = new Sequelize(
     }
 );
 
-export default sequelize; // Use a default export
+export default sequelize;

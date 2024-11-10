@@ -6,6 +6,7 @@ interface UserBookTagAttributes {
     id: number;
     user_book_id: number;
     tag_id: number;
+    createdAt?: Date;
 }
 
 // Define a type for creation (since `id` will be auto-incremented and optional during creation)
@@ -30,12 +31,20 @@ UserBookTag.init(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            field: "created_at",
+        },
     },
     {
         sequelize,
         modelName: "UserBookTag",
         tableName: "user_book_tags",
-        timestamps: false,
+        timestamps: true,
+        createdAt: "created_at",
+        updatedAt: false,
     }
 );
 

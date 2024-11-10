@@ -1,3 +1,5 @@
 {
-    "jest.rootPath": "backend"
-}
+    "jest.jestCommandLine": "npm run test --",
+    "jest.rootPath": "./backend"
+  }
+  

@@ -23,3 +23,5 @@ AUTH0_SECRET=LONG_RANDOM_STRING
 MONGO_URI=mongodb://root:YourStrongPassword123@localhost:27017
 
 SQL_PASSWORD=YourStrongPassword123
+
+ISBNDB_API_KEY=APIKEY

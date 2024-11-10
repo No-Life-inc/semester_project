@@ -5,7 +5,6 @@ import { Model } from "objection";
 import dotenv from "dotenv";
 
 dotenv.config();
-
 // Initialize Knex with initial configuration
 const initialDb = Knex({
   client: "mssql",
@@ -54,6 +53,8 @@ Model.knex(knex);
 
 export const setupTestDB = async () => {
   console.log("Setting up test database:", process.env.TEST_SQL_NAME);
+  console.log("Setting up test database with NODE_ENV:", process.env.NODE_ENV);
+  console.log("Database being set up:", process.env.TEST_SQL_NAME);
   // Create the database if it doesn't exist
   await createDatabaseIfNotExists();
 
@@ -79,6 +80,8 @@ export const teardownTestDB = async () => {
 
   // Rollback migrations
   await knex.migrate.rollback({}, true);
+
+  Model.knex(undefined);
 
   // Destroy the Knex instance
   await knex.destroy();
