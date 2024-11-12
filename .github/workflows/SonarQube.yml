@@ -25,6 +25,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Ensure Java 17 is used
+        run: |
+          export JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64
+          export PATH="$JAVA_HOME/bin:$PATH"
+          java -version
+
       - name: Install Sonar Scanner
         run: |
           curl -sSLo sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
