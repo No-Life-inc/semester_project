@@ -30,9 +30,8 @@ jobs:
           
       - name: Set JAVA_HOME to Java 17
         run: |
-          echo "/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64" >> $GITHUB_ENV
-          export JAVA_HOME="/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64"
-          export PATH="$JAVA_HOME/bin:$PATH"
+          echo "JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64" >> $GITHUB_ENV
+          echo "PATH=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.13-11/x64/bin:$PATH" >> $GITHUB_ENV
 
       - name: Run SonarQube Analysis
         env:
