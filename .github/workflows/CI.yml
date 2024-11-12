@@ -3,7 +3,8 @@ name: Run tests
 on:
   push:
     branches:
-      - '*'
+      - main
+      - development
   pull_request:
     branches:
       - main
@@ -11,7 +12,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 5
+    
     services:
       mssql:
         image: mcr.microsoft.com/mssql/server:2019-CU27-ubuntu-20.04
@@ -51,35 +53,13 @@ jobs:
       - name: Install ts-node
         run: npm install -g ts-node
 
-      - name: Create database
-        run: |
-          sqlcmd -S localhost -U sa -P ${{ secrets.DB_PASSWORD }} -Q "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'bookCollection') CREATE DATABASE bookCollection;"
-
-
-      - name: Run migrations
-        working-directory: ./backend
-        env:
-          SQL_HOST: localhost
-          SQL_USER: SA
-          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          SQL_NAME: bookCollection
-        run: npx knex migrate:latest
-
-
-      - name: Run seeds
-        working-directory: ./backend
-        env:
-          SQL_HOST: localhost
-          SQL_USER: SA
-          SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          SQL_NAME: bookCollection
-        run: npx knex seed:run
-
       - name: Run Backend tests
         run: npm test
         working-directory: ./backend
         env:
           SQL_USER: sa
-          SQL_NAME: bookCollection
           SQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
           SQL_HOST: localhost
+          TEST_SQL_NAME: bookCollectionTest
+          ISBNDB_API_KEY: ${{ secrets.ISBNDB_API_KEY }}
+          NODE_ENV: test

@@ -5,6 +5,7 @@ interface BookAuthorAttributes {
     id: number;
     book_id: number;
     author_id: number;
+    createdAt?: Date;
 }
 
 interface BookAuthorCreationAttributes extends Optional<BookAuthorAttributes, "id"> {}
@@ -14,6 +15,7 @@ class  BookAuthor extends Model <BookAuthorAttributes, BookAuthorCreationAttribu
     public id!: number;
     public book_id!: number;
     public author_id!: number;
+    public createdAt?: Date;
 }
 
 BookAuthor.init(
@@ -35,12 +37,20 @@ BookAuthor.init(
             references: { model: 'authors', key: 'id' },
             onDelete: 'CASCADE',
         },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            field: "created_at",
+        },
     },
     {
         sequelize,
         modelName: "BookAuthor",
         tableName: "book_authors",
-        timestamps: false,
+        timestamps: true,
+        createdAt: "created_at",
+        updatedAt: false,
     }
 );
 

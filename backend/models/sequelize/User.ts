@@ -12,6 +12,7 @@ interface UserAttributes {
     email: string;
     collections?: Collection[]; // Add collections property for TypeScript
     books?: Book[]; // Add books property for TypeScript
+    createdAt?: Date;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, "id"> {}
@@ -22,6 +23,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     public email!: string;
     public collections?: Collection[]; // Add collections property for TypeScript
     public books?: Book[]; // Add books property for TypeScript
+    public createdAt?: Date;
 }
 
 // Initialize the User model
@@ -40,12 +42,20 @@ User.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            field: "created_at",
+        },
     },
     {
         sequelize,
         modelName: "User",
         tableName: "users",
-        timestamps: false,
+        timestamps: true,
+        createdAt: "created_at",
+        updatedAt: false,
     }
 );
 

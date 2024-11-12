@@ -4,35 +4,50 @@ import User from "./User";
 import Book from "./Book";
 
 class UserBook extends Model {
-    public user_id!: number;
-    public book_id!: number;
+  public id!: number;
+  public user_id!: number;
+  public book_id!: number;
+  public createdAt?: Date;
 }
 
 UserBook.init(
-    {
-        user_id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            references: {
-                model: User,
-                key: "id",
-            },
-        },
-        book_id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            references: {
-                model: Book,
-                key: "id",
-            },
-        },
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
-    {
-        sequelize,
-        modelName: "UserBook",
-        tableName: "user_books",
-        timestamps: false,
-    }
+    user_id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      references: {
+        model: User,
+        key: "id",
+      },
+    },
+    book_id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      references: {
+        model: Book,
+        key: "id",
+      },
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+      field: "created_at",
+  },
+  },
+  {
+    sequelize,
+    modelName: "UserBook",
+    tableName: "user_books",
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: false,
+  }
 );
 
 export default UserBook;

@@ -10,7 +10,7 @@ interface BookAttributes {
     id: number;
     title: string;
     publisherId: number;
-    edition: number;
+    edition: string;
     coverId: number;
     isbn: string;
     language: string;
@@ -23,6 +23,7 @@ interface BookAttributes {
     isbn10: string;
     isbn13: string;
     binding: string;
+    createdAt?: Date;
     users?: User[]; // Add users property for TypeScript
     authors?: Author[]; // Add authors property for TypeScript
     subjects?: Subject[]; // Add subjects property for TypeScript
@@ -35,7 +36,7 @@ class Book extends Model<BookAttributes, BookCreationAttributes> implements Book
     public id!: number;
     public title!: string;
     public publisherId!: number;
-    public edition!: number;
+    public edition!: string;
     public coverId!: number;
     public isbn!: string;
     public language!: string;
@@ -48,6 +49,7 @@ class Book extends Model<BookAttributes, BookCreationAttributes> implements Book
     public isbn10!: string;
     public isbn13!: string;
     public binding!: string;
+    public createdAt?: Date;
     public users?: User[]; // Add users property for TypeScript
     public authors?: Author[]; // Add authors property for TypeScript
     public subjects?: Subject[]; // Add subjects property for TypeScript
@@ -125,12 +127,20 @@ Book.init(
             type: DataTypes.STRING,
             allowNull: true,
         },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            field: "created_at",
+        },
     },
     {
         sequelize,
         modelName: "Book",
         tableName: "books",
-        timestamps: false,
+        createdAt: "created_at",
+        timestamps: true,
+        updatedAt: false,
     }
 );
 
