@@ -22,6 +22,7 @@ export const createCollection = async (name: string, userId: number) => {
     return newCollection;
 };
 
+
 /**
  * Retrieves all collections for a specific user.
  *

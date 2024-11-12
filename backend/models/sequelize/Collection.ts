@@ -44,7 +44,7 @@ Collection.init(
         },
         createdAt: {
             type: DataTypes.DATE,
-            allowNull: true,
+            allowNull: false,
             defaultValue: DataTypes.NOW,
             field: "created_at",
         },
