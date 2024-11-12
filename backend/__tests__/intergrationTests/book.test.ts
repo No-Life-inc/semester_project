@@ -91,6 +91,154 @@ describe("getBookById function negative tests", () => {
   );
 });
 
+describe("addBooks function positive tests with minimal data", () => {
+  const minimalDataTestCases = [
+    [
+      [
+        {
+          title: "This is the minimal amount of data required to add a book",
+        },
+      ]
+    ],
+    [
+      [
+        {
+          title: "",
+        },
+      ]
+    ],
+    [
+      [
+        {
+          title: "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst.",
+        },
+      ]
+    ],
+    [
+      [
+        {
+          title: "The title dont matter here",
+        },
+      ]
+    ],
+  ];
+
+  test.each(minimalDataTestCases)(
+    "should add books (booksData: %o) with minimal data without checking publisher or subject",
+    async (booksData) => {
+      const addedBooks = await addBooks(booksData);
+      expect(addedBooks).toBeDefined();
+      expect(addedBooks.length).toBe(booksData.length);
+
+      for (let i = 0; i < booksData.length; i++) {
+        expect(addedBooks[i].title).toBe(booksData[i].title);
+      }
+    }
+  );
+});
+
+describe("BookData field boundary tests", () => {
+  const maxText = "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst.";
+  const maxTextMinusOne = "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst";
+
+  const minimalBookData: BookData = { title: "" };
+
+  const cases: [Partial<BookData>, string][] = [
+      // Title field tests
+      [{ title: "" }, "should accept minimal title"],
+      [{ title: "a" }, "should accept close to minimal title"],
+      [{ title: maxText }, "should accept maximal title (255 chars)"],
+      [{ title: maxTextMinusOne }, "should accept close to maximal title (255 chars)"],
+
+      // Image field tests
+      [{ image: "" }, "should accept minimal image URL"],
+      [{ image: "a" }, "should accept close to minimal image URL"],
+      [{ image: "http://".padEnd(255, "a") }, "should accept maximal image URL (255 chars)"],
+      [{ image: "http://".padEnd(254, "a") }, "should accept close to maximal image URL (254 chars)"],
+
+      // Title_long field tests
+      [{ title_long: "" }, "should accept minimal title_long"],
+      [{ title_long: "a" }, "should accept close to minimal title_long"],
+      [{ title_long: maxText }, "should accept maximal title_long (255 chars)"],
+      [{ title_long: maxTextMinusOne }, "should accept maximal title_long (255 chars)"],
+
+      // Date_published field tests
+      [{ date_published: "" }, "should accept minimal date_published"],
+      [{ date_published: " " }, "should accept minimal date_published"],
+      [{ date_published: "9999-12-31" }, "should accept typical date format for date_published"],
+
+      // Publisher field tests
+      [{ publisher: "" }, "should accept minimal publisher"],
+      [{ publisher: maxText }, "should accept maximal publisher (255 chars)"],
+
+      // Synopsis field tests
+      [{ synopsis: "" }, "should accept minimal synopsis"],
+      [{ synopsis: maxText }, "should accept maximal synopsis (255 chars)"],
+
+      // Subjects field tests
+      [{ subjects: [] }, "should accept empty subjects array"],
+      [{ subjects: [maxText] }, "should accept subjects with maximal length entry (255 chars)"],
+
+      // Authors field tests
+      [{ authors: [] }, "should accept empty authors array"],
+      [{ authors: [maxText] }, "should accept authors with maximal length entry (255 chars)"],
+
+      // ISBN13 field tests
+      [{ isbn13: "" }, "should accept minimal isbn13"],
+      [{ isbn13: "9999999999999" }, "should accept valid ISBN-13 (13 chars)"],
+
+      // MSRP field tests
+      [{ msrp: 0 }, "should accept minimum msrp value (0)"],
+      [{ msrp: 9999.99 }, "should accept maximal msrp within limits"],
+
+      // Edition field tests
+      [{ edition: "" }, "should accept minimal edition"],
+      [{ edition: maxText }, "should accept maximal edition (255 chars)"],
+
+      // Binding field tests
+      [{ binding: "" }, "should accept minimal binding"],
+      [{ binding: maxText }, "should accept maximal binding (255 chars)"],
+
+      // ISBN field tests
+      [{ isbn: "" }, "should accept minimal isbn"],
+      [{ isbn: "9999999999" }, "should accept valid ISBN-10 (10 chars)"],
+
+      // ISBN10 field tests
+      [{ isbn10: "" }, "should accept minimal isbn10"],
+      [{ isbn10: "123456789X" }, "should accept valid ISBN-10 format"],
+
+      // Language field tests
+      [{ language: "" }, "should accept minimal language"],
+      [{ language: maxText }, "should accept typical language value"],
+
+      // Dimensions field tests
+      [{ dimensions: "" }, "should accept minimal dimensions"],
+      [{ dimensions: maxText }, "should accept maximal dimensions (255 chars)"],
+
+      // Dimensions_structured field tests
+      [{ dimensions_structured: { length: { value: 0, unit: "" } } }, "should accept minimal structured dimensions"],
+      [{ dimensions_structured: { length: { value: 9999, unit: "centimeters" } } }, "should accept maximal structured dimensions"],
+
+      // Pages field tests
+      [{ pages: 0 }, "should accept minimum pages (0)"],
+      [{ pages: 10000 }, "should accept maximal pages within limits"],
+
+      // Publisher_id field tests
+      [{ publisher_id: 0 }, "should accept minimum publisher_id (0)"],
+      [{ publisher_id: 99999999 }, "should accept a high publisher_id value"]
+  ];
+
+  test.each(cases)(
+      "%s",
+      async (fieldData, description) => {
+        const validDataArray: BookData[] = [{ ...minimalBookData, ...fieldData[0] }];
+          const result = await addBooks(validDataArray);
+          expect(result).toBeDefined();
+          expect(result.length).toBe(validDataArray.length);
+      }
+  );
+});
+
 describe("addBooks function positive tests", () => {
   const positiveTestCases: [BookData[], string, string][] = [
     [
@@ -144,13 +292,46 @@ describe("addBooks function positive tests", () => {
     [
       [
         {
-          title: "Test Book 3",
+          title: "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst.",
           publisher: "Minimal Publisher",
           subjects: ["Minimal Subject"],
         },
       ],
       "Minimal Publisher",
       "Minimal Subject",
+    ],
+    [
+      [
+        {
+          title: "The title dont matter here",
+          publisher: "a",
+          subjects: ["Minimal Subject"],
+        },
+      ],
+      "a",
+      "Minimal Subject",
+    ],
+    [
+      [
+        {
+          title: "The title dont matter here either",
+          publisher: "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst.",
+          subjects: ["Minimal Subject"],
+        },
+      ],
+      "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst.",
+      "Minimal Subject",
+    ],
+    [
+      [
+        {
+          title: "The title dont matter here x2",
+          publisher: "Minimal Publisher",
+          subjects: [""],
+        },
+      ],
+      "Minimal Publisher",
+      "",
     ],
   ];
 
