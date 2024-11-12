@@ -26,8 +26,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          cd path/to/your/gradle/project
-          ./gradlew sonarqube \
+          sonar-scanner \
             -Dsonar.projectKey=semester_project \
+            -Dsonar.sources=./src \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
