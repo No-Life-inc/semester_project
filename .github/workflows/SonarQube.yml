@@ -42,4 +42,4 @@ jobs:
             -Dsonar.sources=./backend,./frontend/src \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-            -Dsonar.branch.name=${{ github.ref_name }}
+            -Dsonar.branch.name=main
