@@ -38,7 +38,7 @@ jobs:
         run: |
           sonar-scanner \
             -Dsonar.projectKey=semester_project \
-            -Dsonar.organization=No-Life inc \
+            -Dsonar.organization=no-life-inc \
             -Dsonar.sources=./src \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
