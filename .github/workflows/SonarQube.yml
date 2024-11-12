@@ -4,13 +4,11 @@ on:
   push:
     branches:
       - main
-      - production
-      - feature/*
+      - development
   pull_request:
     branches:
       - main
-      - production
-      - feature/*
+      - development
 
 jobs:
   sonarqube:
