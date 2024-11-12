@@ -22,6 +22,12 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
+      - name: Install Sonar Scanner
+        run: |
+          curl -sSLo sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
+          unzip sonar-scanner-cli.zip
+          export PATH="$PATH:$(pwd)/sonar-scanner-4.7.0.2747-linux/bin"
+
       - name: Run SonarQube Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
