@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import pkg from "express-openid-connect";
 import "./models/sequelize/Associations";
 import V1Routes from "./routes/V1";
 import setupDatabase from "./database/knex/createDatabase";
@@ -9,14 +8,12 @@ import { initializeDatabase } from "./database/knex/setupDatabase";
 import connectDB from "./dbconnections/MongoConnection";
 
 dotenv.config();
-const { auth } = pkg;
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.disable('x-powered-by');
 app.use(cors());
 app.use(express.json());
-app.use(auth(config));
 
 async function startServer() {
   try {
