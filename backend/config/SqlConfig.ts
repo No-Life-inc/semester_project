@@ -5,8 +5,8 @@ dotenv.config();
 
 const sequelize = new Sequelize(
     process.env.NODE_ENV === 'test' ? process.env.TEST_SQL_NAME : process.env.SQL_NAME,
-    process.env.SQL_USER as string,
-    process.env.SQL_PASSWORD as string,
+    process.env.SQL_USER,
+    process.env.SQL_PASSWORD,
     {
         host: process.env.SQL_HOST,
         port: process.env.SQL_PORT ? parseInt(process.env.SQL_PORT, 10) : undefined,
