@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it, jest, test } from "@jest/glo
 
 jest.setTimeout(30000); // Sets timeout to 30 seconds
 
-import { setupTestDB, teardownTestDB } from "./setupTestDB";
+import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import knex from "knex";
 import knexConfig from "../../knexfile";
 import { getBooks, getBookById, addBooks, getBooksByTitle } from "../../services/bookService";

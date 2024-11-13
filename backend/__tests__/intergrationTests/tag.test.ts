@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, jest, test } from "@jest/globals";
-import { setupTestDB, teardownTestDB } from "./setupTestDB";
+import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import knex from "knex";
 import knexConfig from "../../knexfile";
 import { getAllTags, getTagById, addTag, deleteTagById } from "../../services/tagService";

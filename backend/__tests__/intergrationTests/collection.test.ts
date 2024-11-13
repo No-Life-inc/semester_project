@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, jest, test } from "@jest/globals
 
 jest.setTimeout(120000); 
 
-import { setupTestDB, teardownTestDB } from "./setupTestDB";
+import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import knex from "knex";
 import knexConfig from "../../knexfile";
 import {
