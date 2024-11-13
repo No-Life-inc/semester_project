@@ -53,4 +53,3 @@ BookAuthor.init(
         updatedAt: false,
     }
 );
-)

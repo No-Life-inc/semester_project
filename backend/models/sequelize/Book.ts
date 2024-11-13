@@ -1,18 +1,15 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../config/SqlConfig";
-import User from "./User"; // Import the User model
-import UserBook from "./UserBook"; // Import the UserBook model
-import Author from "./Author"; // Import the Author model
-import Publisher from "./Publisher"; // Import the Publisher model
-import Subject from "./Subject"; // Import the Subject model
+import User from "./User";
+import Author from "./Author";
+import Publisher from "./Publisher";
+import Subject from "./Subject";
 
-// Define the attributes for the Book model
 interface BookAttributes {
     id: number;
     title: string;
     publisherId: number;
     edition: string;
-    coverId: number;
     isbn: string;
     language: string;
     pages: number;
@@ -25,10 +22,10 @@ interface BookAttributes {
     isbn13: string;
     binding: string;
     createdAt?: Date;
-    users?: User[]; // Add users property for TypeScript
-    authors?: Author[]; // Add authors property for TypeScript
-    subjects?: Subject[]; // Add subjects property for TypeScript
-    publisher?: Publisher; // Add publisher property for TypeScript
+    users?: User[];
+    authors?: Author[];
+    subjects?: Subject[];
+    publisher?: Publisher;
 }
 
 interface BookCreationAttributes extends Optional<BookAttributes, "id"> {}
@@ -38,7 +35,6 @@ class Book extends Model<BookAttributes, BookCreationAttributes> implements Book
     public title!: string;
     public publisherId!: number;
     public edition!: string;
-    public coverId!: number;
     public isbn!: string;
     public language!: string;
     public pages!: number;
@@ -51,10 +47,10 @@ class Book extends Model<BookAttributes, BookCreationAttributes> implements Book
     public isbn13!: string;
     public binding!: string;
     public createdAt?: Date;
-    public users?: User[]; // Add users property for TypeScript
-    public authors?: Author[]; // Add authors property for TypeScript
-    public subjects?: Subject[]; // Add subjects property for TypeScript
-    public publisher?: Publisher; // Add publisher property for TypeScript
+    public users?: User[];
+    public authors?: Author[];
+    public subjects?: Subject[];
+    public publisher?: Publisher;
 }
 
 // Initialize the Book model
@@ -77,11 +73,6 @@ Book.init(
         edition: {
             type: DataTypes.INTEGER,
             allowNull: true,
-        },
-        coverId: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            field: "cover_id",
         },
         isbn: {
             type: DataTypes.STRING,
