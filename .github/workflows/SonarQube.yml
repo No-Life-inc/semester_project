@@ -41,6 +41,6 @@ jobs:
             -Dsonar.organization=no-life-inc \
             -Dsonar.sources=./backend,./frontend/src \
             -Dsonar.exclusions=./backend/__tests__/**
-            -Dsonar.tests=./backend/__tests__/**\
+            -Dsonar.tests=./backend/__tests__/**/**\
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
