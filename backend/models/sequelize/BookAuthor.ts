@@ -3,18 +3,17 @@ import sequelize from "../../config/SqlConfig";
 
 interface BookAuthorAttributes {
     id: number;
-    book_id: number;
-    author_id: number;
+    bookId: number;
+    authorId: number;
     createdAt?: Date;
 }
 
 interface BookAuthorCreationAttributes extends Optional<BookAuthorAttributes, "id"> {}
 
-
 class  BookAuthor extends Model <BookAuthorAttributes, BookAuthorCreationAttributes> implements BookAuthorAttributes {
     public id!: number;
-    public book_id!: number;
-    public author_id!: number;
+    public bookId!: number;
+    public authorId!: number;
     public createdAt?: Date;
 }
 
@@ -25,17 +24,19 @@ BookAuthor.init(
             primaryKey: true,
             autoIncrement: true,
         },
-        book_id: {
+        bookId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: { model: 'books', key: 'id' },
             onDelete: 'CASCADE',
+            field: "book_id",
         },
-        author_id: {
+        authorId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: { model: 'authors', key: 'id' },
             onDelete: 'CASCADE',
+            field: "author_id",
         },
         createdAt: {
             type: DataTypes.DATE,

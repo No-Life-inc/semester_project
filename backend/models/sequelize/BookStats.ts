@@ -2,8 +2,8 @@ import {DataTypes, Model, Optional} from "sequelize"
 import sequelize from "../../config/SqlConfig"
 
 interface BookStatsAttributes {
-    book_id: number;
-    collection_count: number;
+    bookId: number;
+    collectionCount: number;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -11,23 +11,26 @@ interface BookStatsAttributes {
 interface BookStatsCreationAttributes extends Optional<BookStatsAttributes, "createdAt"> {}
 
 class BookStats extends Model<BookStatsAttributes, BookStatsCreationAttributes> implements BookStatsAttributes {
-    public book_id!: number;
-    public collection_count!: number;
+    public bookId!: number;
+    public collectionCount!: number;
     public createdAt?: Date;
     public updatedAt?: Date;
 }
 
 BookStats.init(
     {
-        book_id: {
+        bookId: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             references: { model: 'books', key: 'id' },
             onDelete: 'CASCADE',
+            field: "book_id",
         },
-        collection_count: {
+        collectionCount: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            defaultValue: 0,
+            field: "collection_count",
         },
         createdAt: {
             type: DataTypes.DATE,
