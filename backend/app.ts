@@ -15,6 +15,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 const config = Auth0Config(process.env);
 
+app.disable('x-powered-by');
 app.use(cors());
 app.use(express.json());
 app.use(auth(config));
