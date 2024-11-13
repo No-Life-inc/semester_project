@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import pkg from "express-openid-connect";
 import "./models/sequelize/Associations";
 import V1Routes from "./routes/V1";
-import { Auth0Config } from "./config/Auth0Config";
 import setupDatabase from "./database/knex/createDatabase";
 import { initializeDatabase } from "./database/knex/setupDatabase";
 import connectDB from "./dbconnections/MongoConnection";
@@ -13,7 +12,6 @@ dotenv.config();
 const { auth } = pkg;
 const app = express();
 const port = process.env.PORT || 5000;
-const config = Auth0Config(process.env);
 
 app.disable('x-powered-by');
 app.use(cors());
