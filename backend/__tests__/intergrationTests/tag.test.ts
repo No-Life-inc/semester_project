@@ -71,6 +71,12 @@ describe("addTag function tests", () => {
     test("should throw an error when creating a tag without a name", async () => {
         await expect(addTag("")).rejects.toThrow("Tag name is required");
     });
+    test("should throw an error when Tag.create fails", async () => {
+        const longName = "a".repeat(256);
+        await expect(addTag(longName)).rejects.toThrow("An error occurred while creating tag");
+    });
+
+
 });
 
 
