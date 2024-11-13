@@ -5,7 +5,7 @@ import Book from "./Book";
 
 class UserBook extends Model {
   public id!: number;
-  public user_id!: number;
+  public userId!: number;
   public book_id!: number;
   public createdAt?: Date;
 }
@@ -17,17 +17,19 @@ UserBook.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    user_id: {
+    userId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      field: "user_id",
       references: {
         model: User,
         key: "id",
       },
     },
-    book_id: {
+    bookId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      field: "book_id",
       references: {
         model: Book,
         key: "id",
