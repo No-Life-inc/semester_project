@@ -40,7 +40,6 @@ jobs:
             -Dsonar.projectKey=No-Life-inc_semester_project \
             -Dsonar.organization=no-life-inc \
             -Dsonar.sources=./backend,./frontend/src \
-            -Dsonar.exclusions=./backend/__tests__/**
-            -Dsonar.tests=./backend/__tests__/intergrationTests/\
+            -Dsonar.exclusions=./backend/__tests__/**,./backend/__tests__/integrationTests/** \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
