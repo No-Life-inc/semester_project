@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import User from "../models/sequelize/User";
+import {validatePassword} from "./passwordValidatorService";
 
 /**
  * Registers a new user.
@@ -20,6 +21,7 @@ export const registerUser = async (
     password: string
 ) => {
     try {
+        validatePassword(password);
         // Check if the email already exists
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
