@@ -105,24 +105,30 @@ export const deleteCollection = async (id: number, userId: number) => {
  * @throws {Error} - Throws an error if the userBook entry is not found or the book already exists in the collection.
  */
 export const addBookToCollection = async (userId: number, collectionId: number, bookId: number): Promise<void> => {
+    // Find the user_book entry to get user_book_id
     const userBook = await UserBook.findOne({
-        where: { user_id: userId, book_id: bookId },
+        where: {
+            user_id: userId,
+            book_id: bookId,
+        },
     });
-
+    
     if (!userBook) {
         throw new Error("UserBook entry not found. Add the book to the user first.");
     }
-
+  
+    // Check if the book is already associated with the collection
     const existingEntry = await UserBookCollection.findOne({
         where: { collection_id: collectionId, user_book_id: userBook.id },
     });
-
+    
     if (existingEntry) {
         throw new Error("Book already exists in the collection");
     }
-
+  
+    // Add the user book to the collection
     await UserBookCollection.create({ collection_id: collectionId, user_book_id: userBook.id });
-};
+  };
 
 /**
  * Removes a book from a collection for a user.

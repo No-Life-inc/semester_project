@@ -14,6 +14,7 @@ import {
   removeBookFromCollection,
 } from "../../services/collectionService";
 import UserBookCollection from "../../models/sequelize/UserBookCollection";
+import UserBook from "../../models/sequelize/UserBook";
 
 // Initialize Knex
 const testKnex = knex(knexConfig.test);
@@ -172,16 +173,39 @@ describe("deleteCollection function negative tests", () => {
 // Positive test cases for addBookToCollection
 type AddBookToCollectionTestCase = [number, number, number];
 const addBookToCollectionPositiveCases: AddBookToCollectionTestCase[] = [
-  [1, 2, 3],
-  [2, 1, 2],
+  [1, 1, 1], // Brug id'er som findes i seed-data
+  [2, 2, 2],
 ];
 
 describe("addBookToCollection function positive tests", () => {
   test.each(addBookToCollectionPositiveCases)(
     "should add a book to a collection (userId: %i, collectionId: %i, bookId: %i)",
-    async (userId: number, collectionId: number, bookId: number) => {
-      await UserBookCollection.destroy({ where: { collection_id: collectionId, user_book_id: bookId } });  
+    async (userId, collectionId, bookId) => {
+      // Tjek først, om der findes en UserBook entry for den valgte bog og bruger
+      const userBook = await UserBook.findOne({
+        where: { user_id: userId, book_id: bookId },
+      });
+      expect(userBook).toBeDefined();
+
+      // Sørg for at starte med en ren tilstand ved at fjerne den specifikke entry i UserBookCollection, hvis den eksisterer
+      await UserBookCollection.destroy({
+        where: { collection_id: collectionId, user_book_id: userBook!.id },
+      });
+
+      // Bekræft, at bogen ikke findes i kollektionen før testen
+      const existingEntry = await UserBookCollection.findOne({
+        where: { collection_id: collectionId, user_book_id: userBook!.id },
+      });
+      expect(existingEntry).toBeNull();
+
+      // Test tilføjelse af bogen til kollektionen
       await expect(addBookToCollection(userId, collectionId, bookId)).resolves.not.toThrow();
+
+      // Bekræft, at bogen nu er blevet tilføjet til kollektionen
+      const addedEntry = await UserBookCollection.findOne({
+        where: { collection_id: collectionId, user_book_id: userBook!.id },
+      });
+      expect(addedEntry).toBeDefined();
     }
   );
 });
