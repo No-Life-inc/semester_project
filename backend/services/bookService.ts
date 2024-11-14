@@ -16,10 +16,9 @@ import sequelize from "../config/SqlConfig";
  * 
  * @example
  * getBooks(1, 50)
- * // This will fetch the first 50 books
+ * This will fetch the first 50 books
  */
 export const getBooks = async (page: number = 1, limit: number = 50) => {
-
 
     if (page === undefined) {
         page = 1;
