@@ -80,6 +80,10 @@ export const updateCollection = async (id: number, name: string) => {
  * @throws {Error} - Throws an error if the user ID is invalid, the collection is not found, or the user is not authorized to delete the collection.
  */
 export const deleteCollection = async (id: number, userId: number) => {
+    if (userId == null || isNaN(userId)) {
+        throw new Error("Invalid user ID");
+    }
+
     const collection = await Collection.findByPk(id);
     if (!collection) throw new Error("Collection not found");
 
@@ -130,6 +134,9 @@ export const addBookToCollection = async (userId: number, collectionId: number, 
  * @throws {Error} - Throws an error if the collection, userBook, or UserBookCollection entry is not found.
  */
 export const removeBookFromCollection = async (collectionId: number, userId: number, bookId: number): Promise<void> => {
+    const collection = await Collection.findByPk(collectionId);
+    if (!collection) throw new Error("Collection not found");
+
     const userBook = await UserBook.findOne({
         where: { user_id: userId, book_id: bookId },
     });

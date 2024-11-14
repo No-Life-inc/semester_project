@@ -13,6 +13,7 @@ import {
   addBookToCollection,
   removeBookFromCollection,
 } from "../../services/collectionService";
+import UserBookCollection from "../../models/sequelize/UserBookCollection";
 
 // Initialize Knex
 const testKnex = knex(knexConfig.test);
@@ -141,7 +142,11 @@ describe("deleteCollection function positive tests", () => {
     async (name: string, userId: number) => {
       const collection = await createCollection(name, userId);
       const deleted = await deleteCollection(collection.id, userId);
-      expect(deleted).toBe(1);
+      expect(deleted).toEqual(expect.objectContaining({
+        id: collection.id,
+        name: "Collection to Delete",
+        userId: collection.userId,
+      }));
     }
   );
 });
@@ -175,7 +180,7 @@ describe("addBookToCollection function positive tests", () => {
   test.each(addBookToCollectionPositiveCases)(
     "should add a book to a collection (userId: %i, collectionId: %i, bookId: %i)",
     async (userId: number, collectionId: number, bookId: number) => {
-
+      await UserBookCollection.destroy({ where: { collection_id: collectionId, user_book_id: bookId } });  
       await expect(addBookToCollection(userId, collectionId, bookId)).resolves.not.toThrow();
     }
   );
