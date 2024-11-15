@@ -1,72 +1,59 @@
 import type { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
-  // Trigger for INSERT
   await knex.schema.raw(`
-        CREATE TRIGGER UpdateBookStatsOnInsert
+    CREATE TRIGGER UpdateBookStatsOnInsert
 ON dbo.collection_books
 AFTER INSERT
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Hent book_id fra dbo.user_books baseret på user_book_id
-    IF EXISTS (SELECT 1 FROM dbo.book_stats WHERE book_id = (SELECT ub.book_id 
-                                                             FROM dbo.user_books ub 
-                                                             WHERE ub.id = (SELECT user_book_id FROM inserted)))
-    BEGIN
-        UPDATE dbo.book_stats
-        SET collection_count = collection_count + 1,
-            updated_at = GETDATE()
-        WHERE book_id = (SELECT ub.book_id 
-                         FROM dbo.user_books ub 
-                         WHERE ub.id = (SELECT user_book_id FROM inserted));
-    END
-    ELSE
-    BEGIN
-        INSERT INTO dbo.book_stats (book_id, collection_count, created_at, updated_at)
-        SELECT ub.book_id, 1, GETDATE(), GETDATE()
+    -- Brug MERGE til at håndtere opdatering eller indsættelse
+    MERGE dbo.book_stats AS target
+    USING (
+        SELECT DISTINCT ub.book_id
         FROM dbo.user_books ub
-        WHERE ub.id = (SELECT user_book_id FROM inserted);
-    END
+        INNER JOIN inserted i ON ub.id = i.user_book_id
+    ) AS source (book_id)
+    ON target.book_id = source.book_id
+    WHEN MATCHED THEN
+        UPDATE SET collection_count = collection_count + 1,
+                   updated_at = GETDATE()
+    WHEN NOT MATCHED THEN
+        INSERT (book_id, collection_count, created_at, updated_at)
+        VALUES (source.book_id, 1, GETDATE(), GETDATE());
 END;
+  `);
 
-    `);
-
-  // Trigger for DELETE
   await knex.schema.raw(`
     CREATE TRIGGER UpdateBookStatsOnDelete
-ON dbo.collection_books
-AFTER DELETE
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    -- Hent book_id fra dbo.user_books baseret på user_book_id
-    IF EXISTS (SELECT 1 FROM dbo.book_stats WHERE book_id = (SELECT ub.book_id 
-                                                             FROM dbo.user_books ub 
-                                                             WHERE ub.id = (SELECT user_book_id FROM deleted)))
+    ON dbo.collection_books
+    AFTER DELETE
+    AS
     BEGIN
-        UPDATE dbo.book_stats
-        SET collection_count = collection_count - 1,
-            updated_at = GETDATE()
-        WHERE book_id = (SELECT ub.book_id 
-                         FROM dbo.user_books ub 
-                         WHERE ub.id = (SELECT user_book_id FROM deleted));
+        SET NOCOUNT ON;
 
-        -- Slet fra book_stats, hvis collection_count når 0
-        DELETE FROM dbo.book_stats
-        WHERE book_id = (SELECT ub.book_id 
-                         FROM dbo.user_books ub 
-                         WHERE ub.id = (SELECT user_book_id FROM deleted)) 
-          AND collection_count <= 0;
-    END
-END;
-    `);
+        MERGE dbo.book_stats AS target
+        USING (
+            SELECT ub.book_id
+            FROM dbo.user_books ub
+            INNER JOIN deleted d ON ub.id = d.user_book_id
+        ) AS source (book_id)
+        ON target.book_id = source.book_id
+        WHEN MATCHED THEN
+            UPDATE SET collection_count = CASE
+                WHEN collection_count > 1 THEN collection_count - 1
+                ELSE collection_count
+            END,
+            updated_at = GETDATE()
+        WHEN NOT MATCHED BY SOURCE AND collection_count = 1 THEN
+            DELETE;
+    END;
+  `);
 }
 
 export async function down(knex: Knex): Promise<void> {
-  // Drop triggers
   await knex.schema.raw(`DROP TRIGGER IF EXISTS UpdateBookStatsOnInsert;`);
   await knex.schema.raw(`DROP TRIGGER IF EXISTS UpdateBookStatsOnDelete;`);
 }
