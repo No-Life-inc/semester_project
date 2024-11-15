@@ -69,7 +69,7 @@ export const getBooks = async (page: number = 1, limit: number = 50) => {
 export const getBookById = async (id: number) => {
 
     try {
-        if (isNaN(id) || id < 1) {
+        if (typeof id !== "number" || isNaN(id) || id < 1) {
             throw new Error("Invalid book id. Book id must be a number greater than or equal to 1.");
         }
 

@@ -8,6 +8,7 @@ import Subject from "./Subject";
 interface BookAttributes {
     id: number;
     title: string;
+    titleLong: string;
     publisherId: number;
     edition: string;
     isbn: string;
@@ -33,6 +34,7 @@ interface BookCreationAttributes extends Optional<BookAttributes, "id"> {}
 class Book extends Model<BookAttributes, BookCreationAttributes> implements BookAttributes {
     public id!: number;
     public title!: string;
+    titleLong: string;
     public publisherId!: number;
     public edition!: string;
     public isbn!: string;
@@ -64,6 +66,11 @@ Book.init(
         title: {
             type: DataTypes.STRING,
             allowNull: false,
+        },
+        titleLong: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            field: "title_long",
         },
         publisherId: {
             type: DataTypes.INTEGER,

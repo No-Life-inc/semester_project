@@ -31,7 +31,7 @@ UserBookTag.belongsTo(Tag, { foreignKey: "tag_id", as: "tag" });
 
 // One-to-Many relationship between User and Collection
 User.hasMany(Collection, { foreignKey: "user_id", as: "collections" });
-Collection.belongsTo(User, { foreignKey: "collection_id", as: "users" });
+Collection.belongsTo(User, { foreignKey: "user_id", as: "users" });
 
 // Many-to-Many relationship between Collection and UserBook through UserBookCollection
 Collection.belongsToMany(UserBook, { through: UserBookCollection, foreignKey: "collection_id", as: "user_books" });
