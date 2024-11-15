@@ -127,8 +127,17 @@ export const addBookToCollection = async (userId: number, collectionId: number, 
     }
   
     // Add the user book to the collection
-    await UserBookCollection.create({ collection_id: collectionId, user_book_id: userBook.id });
-  };
+    await UserBookCollection.bulkCreate(
+        [
+            {
+                collection_id: collectionId,
+                user_book_id: userBook.id,
+                createdAt: new Date(),
+            }
+        ],
+        { returning: false }
+    );
+};
 
 /**
  * Removes a book from a collection for a user.

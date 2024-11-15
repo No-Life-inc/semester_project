@@ -40,9 +40,10 @@ UserBookCollection.init(
         sequelize,
         modelName: "UserBookCollection",
         tableName: "collection_books",
-        timestamps: true,
+        timestamps: false,
         createdAt: "created_at",
         updatedAt: false,
+        hasTrigger: true,
     }
 );
 
