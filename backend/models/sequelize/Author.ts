@@ -29,6 +29,9 @@ Author.init(
         name: {
             type: DataTypes.STRING,
             allowNull: false,
+            validate: {
+                len: [0, 255], 
+            },
         },
         createdAt: {
             type: DataTypes.DATE,

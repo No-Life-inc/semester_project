@@ -50,7 +50,6 @@ export const getUserBooks = async (userId: number, page: number = 1, limit: numb
 
         return userBooks;
     } catch (error) {
-        console.error("Error fetching userBooks:", error);
         throw error;
     }
 };
@@ -109,7 +108,6 @@ export const addBookToUser = async (userId: number, bookId: number): Promise<Use
 
         return userBook;
     } catch (error) {
-        console.error("Error adding book to user:", error);
         throw error;
     }
 }
@@ -139,7 +137,6 @@ export const removeBookFromUser = async (userBookId: number): Promise<boolean> =
 
         return true;
     } catch (error) {
-        console.error("Error removing book from user:", error);
         throw error;
     }
 };

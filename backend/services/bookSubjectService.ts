@@ -50,7 +50,6 @@ export const getBooksBySubject = async (
 
         return books;
     } catch (error) {
-        console.error("Error fetching books by subject:", error);
         throw error;
     }
 };

@@ -12,7 +12,6 @@ const tables = [
     "tags",
     "user_book_tags",
     "user_books",
-    "user_collections",
     "users"
 ];
 
