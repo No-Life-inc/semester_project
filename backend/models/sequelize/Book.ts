@@ -66,11 +66,18 @@ Book.init(
         title: {
             type: DataTypes.STRING,
             allowNull: false,
+            validate: {
+                len: [0, 255], 
+                notNull: true,
+            },
         },
         titleLong: {
             type: DataTypes.STRING,
             allowNull: true,
             field: "title_long",
+            validate: {
+                len: [0, 255],
+            },
         },
         publisherId: {
             type: DataTypes.INTEGER,
@@ -80,54 +87,92 @@ Book.init(
         edition: {
             type: DataTypes.INTEGER,
             allowNull: true,
+            validate: {
+                len: [0, 255], 
+            },
         },
         isbn: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: false,
+            validate: {
+                len: [0, 10],
+                notEmpty: true,
+            },
         },
         language: {
             type: DataTypes.STRING,
             allowNull: true,
+            validate: {
+                len: [0, 255], 
+            },
         },
         pages: {
             type: DataTypes.INTEGER,
             allowNull: true,
+            validate: {
+                min: 0,
+                max: 2147483647,
+            },
         },
         publicationDate: {
             type: DataTypes.DATE,
             allowNull: true,
             field: "publication_date",
             validate: {
-                isDate: true, // Ensures the value is a valid date
+                isDate: true, 
+                isAfter: "0001-01-02",
+                isBefore: "9999-12-31",
             },
         },
         dimensions: {
             type: DataTypes.STRING,
             allowNull: true,
+            validate: {
+                len: [0, 255], 
+            },
         },
         image: {
             type: DataTypes.STRING,
             allowNull: true,
+            validate: {
+                len: [0, 255], 
+            },
         },
         synopsis: {
             type: DataTypes.STRING,
             allowNull: true,
+            validate: {
+                len: [0, 255], 
+            },
         },
         msrp: {
             type: DataTypes.FLOAT,
             allowNull: true,
+            validate: {
+                min: 0,
+                max: 99999999.99, 
+            },
         },
         isbn10: {
             type: DataTypes.STRING,
             allowNull: true,
+            validate: {
+                len: [0, 10]
+            },
         },
         isbn13: {
             type: DataTypes.STRING,
             allowNull: true,
+            validate: {
+                len: [0, 13]
+            },
         },
         binding: {
             type: DataTypes.STRING,
             allowNull: true,
+            validate: {
+                len: [0, 255], // Ensures the value is between 1 and 255 characters
+            },
         },
         createdAt: {
             type: DataTypes.DATE,

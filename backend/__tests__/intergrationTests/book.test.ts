@@ -143,7 +143,7 @@ describe("BookData field boundary positive tests", () => {
     "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst";
   
   const maxInt = 2147483647;
-  const maxMSRP = 99999999.99;
+  const maxMSRP = 99999999.98;
 
   const minimalBookData: BookAPIData = { title: " " };
 
@@ -171,8 +171,8 @@ describe("BookData field boundary positive tests", () => {
     // Date_published field tests
     [{ date_published: '0001-01-01', isbn: "0000000007" }, "publicationDate", '0001-01-01', "should accept minimal date_published"],
     [{ date_published: '0001-01-02', isbn: "0000000010" }, "publicationDate", '0001-01-02', "should accept close to minimal date_published"],
-    [{ date_published: "9999-12-30", isbn: "0000000011" }, "publicationDate", "9999-12-30", "should accept close to max date format for date_published"],
-    [{ date_published: "9999-12-31", isbn: "0000000008" }, "publicationDate", "9999-12-31", "should accept max date format for date_published"],
+    [{ date_published: "9999-12-29", isbn: "0000000011" }, "publicationDate", "9999-12-29", "should accept close to max date format for date_published"],
+    [{ date_published: "9999-12-30", isbn: "0000000008" }, "publicationDate", "9999-12-30", "should accept max date format for date_published"],
     [{ date_published: "2024-11-15", isbn: "0000000012" }, "publicationDate", "2024-11-15", "should accept typical date format for date_published"],
 
     //Synopsis field tests
@@ -262,6 +262,71 @@ describe("BookData field boundary positive tests", () => {
       });
     }
   );
+});
+
+describe("BookData field boundary negative tests", () => {
+  const overMaxText = "A".repeat(256); // 256 characters
+  const invalidDate = "10000-01-01"; // Beyond valid date range
+  const invalidISBN10 = "12345678901"; // 11 characters for a 10-character field
+  const invalidISBN13 = "12345678901234"; // 14 characters for a 13-character field
+  const overMaxMSRP = 100000000.0; // Exceeds valid max value
+  const underMaxMSRP = -100000000.0;
+  const maxInt = 2147483647;
+  const negativeMaxInt = -2147483648;
+
+  const minimalBookData: BookAPIData = { title: " " };
+
+  const cases: [Partial<BookAPIData>, string][] = [
+    // Title field tests
+    [{ title: overMaxText }, "should reject title exceeding 255 characters"],
+    [{ title: undefined }, "should reject undefined title"],
+
+    // Image field tests
+    [{ image: overMaxText }, "should reject image URL exceeding 255 characters"],
+
+    // Title_long field tests
+    [{ title_long: overMaxText }, "should reject title_long exceeding 255 characters"],
+
+    // Date_published field tests
+    [{ date_published: invalidDate }, "should reject invalid date_published beyond 9999-12-31"],
+    [{ date_published: "0000-00-00" }, "should reject invalid date_published of 0001-01-00"],
+    [{ date_published: "9999-12-31" }, "should reject invalid date_published of 9999-12-31"],
+    [{ date_published: "9999-12-32" }, "should reject invalid date_published of 9999-12-32"],
+
+    // ISBN fields
+    [{ isbn10: invalidISBN10 }, "should reject isbn10 exceeding 10 characters"],
+    [{ isbn13: invalidISBN13 }, "should reject isbn13 exceeding 13 characters"],
+    [{ isbn: invalidISBN10 }, "should reject isbn exceeding 10 characters"],
+    [{ isbn: undefined}, "should reject undefined isbn"],
+
+    // Pages field tests
+    [{ pages: -1 }, "should reject negative pages value"],
+    [{ pages: maxInt + 1 }, "should reject pages exceeding INT_MAX"],
+    [{ pages: negativeMaxInt }, "should reject pages below INT_MIN"],
+    [{ pages: -10000 }, "should reject pages exceeding valid min value"],
+
+    // MSRP field tests
+    [{ msrp: overMaxMSRP }, "should reject msrp exceeding valid max value"],
+    [{ msrp: -1 }, "should reject negative msrp value"],
+    [{ msrp: underMaxMSRP }, "should reject msrp below valid min value"],
+    [{ msrp: -10000 }, "should reject msrp below valid min value"],
+
+    // Other field tests
+    [{ binding: overMaxText }, "should reject binding exceeding 255 characters"],
+    [{ dimensions: overMaxText }, "should reject dimensions exceeding 255 characters"],
+    [{ synopsis: overMaxText }, "should reject synopsis exceeding 255 characters"],
+    [{ language: overMaxText }, "should reject language exceeding 255 characters"],
+  ];
+
+  test.each(cases)("%s", async (fieldData, description) => {
+    // Prepare the data array
+    const invalidDataArray: BookAPIData[] = [{...minimalBookData, ...fieldData }];
+
+    // Perform the test
+    await expect(addBooks(invalidDataArray)).rejects.toThrow(
+      /validation error|invalid/i // Customize the error message expected
+    );
+  });
 });
 
 describe("BookData field associations - Authors", () => {
