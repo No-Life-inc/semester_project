@@ -1,6 +1,6 @@
 import axios from "axios";
 import dotenv from "dotenv";
-import BookData from "../types/bookData";
+import BookAPIData from "../types/bookAPIData";
 
 dotenv.config();
 
@@ -14,19 +14,18 @@ dotenv.config();
  * fetchBooksFromExternalAPI("Harry")
  * // This will fetch books with titles containing "Harry" from the external API.
  */
-export const fetchBooksFromExternalAPI = async (title: string): Promise<BookData[]> => {
+export const fetchBooksFromExternalAPI = async (title: string): Promise<BookAPIData[]> => {
     try {
         const headers = {
             "Authorization": `${process.env.ISBNDB_API_KEY}`,
             "Content-Type": "application/json"
         };
-        const apiResponse = await axios.get<{ books: BookData[] }>(
+        const apiResponse = await axios.get<{ books: BookAPIData[] }>(
             `https://api2.isbndb.com/books/${title}?page=1&pageSize=20&column=title&shouldMatchAll=0`,
             { headers }
         );
         return apiResponse.data.books;
     } catch (error) {
-        console.error("Error fetching books from external API:", error);
         throw error;
     }
 };

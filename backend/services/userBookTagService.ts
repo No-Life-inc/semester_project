@@ -27,7 +27,6 @@ export const addTagToBook = async (tagId: number, bookId: number) => {
         return await UserBookTag.create({tagId: tagId, userBookId: bookId});
 
     } catch (error) {
-        console.error("Error adding tag to book:", error);
         throw new Error("An error occurred while adding tag to book");
     }
 }
@@ -52,7 +51,6 @@ export const deleteTagFromBook = async (tagId: number, bookId: number) => {
             }
         });
     } catch (error) {
-        console.error("Error deleting tag from book:", error);
         throw new Error("An error occurred while deleting tag from book");
     }
 };

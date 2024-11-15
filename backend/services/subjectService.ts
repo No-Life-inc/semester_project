@@ -47,7 +47,6 @@ export const getAllSubjects = async (page: number = 1, limit: number = 50) => {
       });
      return books;
     } catch (error) {
-      console.error("Error fetching subjects:", error);
       throw error;
     }
   };
@@ -72,7 +71,6 @@ export const getSubjectById = async (id: number): Promise<Subject> => {
         }
         return subject;
     } catch (error) {
-        console.error("Error fetching subject by ID:", error);
         throw error;
     }
 };

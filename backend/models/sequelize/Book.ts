@@ -5,23 +5,23 @@ import Author from "./Author";
 import Publisher from "./Publisher";
 import Subject from "./Subject";
 
-interface BookAttributes {
+export interface BookAttributes {
     id: number;
     title: string;
-    titleLong: string;
-    publisherId: number;
-    edition: string;
+    titleLong?: string;
+    publisherId?: number;
+    edition?: string;
     isbn: string;
-    language: string;
-    pages: number;
-    publicationDate: Date;
-    dimensions: string;
-    image: string;
-    synopsis: string;
-    msrp: number;
-    isbn10: string;
-    isbn13: string;
-    binding: string;
+    language?: string;
+    pages?: number;
+    publicationDate?: Date;
+    dimensions?: string;
+    image?: string;
+    synopsis?: string;
+    msrp?: number;
+    isbn10?: string;
+    isbn13?: string;
+    binding?: string;
     createdAt?: Date;
     users?: User[];
     authors?: Author[];
@@ -29,7 +29,7 @@ interface BookAttributes {
     publisher?: Publisher;
 }
 
-interface BookCreationAttributes extends Optional<BookAttributes, "id"> {}
+export interface BookCreationAttributes extends Optional<BookAttributes, "id"> {}
 
 class Book extends Model<BookAttributes, BookCreationAttributes> implements BookAttributes {
     public id!: number;
@@ -97,6 +97,9 @@ Book.init(
             type: DataTypes.DATE,
             allowNull: true,
             field: "publication_date",
+            validate: {
+                isDate: true, // Ensures the value is a valid date
+            },
         },
         dimensions: {
             type: DataTypes.STRING,
