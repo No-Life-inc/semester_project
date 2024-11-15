@@ -1,6 +1,5 @@
 import  { Request, Response } from "express";
 import {addTag, deleteTagById, getAllTags, getTagById} from "../services/tagService";
-import { parse } from "dotenv";
 
 /**
  * Fetches all tags from the database.

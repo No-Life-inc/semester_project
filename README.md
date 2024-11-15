@@ -43,10 +43,6 @@ BASE_URL=http://localhost:5000
 
 CLIENT_ID=ciJKdUsLXUPHNCsuFZ1umOy7GL67Dzm7
 
-ISSUER_BASE_URL=https://dev-z127od7fd0csxf81.eu.auth0.com
-
-AUTH0_SECRET=LONG_RANDOM_STRING
-
 MONGODB_USERNAME=root
 
 

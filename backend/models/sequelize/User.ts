@@ -1,9 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../config/SqlConfig";
 import Collection from "./Collection"; // Import the Collection model
-import UserCollection from "./UserCollection"; // Import the UserCollection model
 import Book from "./Book"; // Import the Book model
-import UserBook from "./UserBook"; // Import the UserBook model
 
 // Define the attributes for the User model
 interface UserAttributes {

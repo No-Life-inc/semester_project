@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it, jest, test } from "@jest/globals";
-import { setupTestDB, teardownTestDB } from "./setupTestDB";
+import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import { getAllSubjects, getSubjectById } from "../../services/subjectService";
 
 jest.setTimeout(30000);

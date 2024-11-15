@@ -4,8 +4,8 @@ import sequelize from "../../config/SqlConfig";
 // Define the attributes for the UserBookTag model
 interface UserBookTagAttributes {
     id: number;
-    user_book_id: number;
-    tag_id: number;
+    userBookId: number;
+    tagId: number;
     createdAt?: Date;
 }
 
@@ -23,13 +23,15 @@ UserBookTag.init(
             primaryKey: true,
             autoIncrement: true,
         },
-        user_book_id: {
+        userBookId: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            references: { model: "user_books", key: "id" },
         },
-        tag_id: {
+        tagId: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            references: { model: "tags", key: "id" },
         },
         createdAt: {
             type: DataTypes.DATE,
