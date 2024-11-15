@@ -280,6 +280,8 @@ describe("BookData field boundary negative tests", () => {
     // Title field tests
     [{ title: overMaxText }, "should reject title exceeding 255 characters"],
     [{ title: undefined }, "should reject undefined title"],
+    [{ title: "" }, "should reject empty title"],
+    [{ title: null }, "should reject null title"],
 
     // Image field tests
     [{ image: overMaxText }, "should reject image URL exceeding 255 characters"],
@@ -298,6 +300,8 @@ describe("BookData field boundary negative tests", () => {
     [{ isbn13: invalidISBN13 }, "should reject isbn13 exceeding 13 characters"],
     [{ isbn: invalidISBN10 }, "should reject isbn exceeding 10 characters"],
     [{ isbn: undefined}, "should reject undefined isbn"],
+    [{ isbn: "" }, "should reject empty isbn"],
+    [{ isbn: null}, "should reject null isbn"],
 
     // Pages field tests
     [{ pages: -1 }, "should reject negative pages value"],
@@ -335,6 +339,7 @@ describe("BookData field associations - Authors", () => {
   const cases: [Partial<BookAPIData>, keyof Book, any, string][] = [
     [{ authors: ["Author 1", "Author 2"], isbn: "0000000058" }, "authors", ["Author 1", "Author 2"], "should correctly associate multiple authors"],
     [{ authors: ["Author 3"], isbn: "0000000060" }, "authors", ["Author 3"], "should correctly associate a single author"],
+    [{ authors: [""], isbn: "0000000160" }, "authors", [""], "should correctly associate a single author"],
   ];
 
   test.each(cases)(
@@ -366,6 +371,29 @@ describe("BookData field associations - Authors", () => {
     }
   );
 });
+
+describe("BookData field associations - Authors (Negative Tests)", () => {
+  const maxTextPlusOne =
+    "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst.-";
+
+  const minimalBookData: BookAPIData = { title: "Test Book" };
+
+  const cases: [Partial<BookAPIData>, string][] = [
+    [{ authors: [maxTextPlusOne], isbn: "0000000101"}, "should ignore empty or invalid author names"],
+  ];
+
+  test.each(cases)(
+    "%s",
+    async (fieldData, description) => {
+      const invalidDataArray: BookAPIData[] = [{ ...minimalBookData, ...fieldData }];
+
+      // Perform the test
+    await expect(addBooks(invalidDataArray)).rejects.toThrow(
+      /validation error|invalid/i // Customize the error message expected
+    );
+  });
+    });
+
 
 describe("BookData field associations - Subjects", () => {
   const minimalBookData: BookAPIData = { title: "Test Book" };
