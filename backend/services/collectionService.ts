@@ -1,6 +1,5 @@
 import User from "../models/sequelize/User";
 import Collection from "../models/sequelize/Collection";
-import UserCollection from "../models/sequelize/UserCollection";
 import UserBook from "../models/sequelize/UserBook";
 import Book from "../models/sequelize/Book";
 import UserBookCollection from "../models/sequelize/UserBookCollection";

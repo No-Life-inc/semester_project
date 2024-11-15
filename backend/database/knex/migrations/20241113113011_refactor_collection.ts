@@ -19,6 +19,7 @@ export async function down(knex: Knex): Promise<void> {
         table.foreign('collection_id').references('collections.id');
     });
     await knex.schema.table('collections', table => {
+        table.dropForeign(['user_id']);
         table.dropColumn('user_id');
     });
 }
