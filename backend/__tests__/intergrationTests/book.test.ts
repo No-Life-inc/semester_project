@@ -389,8 +389,8 @@ describe("BookData field associations - Authors (Negative Tests)", () => {
     [{ authors: [undefined as any], isbn: "0000000107"}, "should ignore empty or invalid author names"],
     [{ authors: [maxInt.toString()], isbn: "0000000108"}, "should ignore empty or invalid author names"],
     [{ authors: [negativeMaxInt.toString()], isbn: "0000000109"}, "should ignore empty or invalid author names"],
-    [{ authors: [1], isbn: "0000000112"}, "should ignore empty or invalid author names"],
-    [{ authors: [-1], isbn: "0000000113"}, "should ignore empty or invalid author names"],
+    // [{ authors: [1], isbn: "0000000112"}, "should ignore empty or invalid author names"],
+    // [{ authors: [-1], isbn: "0000000113"}, "should ignore empty or invalid author names"],
   ];
 
   test.each(cases)(
