@@ -9,7 +9,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Brug MERGE til at håndtere opdatering eller indsættelse
+
     MERGE dbo.book_stats AS target
     USING (
         SELECT DISTINCT ub.book_id
