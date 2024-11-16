@@ -27,7 +27,6 @@ export async function seed(knex: Knex): Promise<void> {
 
     // Fetch existing books in a deterministic order
     const books = await knex("books").select("id").orderBy("id", "asc").limit(10);
-    console.log("Seeded Books:", books);
 
     // Seed UserBooks
     const userBooks = [
@@ -36,7 +35,6 @@ export async function seed(knex: Knex): Promise<void> {
         { user_id: user3.id, book_id: books[2].id },
     ];
     const insertedUserBooks = await knex("user_books").insert(userBooks).returning("*");
-    console.log("Seeded UserBooks:", insertedUserBooks);
 
     // Seed UserBookCollection
     const userBookCollections = [
