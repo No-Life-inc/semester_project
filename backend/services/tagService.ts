@@ -59,7 +59,6 @@ export const addTag = async (name: string) => {
     try{
         return await Tag.create({name});
     } catch (error) {
-        console.error("Error creating tag:", error);
         throw new Error("An error occurred while creating tag");
     }
 }
@@ -83,7 +82,6 @@ export const deleteTagById = async (id: number) => {
         }
         return deletedCount;
     } catch (error) {
-        console.error("Error deleting tag:", error);
         throw new Error("An error occurred while deleting tag");
     }
 };

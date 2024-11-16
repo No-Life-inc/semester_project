@@ -80,6 +80,10 @@ export const updateCollection = async (id: number, name: string) => {
  * @throws {Error} - Throws an error if the user ID is invalid, the collection is not found, or the user is not authorized to delete the collection.
  */
 export const deleteCollection = async (id: number, userId: number) => {
+    if (userId == null || isNaN(userId)) {
+        throw new Error("Invalid user ID");
+    }
+
     const collection = await Collection.findByPk(id);
     if (!collection) throw new Error("Collection not found");
 
@@ -101,23 +105,38 @@ export const deleteCollection = async (id: number, userId: number) => {
  * @throws {Error} - Throws an error if the userBook entry is not found or the book already exists in the collection.
  */
 export const addBookToCollection = async (userId: number, collectionId: number, bookId: number): Promise<void> => {
+    // Find the user_book entry to get user_book_id
     const userBook = await UserBook.findOne({
-        where: { user_id: userId, book_id: bookId },
+        where: {
+            user_id: userId,
+            book_id: bookId,
+        },
     });
-
+    
     if (!userBook) {
         throw new Error("UserBook entry not found. Add the book to the user first.");
     }
-
+  
+    // Check if the book is already associated with the collection
     const existingEntry = await UserBookCollection.findOne({
         where: { collection_id: collectionId, user_book_id: userBook.id },
     });
-
+    
     if (existingEntry) {
         throw new Error("Book already exists in the collection");
     }
-
-    await UserBookCollection.create({ collection_id: collectionId, user_book_id: userBook.id });
+  
+    // Add the user book to the collection
+    await UserBookCollection.bulkCreate(
+        [
+            {
+                collection_id: collectionId,
+                user_book_id: userBook.id,
+                createdAt: new Date(),
+            }
+        ],
+        { returning: false }
+    );
 };
 
 /**
@@ -130,6 +149,9 @@ export const addBookToCollection = async (userId: number, collectionId: number, 
  * @throws {Error} - Throws an error if the collection, userBook, or UserBookCollection entry is not found.
  */
 export const removeBookFromCollection = async (collectionId: number, userId: number, bookId: number): Promise<void> => {
+    const collection = await Collection.findByPk(collectionId);
+    if (!collection) throw new Error("Collection not found");
+
     const userBook = await UserBook.findOne({
         where: { user_id: userId, book_id: bookId },
     });
