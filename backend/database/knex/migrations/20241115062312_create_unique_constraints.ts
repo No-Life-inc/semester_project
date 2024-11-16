@@ -1,7 +1,7 @@
 exports.up = async function(knex) {
     // Alter `isbn` to be not nullable and unique
     await knex.schema.alterTable('books', (table) => {
-      table.string('isbn', 255).notNullable().alter();
+      table.string('isbn', 13).notNullable().alter();
       table.unique(['isbn']);
     });
   
@@ -46,7 +46,7 @@ exports.up = async function(knex) {
   
     // Run the rollback migration that only sets columns to nullable
     await knex.schema.alterTable('books', (table) => {
-      table.string('isbn', 255).nullable().alter();
+      table.string('isbn', 13).nullable().alter();
     });
     await knex.schema.alterTable('authors', (table) => {
       table.string('name', 255).nullable().alter();

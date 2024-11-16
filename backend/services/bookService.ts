@@ -3,7 +3,7 @@ import Book from "../models/sequelize/Book";
 import Subject from "../models/sequelize/Subject";
 import Author from "../models/sequelize/Author";
 import Publisher from "../models/sequelize/Publisher";
-import { Op } from "sequelize";
+import { Op, Transaction } from "sequelize";
 import BookAPIData from "../types/bookAPIData";
 import sequelize from "../config/SqlConfig";
 import { BookCreationAttributes } from "../models/sequelize/Book";
@@ -120,6 +120,138 @@ export const getBooksByTitle = async (title: string): Promise<Book[]> => {
   }
 };
 
+
+
+// export const addBooks = async (
+//   booksData: BookAPIData[]
+// ): Promise<Book[]> => {
+//   const t = await sequelize.transaction(); // Start a transaction
+
+//   try {
+//     const addedBooks = [];
+
+//     for (const bookData of booksData) {
+//       const {
+//         subjects,
+//         authors,
+//         publisher,
+//         date_published,
+//         ...bookDetails
+//       }: BookAPIData = bookData;
+
+//       let bookCreationDetails: BookCreationAttributes = {
+//         title: bookDetails.title,
+//         titleLong: bookDetails.title_long || "",
+//         edition: bookDetails.edition || "",
+//         isbn: bookDetails.isbn || "",
+//         language: bookDetails.language || "",
+//         pages: bookDetails.pages || 0,
+//         publicationDate: date_published ? new Date(date_published) : null,
+//         dimensions: bookDetails.dimensions || "",
+//         image: bookDetails.image || "",
+//         synopsis: bookDetails.synopsis || "",
+//         msrp: bookDetails.msrp || 0,
+//         isbn10: bookDetails.isbn10 || "",
+//         isbn13: bookDetails.isbn13 || "",
+//         binding: bookDetails.binding || "",
+//       };
+
+//       // Handle publisher
+//       let publisherInstance = null;
+//       if (publisher) {
+//         publisherInstance = await Publisher.findOne({
+//           where: { name: publisher },
+//           transaction: t,
+//         });
+//         if (!publisherInstance) {
+//           publisherInstance = await Publisher.create(
+//             { name: publisher },
+//             { transaction: t }
+//           );
+//         }
+//         bookCreationDetails.publisherId = publisherInstance.id;
+//       }
+
+//       // Create the book
+//       const book = await Book.create(bookCreationDetails, { transaction: t });
+
+//       // Handle subjects
+//       if (subjects && subjects.length > 0) {
+//         for (const subjectName of subjects) {
+//           let subject = await Subject.findOne({
+//             where: { name: subjectName },
+//             transaction: t,
+//           });
+//           if (!subject) {
+//             subject = await Subject.create(
+//               { name: subjectName },
+//               { transaction: t }
+//             );
+//           }
+
+//           // Check if the book is already associated with the subject to avoid duplicates
+//           const existingAssociation =
+//             await sequelize.models.book_subjects.findOne({
+//               where: { book_id: book.id, subject_id: subject.id },
+//               transaction: t,
+//             });
+
+//           if (!existingAssociation) {
+//             await sequelize.models.book_subjects.create(
+//               {
+//                 book_id: book.id,
+//                 subject_id: subject.id,
+//               },
+//               { transaction: t }
+//             );
+//           }
+//         }
+//       }
+
+//       // Handle authors
+//       if (authors && authors.length > 0) {
+//         for (const authorName of authors) {
+//           let author = await Author.findOne({
+//             where: { name: authorName },
+//             transaction: t,
+//           });
+//           if (!author) {
+//             author = await Author.create(
+//               { name: authorName },
+//               { transaction: t }
+//             );
+//           }
+
+//           // Check if the book is already associated with the author to avoid duplicates
+//           const existingAssociation =
+//             await sequelize.models.book_authors.findOne({
+//               where: { book_id: book.id, author_id: author.id },
+//               transaction: t,
+//             });
+
+//           if (!existingAssociation) {
+//             await sequelize.models.book_authors.create(
+//               {
+//                 book_id: book.id,
+//                 author_id: author.id,
+//               },
+//               { transaction: t }
+//             );
+//           }
+//         }
+//       }
+
+//       addedBooks.push(book);
+//     }
+
+//     await t.commit(); // Commit the transaction if all operations are successful
+//     return addedBooks;
+//   } catch (error) {
+//     await t.rollback(); // Rollback the transaction if there's an error
+//     throw error;
+//   }
+// };
+
 /**
  * Adds new books to the database.
  *
@@ -130,133 +262,142 @@ export const getBooksByTitle = async (title: string): Promise<Book[]> => {
  * addBooks([{ title: "New Book", author: "Author Name" }])
  * // This will add new books to the database.
  */
-
-export const addBooks = async (
-  booksData: BookAPIData[]
-): Promise<Book[]> => {
-  const t = await sequelize.transaction(); // Start a transaction
+export const addBooks = async (booksData: BookAPIData[]): Promise<Book[]> => {
+  const t = await sequelize.transaction();
 
   try {
     const addedBooks = [];
 
     for (const bookData of booksData) {
-      const {
-        subjects,
-        authors,
-        publisher,
-        date_published,
-        ...bookDetails
-      }: BookAPIData = bookData;
+      const bookCreationDetails = prepareBookDetails(bookData);
 
-      let bookCreationDetails: BookCreationAttributes = {
-        title: bookDetails.title,
-        titleLong: bookDetails.title_long || "",
-        edition: bookDetails.edition || "",
-        isbn: bookDetails.isbn || "",
-        language: bookDetails.language || "",
-        pages: bookDetails.pages || 0,
-        publicationDate: date_published ? new Date(date_published) : null,
-        dimensions: bookDetails.dimensions || "",
-        image: bookDetails.image || "",
-        synopsis: bookDetails.synopsis || "",
-        msrp: bookDetails.msrp || 0,
-        isbn10: bookDetails.isbn10 || "",
-        isbn13: bookDetails.isbn13 || "",
-        binding: bookDetails.binding || "",
-      };
+      const publisherInstance = await handlePublisher(
+        bookData.publisher,
+        t
+      );
 
-      // Handle publisher
-      let publisherInstance = null;
-      if (publisher) {
-        publisherInstance = await Publisher.findOne({
-          where: { name: publisher },
-          transaction: t,
-        });
-        if (!publisherInstance) {
-          publisherInstance = await Publisher.create(
-            { name: publisher },
-            { transaction: t }
-          );
-        }
+      if (publisherInstance) {
         bookCreationDetails.publisherId = publisherInstance.id;
       }
 
-      // Create the book
       const book = await Book.create(bookCreationDetails, { transaction: t });
 
-      // Handle subjects
-      if (subjects && subjects.length > 0) {
-        for (const subjectName of subjects) {
-          let subject = await Subject.findOne({
-            where: { name: subjectName },
-            transaction: t,
-          });
-          if (!subject) {
-            subject = await Subject.create(
-              { name: subjectName },
-              { transaction: t }
-            );
-          }
-
-          // Check if the book is already associated with the subject to avoid duplicates
-          const existingAssociation =
-            await sequelize.models.book_subjects.findOne({
-              where: { book_id: book.id, subject_id: subject.id },
-              transaction: t,
-            });
-
-          if (!existingAssociation) {
-            await sequelize.models.book_subjects.create(
-              {
-                book_id: book.id,
-                subject_id: subject.id,
-              },
-              { transaction: t }
-            );
-          }
-        }
+      if (bookData.subjects) {
+        await handleSubjects(book.id, bookData.subjects, t);
       }
 
-      // Handle authors
-      if (authors && authors.length > 0) {
-        for (const authorName of authors) {
-          let author = await Author.findOne({
-            where: { name: authorName },
-            transaction: t,
-          });
-          if (!author) {
-            author = await Author.create(
-              { name: authorName },
-              { transaction: t }
-            );
-          }
-
-          // Check if the book is already associated with the author to avoid duplicates
-          const existingAssociation =
-            await sequelize.models.book_authors.findOne({
-              where: { book_id: book.id, author_id: author.id },
-              transaction: t,
-            });
-
-          if (!existingAssociation) {
-            await sequelize.models.book_authors.create(
-              {
-                book_id: book.id,
-                author_id: author.id,
-              },
-              { transaction: t }
-            );
-          }
-        }
+      if (bookData.authors) {
+        await handleAuthors(book.id, bookData.authors, t);
       }
 
       addedBooks.push(book);
     }
 
-    await t.commit(); // Commit the transaction if all operations are successful
+    await t.commit();
     return addedBooks;
   } catch (error) {
-    await t.rollback(); // Rollback the transaction if there's an error
+    await t.rollback();
     throw error;
+  }
+};
+
+// Helper function to prepare book details
+const prepareBookDetails = (bookData: BookAPIData): BookCreationAttributes => {
+  const { date_published, ...details } = bookData;
+
+  return {
+    title: details.title,
+    titleLong: details.title_long || "",
+    edition: details.edition || "",
+    isbn: details.isbn || "",
+    language: details.language || "",
+    pages: details.pages || 0,
+    publicationDate: date_published ? new Date(date_published) : null,
+    dimensions: details.dimensions || "",
+    image: details.image || "",
+    synopsis: details.synopsis || "",
+    msrp: details.msrp || 0,
+    isbn10: details.isbn10 || "",
+    isbn13: details.isbn13 || "",
+    binding: details.binding || "",
+  };
+};
+
+// Helper function to handle publisher
+const handlePublisher = async (
+  publisherName: string | undefined,
+  transaction: Transaction
+): Promise<Publisher | null> => {
+  if (!publisherName) return null;
+
+  let publisher = await Publisher.findOne({
+    where: { name: publisherName },
+    transaction,
+  });
+
+  if (!publisher) {
+    publisher = await Publisher.create({ name: publisherName }, { transaction });
+  }
+
+  return publisher;
+};
+
+// Helper function to handle subjects
+const handleSubjects = async (
+  bookId: number,
+  subjects: string[],
+  transaction: Transaction
+): Promise<void> => {
+  for (const subjectName of subjects) {
+    let subject = await Subject.findOne({
+      where: { name: subjectName },
+      transaction,
+    });
+
+    if (!subject) {
+      subject = await Subject.create({ name: subjectName }, { transaction });
+    }
+
+    const existingAssociation = await sequelize.models.book_subjects.findOne({
+      where: { book_id: bookId, subject_id: subject.id },
+      transaction,
+    });
+
+    if (!existingAssociation) {
+      await sequelize.models.book_subjects.create(
+        { book_id: bookId, subject_id: subject.id },
+        { transaction }
+      );
+    }
+  }
+};
+
+// Helper function to handle authors
+const handleAuthors = async (
+  bookId: number,
+  authors: string[],
+  transaction: Transaction
+): Promise<void> => {
+  for (const authorName of authors) {
+    let author = await Author.findOne({
+      where: { name: authorName },
+      transaction,
+    });
+
+    if (!author) {
+      author = await Author.create({ name: authorName }, { transaction });
+    }
+
+    const existingAssociation = await sequelize.models.book_authors.findOne({
+      where: { book_id: bookId, author_id: author.id },
+      transaction,
+    });
+
+    if (!existingAssociation) {
+      await sequelize.models.book_authors.create(
+        { book_id: bookId, author_id: author.id },
+        { transaction }
+      );
+    }
   }
 };
