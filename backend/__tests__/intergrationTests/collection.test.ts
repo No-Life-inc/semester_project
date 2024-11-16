@@ -173,8 +173,9 @@ describe("deleteCollection function negative tests", () => {
 // Positive test cases for addBookToCollection
 type AddBookToCollectionTestCase = [number, number, number];
 const addBookToCollectionPositiveCases: AddBookToCollectionTestCase[] = [
-  [1, 1, 1], // Brug id'er som findes i seed-data
+  [1, 1, 1],
   [2, 2, 2],
+  [3, 3, 3],
 ];
 
 describe("addBookToCollection function positive tests", () => {
@@ -184,6 +185,7 @@ describe("addBookToCollection function positive tests", () => {
       const userBook = await UserBook.findOne({
         where: { user_id: userId, book_id: bookId },
       });
+      console.log('UserBook fetched:', userBook);
       expect(userBook).toBeDefined();
 
       await UserBookCollection.destroy({
@@ -225,7 +227,7 @@ describe("addBookToCollection function negative tests", () => {
 type RemoveBookFromCollectionTestCase = [number, number, number];
 const removeBookFromCollectionPositiveCases: RemoveBookFromCollectionTestCase[] = [
   [1, 1, 1],
-  [2, 1, 2],
+  [2, 2, 2],
 ];
 
 describe("removeBookFromCollection function positive tests", () => {

@@ -1,69 +1,55 @@
 import { Knex } from "knex";
 
 export async function seed(knex: Knex): Promise<void> {
-    // Deletes ALL existing entries in the relevant tables
     await knex("user_book_tags").del();
     await knex("collection_books").del();
     await knex("user_books").del();
     await knex("collections").del();
     await knex("users").del();
 
-    // Inserts seed entries for users
-    const [user1, user2, user3] = await knex("users").insert([
-        { name: "user1", email: "user1@example.com", password: "password" },
-        { name: "user2", email: "user2@example.com", password: "password" },
-        { name: "user3", email: "user3@example.com", password: "password" }
-    ]).returning("id");
+    // Seed users
+    const [user1, user2, user3] = await knex("users")
+        .insert([
+            { name: "user1", email: "user1@example.com", password: "password" },
+            { name: "user2", email: "user2@example.com", password: "password" },
+            { name: "user3", email: "user3@example.com", password: "password" },
+        ])
+        .returning("*");
 
-    // Inserts seed entries for collections
-    const [collection1, collection2, collection3] = await knex("collections").insert([
-        { name: "Collection 1", user_id: user1.id },
-        { name: "Collection 2", user_id: user2.id },
-        { name: "Collection 3", user_id: user3.id }
-    ]).returning("id");
+    // Seed collections
+    const [collection1, collection2, collection3] = await knex("collections")
+        .insert([
+            { name: "Collection 1", user_id: user1.id },
+            { name: "Collection 2", user_id: user2.id },
+            { name: "Collection 3", user_id: user3.id },
+        ])
+        .returning("*");
 
-    // Fetch existing books from the books table
-    const books = await knex("books").select("id").limit(10);
+    // Fetch existing books in a deterministic order
+    const books = await knex("books").select("id").orderBy("id", "asc").limit(10);
+    console.log("Seeded Books:", books);
 
-    // Create associations between users and books
-    const userBooks = [];
-    for (const user of [user1, user2, user3]) {
-        for (const book of books) {
-            userBooks.push({
-                user_id: user.id,
-                book_id: book.id
-            });
-        }
-    }
-    const insertedUserBooks = await knex("user_books").insert(userBooks).returning(["id", "user_id", "book_id"]);
+    // Seed UserBooks
+    const userBooks = [
+        { user_id: user1.id, book_id: books[0].id },
+        { user_id: user2.id, book_id: books[1].id },
+        { user_id: user3.id, book_id: books[2].id },
+    ];
+    const insertedUserBooks = await knex("user_books").insert(userBooks).returning("*");
+    console.log("Seeded UserBooks:", insertedUserBooks);
 
-    // Create collection associations with user books
-    const collectionBooks = [];
-    for (const userBook of insertedUserBooks) {
-        for (const collection of [collection1, collection2, collection3]) {
-            collectionBooks.push({
-                collection_id: collection.id,
-                user_book_id: userBook.id
-            });
-        }
-    }
-    await knex("collection_books").insert(collectionBooks);
+    // Seed UserBookCollection
+    const userBookCollections = [
+        { collection_id: collection1.id, user_book_id: insertedUserBooks[0].id },
+        { collection_id: collection2.id, user_book_id: insertedUserBooks[1].id },
+        { collection_id: collection3.id, user_book_id: insertedUserBooks[2].id },
+    ];
+    await knex("collection_books").insert(userBookCollections);
 
-    // Fetch existing tags from the tags table
     const tags = await knex("tags").select("id");
-
-    // Assign tags to user_book associations
-    const userBookTags = [];
-    insertedUserBooks.forEach((userBook) => {
-        tags.forEach((tag) => {
-            userBookTags.push({
-                user_book_id: userBook.id,
-                tag_id: tag.id
-            });
-        });
-    });
-
-    // Use batchInsert to handle large inserts
-    const batchSize = 1000; // Adjust the batch size as needed
-    await knex.batchInsert("user_book_tags", userBookTags, batchSize);
+    const userBookTags = insertedUserBooks.map((userBook, index) => ({
+        user_book_id: userBook.id,
+        tag_id: tags[index % tags.length].id,
+    }));
+    await knex("user_book_tags").insert(userBookTags);
 }
