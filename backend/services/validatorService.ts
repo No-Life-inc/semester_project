@@ -1,6 +1,10 @@
 export const validatePassword = (password: string): void => {
-    if (!password || password.trim() === "") {
-        throw new Error("Password cannot be empty or whitespace.");
+    if (password.trim() === "") {
+        throw new Error("Password cannot be whitespace.");
+    }
+
+    if (/\s/.test(password)) {
+        throw new Error("Password cannot contain spaces.");
     }
 
     if (password.length < 8) {
@@ -17,6 +21,10 @@ export const validatePassword = (password: string): void => {
 
     if (!/[0-9]/.test(password)) {
         throw new Error("Password must contain at least one digit.");
+    }
+
+    if (/\s/.test(password)) {
+        throw new Error("Password cannot contain a space.");
     }
 };
 
