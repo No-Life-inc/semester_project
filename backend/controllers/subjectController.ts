@@ -28,14 +28,15 @@ export const getAllSubjectsController = async (request: Request, response: Respo
  * 
  * @param {Request} req - The request object.
  * @param {Response} res - The response object.
- * 
- * @returns {Promise<void>} - A promise that resolves to void.
  */
-export const getSubjectByIdController = async (req: Request, res: Response): Promise<void> => {
+export const getSubjectByIdController = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     try {
         const subject = await getSubjectById(Number(id));
+        if (!subject) {
+            return res.status(404).json({ error: "Subject not found" });
+        }
         res.json(subject);
     } catch (error) {
         console.error("Error fetching subject by ID:", error);

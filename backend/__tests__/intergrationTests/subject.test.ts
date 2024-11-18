@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, jest, test } from "@jest/globals";
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import { getAllSubjects, getSubjectById } from "../../services/subjectService";
+import SubjectAPIData from "../../types/subjectAPIData";
 
 jest.setTimeout(30000);
 
@@ -31,21 +32,21 @@ test.each(positiveTestCases)(
 });
 
 describe("getAllSubjects function negative tests", () => {
-    const negativeTestCases = [
-      [-1, 10, "Invalid page number. Page must be a number greater than or equal to 1."],
-      [NaN, 10, "Invalid page number. Page must be a number greater than or equal to 1."],
-      [1, -10, "Invalid limit. Limit must be a number greater than or equal to 1."],
-      [1, NaN, "Invalid limit. Limit must be a number greater than or equal to 1."],
-      [1, 101, "Invalid limit. Limit must be a number less than or equal to 100."],
-    ];
-  
-    test.each(negativeTestCases)(
-      "should throw an error (page: %i, limit: %i, errorMessage: %s)",
-      async (page, limit, errorMessage) => {
-        await expect(getAllSubjects(Number(page), Number(limit))).rejects.toThrow(errorMessage);
-      }
-    );
-  });
+  const negativeTestCases = [
+    [-1, 10, "Invalid page number. Page must be a number greater than or equal to 1."],
+    [NaN, 10, "Invalid page number. Page must be a number greater than or equal to 1."],
+    [1, -10, "Invalid limit. Limit must be a number greater than or equal to 1."],
+    [1, NaN, "Invalid limit. Limit must be a number greater than or equal to 1."],
+    [1, 101, "Invalid limit. Limit must be a number less than or equal to 100."],
+  ];
+
+  test.each(negativeTestCases)(
+    "should throw an error (page: %i, limit: %i, errorMessage: %s)",
+    async (page, limit, errorMessage) => {
+      await expect(getAllSubjects(Number(page), Number(limit))).rejects.toThrow(errorMessage);
+    }
+  );
+});
 
 describe("getSubjectById function positive tests", () => {
 const positiveTestCases = [
@@ -70,7 +71,9 @@ describe("getSubjectById function negative tests", () => {
 const negativeTestCases: [number, string][] = [
     [-1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
     [NaN, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
-    [9999, "Subject not found"],
+    [5000, "Subject not found"],
+    [0, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
+    ["1" as any, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
 ];
 
 test.each(negativeTestCases)(
