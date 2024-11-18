@@ -20,3 +20,12 @@ export const validatePassword = (password: string): void => {
     }
 };
 
+export const validateEmail = (email: string): void => {
+    if (!email || email.trim() === "") {
+        throw new Error("Email cannot be empty or whitespace.");
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw new Error("Invalid email format.");
+    }
+}

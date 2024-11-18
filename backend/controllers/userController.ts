@@ -17,7 +17,7 @@ export const registerUserController = async (request: Request, response: Respons
     const {name, email, password} = request.body;
 
     try {
-        const user = await registerUser(name, email, password);
+        const user = await registerUser(name, email.toLowerCase(), password);
         response.json(user);
     } catch (error) {
         console.error("Error registering user:", error);
@@ -36,7 +36,7 @@ export const loginUserController = async (request: Request, response: Response) 
     const {email, password} = request.body;
 
     try {
-        const user = await loginUser(email, password);
+        const user = await loginUser(email.toLowerCase(), password);
         response.json(user);
     } catch (error) {
         console.error("Error logging in user:", error);
@@ -76,7 +76,7 @@ export const editUserController = async (request: Request, response: Response) =
     }
 
     try {
-        const result = await editUser(token, name, email);
+        const result = await editUser(token, name, email.toLowerCase());
         response.json({ message: result });
     } catch (error) {
         console.error("Error editing user:", error);

@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import User from "../models/sequelize/User";
-import {validatePassword} from "./passwordValidatorService";
+import {validateEmail, validatePassword} from "./validatorService";
 import {generateToken, verifyToken} from "./jwtService";
 
 /**
@@ -16,14 +16,11 @@ import {generateToken, verifyToken} from "./jwtService";
  * This will create a new user with the name "johndoe", email "johndoe@johndoe.com" and password "password123"
  * but hashing the password before storing it in the database, with the help of the User model.
  */
-export const registerUser = async (
-    name: string,
-    email: string,
-    password: string
-) => {
+export const registerUser = async (name: string, email: string, password: string) => {
     try {
         validatePassword(password);
-        // Check if the email already exists
+        validateEmail(email);
+
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
             throw new Error("Email is already in use.");
@@ -104,11 +101,12 @@ export const editUser = async (token: string, name: string, email: string) => {
             throw new Error("User not found.");
         }
 
+        if (email) {
+            validateEmail(email);
+            user.email = email;
+        }
         if (name) {
             user.name = name;
-        }
-        if (email) {
-            user.email = email;
         }
 
         await user.save();
