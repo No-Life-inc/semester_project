@@ -18,6 +18,7 @@
     "typescript-eslint": "^8.6.0"
   },
   "dependencies": {
-    "axios": "^1.7.7"
+    "axios": "^1.7.7",
+    "supertest": "^7.0.0"
   }
 }

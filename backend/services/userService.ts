@@ -1,0 +1,148 @@
+import bcrypt from "bcrypt";
+import User from "../models/sequelize/User";
+import {validateEmail, validatePassword} from "./validatorService";
+import {generateToken, verifyToken} from "./jwtService";
+
+/**
+ * Registers a new user.
+ *
+ * @param {string} name - The name of the new user
+ * @param {string} email - The email of the new user
+ * @param {string} password - The password of the new user
+ * @returns {Promise<User>} - The created User instance without the password
+ *
+ * @example
+ * registerUser("johndoe", "johndoe@johndoe.com", "password123")
+ * This will create a new user with the name "johndoe", email "johndoe@johndoe.com" and password "password123"
+ * but hashing the password before storing it in the database, with the help of the User model.
+ */
+export const registerUser = async (name: string, email: string, password: string) => {
+    try {
+        validatePassword(password);
+        validateEmail(email);
+
+        const existingUser = await User.findOne({ where: { email } });
+        if (existingUser) {
+            throw new Error("Email is already in use.");
+        }
+
+        // Create and return the new user
+        const newUser = await User.create({ name, email, password });
+
+        const userWithoutPassword = newUser.toJSON();
+        delete userWithoutPassword.password;
+
+        return userWithoutPassword;
+    } catch (error) {
+        console.error("Error registering user:", error);
+        throw error;
+    }
+};
+
+/**
+ * Logs in a user.
+ *
+ * @param {string} email - The email of the user
+ * @param {string} password - The password of the user
+ * @returns {Promise<User>} - The logged in User instance without the password
+ *
+ * @example
+ * loginUser("johndoe@johndoe.com", "password123")
+ * This will log in the user with the email "johndoe@johndoe.com" if the password matches the hashed password in the database.
+ */
+export const loginUser = async (email: string, password: string) => {
+    try {
+        const user = await User.findOne({
+            where: { email },
+            attributes: { include: ["password"] },
+        });
+        if (!user) {
+            throw new Error("Invalid email or password.");
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            throw new Error("Invalid email or password.");
+        }
+
+        const userWithoutPassword = user.toJSON();
+        delete userWithoutPassword.password;
+
+        // Generate JWT token
+        const token = generateToken(user);
+
+        return { user: userWithoutPassword, token };
+    } catch (error) {
+        console.error("Error logging in user:", error);
+        throw error;
+    }
+};
+
+/**
+ * Edit user details without the password.
+ *
+ * @param {string} token - The JWT token of the user
+ * @param {string} name - The new name of the user
+ * @param {string} email - The email of the user
+ * @returns {Promise<void>} - A promise that resolves to void
+ *
+ * @example
+ * editUser("johndoeeeee", "johndoe@hotmail.com")
+ * This will edit the user with the given name and email
+ * if the user with the given email exists.
+ */
+
+export const editUser = async (token: string, name: string, email: string) => {
+    try {
+        const decoded = verifyToken(token);
+        const user = await User.findOne({ where: { id: decoded.id } });
+
+        if (!user) {
+            throw new Error("User not found.");
+        }
+
+        if (email) {
+            validateEmail(email);
+            user.email = email;
+        }
+        if (name) {
+            user.name = name;
+        }
+
+        await user.save();
+        return "User details have been updated successfully.";
+
+    }
+    catch (error) {
+        console.error("Error editing user:", error);
+        throw error;
+    }
+}
+
+export const editPassword = async (token: string, oldPassword: string, password: string) => {
+    try {
+        const decoded = verifyToken(token);
+        validatePassword(password);
+
+        const user = await User.findOne({
+            where: { id: decoded.id, },
+            attributes: { include: ["password"] },
+        });
+
+        if (!user) {
+            throw new Error("User not found.");
+        }
+
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            throw new Error("Invalid password.");
+        }
+
+        user.password = password;
+        await user.save();
+        return "Your password has been updated successfully."
+    } catch (error) {
+        console.error("Error editing user:", error);
+        throw error;
+    }
+}

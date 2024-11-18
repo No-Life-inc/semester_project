@@ -26,8 +26,7 @@ export const getBooksController = async (request: Request, response: Response) =
         console.error("Error fetching books:", error);
         response.status(500).json({ error: "An error occurred while fetching books" });
     }
-
-  };
+};
 
 /**
  * Fetches a book by its ID.
@@ -44,15 +43,20 @@ export const getBooksController = async (request: Request, response: Response) =
  */
 export const getBookByIdController = async (request: Request, response: Response) => {
     const { id } = request.params;
-    
+
     try {
         const book = await getBookById(Number(id));
+
+        if (!book) {
+            return response.status(404).json({ error: "Book not found" });
+        }
+
         response.json(book);
     } catch (error) {
         console.error("Error fetching book:", error);
         response.status(500).json({ error: "An error occurred while fetching book" });
     }
-    };
+};
 
 /**
  * Fetches books by a subset of the title.

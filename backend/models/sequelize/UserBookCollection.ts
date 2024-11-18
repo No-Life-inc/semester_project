@@ -4,16 +4,17 @@ import UserBook from "./UserBook";
 import Collection from "./Collection";
 
 class UserBookCollection extends Model {
-    public user_book_id!: number;
+    public userBookId!: number;
     public collection_id!: number;
     public createdAt?: Date;
 }
 
 UserBookCollection.init(
     {
-        user_book_id: {
+        userBookId: {
             type: DataTypes.INTEGER,
             primaryKey: true,
+            field: "user_book_id",
             references: {
                 model: UserBook,
                 key: "id",
@@ -22,6 +23,7 @@ UserBookCollection.init(
         collection_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
+            field: "collection_id",
             references: {
                 model: Collection,
                 key: "id",
@@ -38,9 +40,10 @@ UserBookCollection.init(
         sequelize,
         modelName: "UserBookCollection",
         tableName: "collection_books",
-        timestamps: true,
+        timestamps: false,
         createdAt: "created_at",
         updatedAt: false,
+        hasTrigger: true,
     }
 );
 

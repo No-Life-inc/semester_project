@@ -69,7 +69,6 @@ export const teardownTestDB = async () => {
   await knex("user_book_tags").del();
   await knex("user_books").del();
   await knex("collection_books").del();
-  await knex("user_collections").del();
   await knex("collections").del();
   await knex("users").del();
   await knex("book_subjects").del();

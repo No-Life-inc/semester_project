@@ -29,6 +29,19 @@ Author.init(
         name: {
             type: DataTypes.STRING,
             allowNull: false,
+            validate: {
+                len: [0, 255],
+                isNotOnlyNumbers(value: any) {
+                    if (/^-?\d+$/.test(value)) { 
+                      // Matches strings that are entirely numeric, optionally with a leading '-'
+                      throw new Error("Name cannot consist of numbers only.");
+                    }
+                  },
+                  is: {
+                    args: /^[a-zA-Z0-9\s]+$/i, // Allow alphanumeric characters and spaces
+                    msg: "Name must only contain alphanumeric characters and spaces.",
+                  },
+            },
         },
         createdAt: {
             type: DataTypes.DATE,

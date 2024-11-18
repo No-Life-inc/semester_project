@@ -40,7 +40,6 @@ export const getUserCollections = async (req: Request, res: Response) => {
   }
 };
 
-
 /**
  * Updates the name of a collection.
  *
@@ -87,23 +86,28 @@ export const deleteCollection = async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves when the book is added to the collection.
  * @throws {Error} - Throws an error if the userBook entry is not found or the book already exists in the collection.
  */
-export const addBookToCollection = async (req: Request, res: Response): Promise<void> => {
+export const addBookToCollection = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   let { userId, collectionId, bookId } = req.body;
 
   try {
-      userId = Number(userId);
-      collectionId = Number(collectionId);
-      bookId = Number(bookId);
+    userId = Number(userId);
+    collectionId = Number(collectionId);
+    bookId = Number(bookId);
 
-      if (isNaN(userId) || isNaN(collectionId) || isNaN(bookId)) {
-          throw new Error("Invalid input. userId, collectionId, and bookId must be numbers.");
-      }
+    if (isNaN(userId) || isNaN(collectionId) || isNaN(bookId)) {
+      throw new Error(
+        "Invalid input. userId, collectionId, and bookId must be numbers."
+      );
+    }
 
-      await CollectionService.addBookToCollection(userId, collectionId, bookId);
-      res.status(201).json({ message: "Book added to collection successfully" });
+    await CollectionService.addBookToCollection(userId, collectionId, bookId);
+    res.status(201).json({ message: "Book added to collection successfully" });
   } catch (error) {
-      console.error("Error in addBookToCollection:", error);
-      res.status(400).json({ error: (error as Error).message });
+    console.error("Error in addBookToCollection:", error);
+    res.status(400).json({ error: (error as Error).message });
   }
 };
 
@@ -114,21 +118,32 @@ export const addBookToCollection = async (req: Request, res: Response): Promise<
  * @param {Response} res - The response object used to send the result or error.
  * @returns {Promise<void>} - A promise that resolves when the book is removed from the collection.
  */
-export const removeBookFromCollection = async (req: Request, res: Response): Promise<void> => {
+export const removeBookFromCollection = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   let { userId, collectionId, bookId } = req.body;
 
   try {
-      userId = Number(userId);
-      collectionId = Number(collectionId);
-      bookId = Number(bookId);
+    userId = Number(userId);
+    collectionId = Number(collectionId);
+    bookId = Number(bookId);
 
-      if (isNaN(userId) || isNaN(collectionId) || isNaN(bookId)) {
-          throw new Error("Invalid input. userId, collectionId, and bookId must be numbers.");
-      }
+    if (isNaN(userId) || isNaN(collectionId) || isNaN(bookId)) {
+      throw new Error(
+        "Invalid input. userId, collectionId, and bookId must be numbers."
+      );
+    }
 
-      await CollectionService.removeBookFromCollection(collectionId, userId, bookId);
-      res.status(200).json({ message: "Book removed from collection successfully" });
+    await CollectionService.removeBookFromCollection(
+      collectionId,
+      userId,
+      bookId
+    );
+    res
+      .status(200)
+      .json({ message: "Book removed from collection successfully" });
   } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+    res.status(400).json({ error: (error as Error).message });
   }
 };

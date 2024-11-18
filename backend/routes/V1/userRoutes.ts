@@ -1,23 +1,16 @@
-import express, { Request, Response } from "express";
-import { getDashboard, handleCallback } from "../../controllers/userController";
-import pkg from "express-openid-connect";
-
-const {  requiresAuth } = pkg;
+import express from "express";
+import {
+    registerUserController,
+    loginUserController,
+    editUserController,
+    editPasswordController
+} from "../../controllers/userController";
 
 const router = express.Router();
 
-router.get("/callback", handleCallback);
-
-router.get("/dashboard", requiresAuth(), getDashboard);
-
-router.get("/login", requiresAuth(), (req: Request, res: Response) => {
-  res.redirect("/v1/user/dashboard");
-});
-
-router.get("/logout", (req: Request, res: Response) => {
-  res.oidc.logout({ returnTo: process.env.BASE_URL || "http://localhost:5000" });
-});
-
-
+router.post("/register", registerUserController);
+router.post("/login", loginUserController);
+router.patch("/editUser", editUserController);
+router.patch("/editPassword", editPasswordController)
 
 export default router;

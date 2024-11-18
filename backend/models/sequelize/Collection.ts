@@ -1,15 +1,14 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../config/SqlConfig";
 import User from "./User"; // Import the User model
-import UserCollection from "./UserCollection"; // Import the UserCollection model
 import UserBook from "./UserBook"; // Import the UserBook model
-import UserBookCollection from "./UserBookCollection"; // Import the UserBookCollection model
 
 // Define the attributes for the Collection model
 interface CollectionAttributes {
     id: number;
     name: string;
-    users?: User[]; // Add users property for TypeScript
+    userId: number;
+    user?: User; // Add user property for TypeScript
     userBooks?: UserBook[]; // Add user_books property for TypeScript
     createdAt?: Date;
 }
@@ -19,7 +18,8 @@ interface CollectionCreationAttributes extends Optional<CollectionAttributes, "i
 class Collection extends Model<CollectionAttributes, CollectionCreationAttributes> implements CollectionAttributes {
     public id!: number;
     public name!: string;
-    public users?: User[]; // Add users property for TypeScript
+    public userId!: number;
+    public user?: User; // Add user property for TypeScript
     public userBooks?: UserBook[]; // Add user_books property for TypeScript
     public createdAt?: Date;
 }
@@ -41,6 +41,13 @@ Collection.init(
                     msg: "Name cannot be null",
                 }
             }
+        },
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: { model: "users", key: "id" },
+            onDelete: "CASCADE",
+            field: "user_id",
         },
         createdAt: {
             type: DataTypes.DATE,
