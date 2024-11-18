@@ -14,13 +14,14 @@ import {registerUser, loginUser, editUser, editPassword} from "../services/userS
  * This will register a new user with the provided name, email, and password
  */
 export const registerUserController = async (request: Request, response: Response) => {
-    const {name, email, password} = request.body;
+    const { name, email, password } = request.body;
 
     try {
         const user = await registerUser(name, email.toLowerCase(), password);
         response.json(user);
-    } catch (error) {
-        response.status(500).json({error: "An error occurred while registering user"});
+    } catch (error: any) {
+        const errorMessage = error.message || "An error occurred while registering user";
+        response.status(500).json({ error: errorMessage });
     }
 };
 
@@ -32,15 +33,16 @@ export const registerUserController = async (request: Request, response: Respons
  * @returns {Promise<void>} - A promise that resolves to void.
  */
 export const loginUserController = async (request: Request, response: Response) => {
-    const {email, password} = request.body;
+    const { email, password } = request.body;
 
     try {
         const user = await loginUser(email.toLowerCase(), password);
         response.json(user);
-    } catch (error) {
-        response.status(500).json({error: "An error occurred while logging in user"});
+    } catch (error: any) {
+        const errorMessage = error.message || "An error occurred while logging in user";
+        response.status(500).json({ error: errorMessage });
     }
-}
+};
 
 
 /**
@@ -65,10 +67,6 @@ export const editUserController = async (request: Request, response: Response) =
 
     const { name, email } = request.body;
 
-    if (!token) {
-        return response.status(400).json({ error: "Token is required" });
-    }
-
     if (!name && !email) {
         return response.status(400).json({ error: "At least one of 'name' or 'email' must be provided" });
     }
@@ -76,10 +74,11 @@ export const editUserController = async (request: Request, response: Response) =
     try {
         const result = await editUser(token, name, email.toLowerCase());
         response.json({ message: result });
-    } catch (error) {
-        response.status(500).json({error: "An error occurred while editing user"});
+    } catch (error: any) {
+        const errorMessage = error.message || "An error occurred while editing user";
+        response.status(500).json({ error: errorMessage });
     }
-}
+};
 
 /**
  * Edit user password.
@@ -104,18 +103,18 @@ export const editPasswordController = async (request: Request, response: Respons
     const { oldPassword, password } = request.body;
     if (!oldPassword || !password) {
         return response.status(400).json({ error: "Both 'oldPassword' and 'password' must be provided" });
-    }
-    else if (oldPassword === password) {
+    } else if (oldPassword === password) {
         return response.status(400).json({ error: "New password must be different from old password" });
     }
 
     try {
-        const user = await editPassword(token, oldPassword, password);
-        response.json(user);
-    } catch (error) {
-        response.status(500).json({ error: "An error occurred while editing user password" });
+        const result = await editPassword(token, oldPassword, password);
+        response.json({ message: result });
+    } catch (error: any) {
+        const errorMessage = error.message || "An error occurred while editing user password";
+        response.status(500).json({ error: errorMessage });
     }
-}
+};
 
 const extractToken = (authHeader: string | undefined): string | null => {
     if (!authHeader) return null;
