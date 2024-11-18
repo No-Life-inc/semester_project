@@ -1,10 +1,15 @@
-//navbar
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Navbar.css';
-import exp from 'constants';
 
 const Navbar = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token); // Update state based on token presence
+  }, []);
+
   return (
     <nav className="navbar">
       <h1>CollectionAPP 5000</h1>
@@ -18,6 +23,20 @@ const Navbar = () => {
         <li>
           <Link to="/profile">Profile</Link>
         </li>
+        {!isLoggedIn ? (
+          <>
+            <li>
+              <Link to="/register">Register</Link>
+            </li>
+            <li>
+              <Link to="/login">Login</Link>
+            </li>
+          </>
+        ) : (
+          <li>
+            <Link to="/logout">Logout</Link>
+          </li>
+        )}
       </ul>
     </nav>
   );

@@ -1,12 +1,67 @@
-import { useAuth0 } from "@auth0/auth0-react";
-import React from "react";
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const { loginWithRedirect } = useAuth0();
-    
-    return (
-        <button onClick={() => loginWithRedirect()}>Log In</button>
-    );
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+    try {
+      const response = await axios.post('http://localhost:5000/v1/user/login', formData);
+      localStorage.setItem('token', response.data.token); // Save token to localStorage
+      setMessage('Login successful!');
+      navigate('/'); // Redirect to the home page or dashboard
+      window.location.reload(); // Refresh the page to update the Navbar
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        setMessage('Invalid email or password.');
+      } else {
+        setMessage('An error occurred during login. Please try again.');
+      }
+      console.error('Login error:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  return (
+    <div>
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleInputChange}
+          required
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
+      {message && <p>{message}</p>}
+    </div>
+  );
+};
 
 export default Login;
