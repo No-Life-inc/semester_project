@@ -26,8 +26,7 @@ export const getBooksController = async (request: Request, response: Response) =
         console.error("Error fetching books:", error);
         response.status(500).json({ error: "An error occurred while fetching books" });
     }
-
-  };
+};
 
 /**
  * Fetches a book by its ID.

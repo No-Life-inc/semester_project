@@ -23,6 +23,7 @@ The repository includes 3 main directories. The backend is created with Node.js,
 Create a .env in the root folder.
 
 #FRONTEND
+
 FRONTEND_PORT=3000
 
 #BACKEND
@@ -41,12 +42,11 @@ SQL_USER=SA
 
 BASE_URL=http://localhost:5000
 
-CLIENT_ID=ciJKdUsLXUPHNCsuFZ1umOy7GL67Dzm7
-
 MONGODB_USERNAME=root
 
 
 #DATABASE
+
 DB_PASSWORD=YourStrongPassword123
 
 MONGO_URI=mongodb://root:YourStrongPassword123@mongo-db:27017
