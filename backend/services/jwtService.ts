@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET
 
 interface DecodedToken {
-    id: number;
+    name: string;
     email: string;
 }
 
@@ -13,9 +13,9 @@ interface DecodedToken {
  * @param {object} user - The user object for which to generate the token
  * @returns {string} - The generated JWT token
  */
-export const generateToken = (user: { id: number; email: string }): string => {
+export const generateToken = (user: { name: string; email: string }): string => {
     return jwt.sign(
-        { id: user.id, email: user.email }, // Payload
+        { name: user.name, email: user.email }, // Payload
         JWT_SECRET,
         { expiresIn: "1h" } // Token expiration time
     );
