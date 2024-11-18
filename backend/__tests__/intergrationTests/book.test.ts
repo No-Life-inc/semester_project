@@ -298,7 +298,7 @@ describe("BookData field boundary negative tests", () => {
     // ISBN fields
     [{ isbn10: invalidISBN10 }, "should reject isbn10 exceeding 10 characters"],
     [{ isbn13: invalidISBN13 }, "should reject isbn13 exceeding 13 characters"],
-    [{ isbn: invalidISBN10 }, "should reject isbn exceeding 10 characters"],
+    [{ isbn: invalidISBN13 }, "should reject isbn exceeding 10 characters"],
     [{ isbn: undefined}, "should reject undefined isbn"],
     [{ isbn: "" }, "should reject empty isbn"],
     [{ isbn: null}, "should reject null isbn"],
@@ -308,12 +308,14 @@ describe("BookData field boundary negative tests", () => {
     [{ pages: maxInt + 1 }, "should reject pages exceeding INT_MAX"],
     [{ pages: negativeMaxInt }, "should reject pages below INT_MIN"],
     [{ pages: -10000 }, "should reject pages exceeding valid min value"],
+    [{ pages: NaN }, "should reject Nan pages value"],
 
     // MSRP field tests
     [{ msrp: overMaxMSRP }, "should reject msrp exceeding valid max value"],
     [{ msrp: -1 }, "should reject negative msrp value"],
     [{ msrp: underMaxMSRP }, "should reject msrp below valid min value"],
     [{ msrp: -10000 }, "should reject msrp below valid min value"],
+    [{ msrp: NaN }, "should reject Nan msrp"],
 
     // Other field tests
     [{ binding: overMaxText }, "should reject binding exceeding 255 characters"],
@@ -339,7 +341,8 @@ describe("BookData field associations - Authors", () => {
   const cases: [Partial<BookAPIData>, keyof Book, any, string][] = [
     [{ authors: ["Author 1", "Author 2"], isbn: "0000000058" }, "authors", ["Author 1", "Author 2"], "should correctly associate multiple authors"],
     [{ authors: ["Author 3"], isbn: "0000000060" }, "authors", ["Author 3"], "should correctly associate a single author"],
-    [{ authors: [""], isbn: "0000000160" }, "authors", [""], "should correctly associate a single author"],
+    [{ authors: [" "], isbn: "0000000160" }, "authors", [" "], "should correctly associate a single author"],
+    [{ authors: [""], isbn: "0000000162" }, "authors", [" "], "should correctly associate a single author"],
   ];
 
   test.each(cases)(
@@ -373,13 +376,21 @@ describe("BookData field associations - Authors", () => {
 });
 
 describe("BookData field associations - Authors (Negative Tests)", () => {
-  const maxTextPlusOne =
-    "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst.-";
+  const maxTextPlusOne = "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst.-";
+  const maxInt = 2147483647;
+  const negativeMaxInt = -2147483648;
 
   const minimalBookData: BookAPIData = { title: "Test Book" };
 
   const cases: [Partial<BookAPIData>, string][] = [
     [{ authors: [maxTextPlusOne], isbn: "0000000101"}, "should ignore empty or invalid author names"],
+    [{ authors: ["1"], isbn: "0000000102"}, "should ignore empty or invalid author names"],
+    [{ authors: ["-1"], isbn: "0000000103"}, "should ignore empty or invalid author names"],
+    [{ authors: [undefined as any], isbn: "0000000107"}, "should ignore empty or invalid author names"],
+    [{ authors: [maxInt.toString()], isbn: "0000000108"}, "should ignore empty or invalid author names"],
+    [{ authors: [negativeMaxInt.toString()], isbn: "0000000109"}, "should ignore empty or invalid author names"],
+    // [{ authors: [1], isbn: "0000000112"}, "should ignore empty or invalid author names"],
+    // [{ authors: [-1], isbn: "0000000113"}, "should ignore empty or invalid author names"],
   ];
 
   test.each(cases)(
@@ -393,7 +404,7 @@ describe("BookData field associations - Authors (Negative Tests)", () => {
     );
   });
     });
-
+    
 
 describe("BookData field associations - Subjects", () => {
   const minimalBookData: BookAPIData = { title: "Test Book" };

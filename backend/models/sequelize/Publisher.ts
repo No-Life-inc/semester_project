@@ -23,7 +23,19 @@ Publisher.init({
     },
     name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            len: [0, 255],
+            isNotOnlyNumbers(value: string) {
+                if (/^\d+$/.test(value)) {
+                  throw new Error("Name cannot consist of numbers only.");
+                }
+              },
+              is: {
+                args: /^[a-zA-Z0-9\s]+$/i, // Allow alphanumeric characters and spaces
+                msg: "Name must only contain alphanumeric characters and spaces.",
+              },
+        },
     },
     createdAt: {
         type: DataTypes.DATE,
