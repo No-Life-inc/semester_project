@@ -10,9 +10,7 @@ const router = express.Router();
 
 router.post("/register", registerUserController);
 router.post("/login", loginUserController);
-router.post("/editName", editUserController);
-router.post("/editPassword", editPasswordController)
-
-
+router.patch("/editUser", editUserController);
+router.patch("/editPassword", editPasswordController)
 
 export default router;

@@ -44,7 +44,7 @@ services:
       - SQL_PASSWORD=${DB_PASSWORD}   #changing the env name from DB_PASSWORD to SQL_PASSWORD when passing to backend
       - MONGO_URI=${MONGO_URI}
       - ISBNDB_API_KEY=${ISBNDB_API_KEY}
-      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET=${JWT_SECRET}
     command: sh -c "npm install && npx ts-node ./app.ts"
 
   frontend:

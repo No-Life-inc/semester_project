@@ -1,6 +1,11 @@
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = process.env.SECRET_KEY
+const JWT_SECRET = process.env.JWT_SECRET
+
+interface DecodedToken {
+    id: number;
+    email: string;
+}
 
 /**
  * Generates a JWT token for the given user.
@@ -11,7 +16,7 @@ const SECRET_KEY = process.env.SECRET_KEY
 export const generateToken = (user: { id: number; email: string }): string => {
     return jwt.sign(
         { id: user.id, email: user.email }, // Payload
-        SECRET_KEY,
+        JWT_SECRET,
         { expiresIn: "1h" } // Token expiration time
     );
 };
@@ -23,9 +28,9 @@ export const generateToken = (user: { id: number; email: string }): string => {
  * @returns {object} - The decoded token payload if valid
  * @throws {Error} - If the token is invalid or expired
  */
-export const verifyToken = (token: string): object => {
+export const verifyToken = (token: string): DecodedToken => {
     try {
-        return jwt.verify(token, SECRET_KEY);
+        return jwt.verify(token, JWT_SECRET) as DecodedToken;
     } catch (error) {
         throw new Error("Invalid or expired token.");
     }

@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import User from "../models/sequelize/User";
 import {validatePassword} from "./passwordValidatorService";
+import {generateToken, verifyToken} from "./jwtService";
 
 /**
  * Registers a new user.
@@ -70,7 +71,10 @@ export const loginUser = async (email: string, password: string) => {
         const userWithoutPassword = user.toJSON();
         delete userWithoutPassword.password;
 
-        return userWithoutPassword;
+        // Generate JWT token
+        const token = generateToken(user);
+
+        return { user: userWithoutPassword, token };
     } catch (error) {
         console.error("Error logging in user:", error);
         throw error;
@@ -80,6 +84,7 @@ export const loginUser = async (email: string, password: string) => {
 /**
  * Edit user details without the password.
  *
+ * @param {string} token - The JWT token of the user
  * @param {string} name - The new name of the user
  * @param {string} email - The email of the user
  * @returns {Promise<void>} - A promise that resolves to void
@@ -90,14 +95,24 @@ export const loginUser = async (email: string, password: string) => {
  * if the user with the given email exists.
  */
 
-export const editUser = async (name: string, email: string) => {
+export const editUser = async (token: string, name: string, email: string) => {
     try {
-        const user = await User.findOne({ where: { email } });
+        const decoded = verifyToken(token);
+        const user = await User.findOne({ where: { id: decoded.id } });
+
         if (!user) {
-            throw new Error("Invalid email or password.");
+            throw new Error("User not found.");
         }
-        user.name = name;
-        return await user.save();
+
+        if (name) {
+            user.name = name;
+        }
+        if (email) {
+            user.email = email;
+        }
+
+        await user.save();
+        return "User details have been updated successfully.";
 
     }
     catch (error) {
@@ -106,12 +121,25 @@ export const editUser = async (name: string, email: string) => {
     }
 }
 
-export const editPassword = async (email: string, password: string) => {
+export const editPassword = async (token: string, oldPassword: string, password: string) => {
     try {
-        const user = await User.findOne({where: {email}});
+        const decoded = verifyToken(token);
+        validatePassword(password);
+
+        const user = await User.findOne({
+            where: { id: decoded.id, },
+            attributes: { include: ["password"] },
+        });
+
         if (!user) {
-            throw new Error("Invalid email or password.");
+            throw new Error("User not found.");
         }
+
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            throw new Error("Invalid password.");
+        }
+
         user.password = password;
         await user.save();
         return "Your password has been updated successfully."
