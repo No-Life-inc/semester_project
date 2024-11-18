@@ -18,10 +18,6 @@ const initialDb = Knex({
 // Function to create the database if it doesn't exist
 const createDatabaseIfNotExists = async () => {
   const databaseName = process.env.TEST_SQL_NAME;
-  console.log(
-    "Connecting to MSSQL with the following configuration:",
-    initialDb.client.config.connection
-  );
 
   try {
     const result = await initialDb
@@ -31,9 +27,7 @@ const createDatabaseIfNotExists = async () => {
 
     if (result.length === 0) {
       await initialDb.raw(`CREATE DATABASE ${databaseName}`);
-      console.log(`Database ${databaseName} created!`);
     } else {
-      console.log(`Database ${databaseName} already exists.`);
     }
   } catch (err) {
     console.error("Error checking or creating database:", err);
@@ -52,9 +46,6 @@ const databaseName = process.env.TEST_SQL_NAME;
 Model.knex(knex);
 
 export const setupTestDB = async () => {
-  console.log("Setting up test database:", process.env.TEST_SQL_NAME);
-  console.log("Setting up test database with NODE_ENV:", process.env.NODE_ENV);
-  console.log("Database being set up:", process.env.TEST_SQL_NAME);
   // Create the database if it doesn't exist
   await createDatabaseIfNotExists();
 

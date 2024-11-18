@@ -44,6 +44,8 @@ BASE_URL=http://localhost:5000
 
 MONGODB_USERNAME=root
 
+JWT_SECRET=1pa4fhI3lSHLSntAgcz5AS7otxdnSylfDpqc322wOLw=
+
 
 #DATABASE
 

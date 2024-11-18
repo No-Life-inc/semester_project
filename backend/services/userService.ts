@@ -34,7 +34,6 @@ export const registerUser = async (name: string, email: string, password: string
 
         return userWithoutPassword;
     } catch (error) {
-        console.error("Error registering user:", error);
         throw error;
     }
 };
@@ -73,7 +72,6 @@ export const loginUser = async (email: string, password: string) => {
 
         return { user: userWithoutPassword, token };
     } catch (error) {
-        console.error("Error logging in user:", error);
         throw error;
     }
 };
@@ -87,7 +85,7 @@ export const loginUser = async (email: string, password: string) => {
  * @returns {Promise<void>} - A promise that resolves to void
  *
  * @example
- * editUser("johndoeeeee", "johndoe@hotmail.com")
+ * editUser("JWT_TOKEN", "Johndoeee", "johndoe@hotmail.com")
  * This will edit the user with the given name and email
  * if the user with the given email exists.
  */
@@ -95,7 +93,7 @@ export const loginUser = async (email: string, password: string) => {
 export const editUser = async (token: string, name: string, email: string) => {
     try {
         const decoded = verifyToken(token);
-        const user = await User.findOne({ where: { id: decoded.id } });
+        const user = await User.findOne({ where: { email: decoded.email } });
 
         if (!user) {
             throw new Error("User not found.");
@@ -114,18 +112,30 @@ export const editUser = async (token: string, name: string, email: string) => {
 
     }
     catch (error) {
-        console.error("Error editing user:", error);
         throw error;
     }
 }
 
+/**
+ * Edit user password.
+ *
+ * @param {string} token - The JWT token of the user
+ * @param {string} oldPassword - The old password of the user
+ * @param {string} password - The new password of the user
+ * @returns {Promise<void>} - A promise that resolves to void
+ *
+ * @example
+ * editPassword("JWT_TOKEN", "password123", "password1234")
+ * This will edit the user with the given password
+ * if the user with the given password exists.
+ */
 export const editPassword = async (token: string, oldPassword: string, password: string) => {
     try {
         const decoded = verifyToken(token);
         validatePassword(password);
 
         const user = await User.findOne({
-            where: { id: decoded.id, },
+            where: { email: decoded.email, },
             attributes: { include: ["password"] },
         });
 
@@ -142,7 +152,6 @@ export const editPassword = async (token: string, oldPassword: string, password:
         await user.save();
         return "Your password has been updated successfully."
     } catch (error) {
-        console.error("Error editing user:", error);
         throw error;
     }
 }
