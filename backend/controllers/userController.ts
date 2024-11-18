@@ -20,7 +20,6 @@ export const registerUserController = async (request: Request, response: Respons
         const user = await registerUser(name, email.toLowerCase(), password);
         response.json(user);
     } catch (error) {
-        console.error("Error registering user:", error);
         response.status(500).json({error: "An error occurred while registering user"});
     }
 };
@@ -39,7 +38,6 @@ export const loginUserController = async (request: Request, response: Response) 
         const user = await loginUser(email.toLowerCase(), password);
         response.json(user);
     } catch (error) {
-        console.error("Error logging in user:", error);
         response.status(500).json({error: "An error occurred while logging in user"});
     }
 }
@@ -79,7 +77,6 @@ export const editUserController = async (request: Request, response: Response) =
         const result = await editUser(token, name, email.toLowerCase());
         response.json({ message: result });
     } catch (error) {
-        console.error("Error editing user:", error);
         response.status(500).json({error: "An error occurred while editing user"});
     }
 }
@@ -116,7 +113,6 @@ export const editPasswordController = async (request: Request, response: Respons
         const user = await editPassword(token, oldPassword, password);
         response.json(user);
     } catch (error) {
-        console.error("Error editing user password:", error);
         response.status(500).json({ error: "An error occurred while editing user password" });
     }
 }
