@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../context/UserContext';
+import { User } from '../types/type';
 
 const Login = () => {
+  const { setUser } = useContext(UserContext) as {
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  };
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,10 +24,14 @@ const Login = () => {
     setMessage('');
     try {
       const response = await axios.post('http://localhost:5000/v1/user/login', formData);
-      localStorage.setItem('token', response.data.token); // Save token to localStorage
+      const { token, user } = response.data; // Extract token and user data from response
+
+      // Save token to localStorage and update UserContext
+      localStorage.setItem('token', token);
+      setUser(user); // Set user in the UserContext
+
       setMessage('Login successful!');
       navigate('/'); // Redirect to the home page or dashboard
-      window.location.reload(); // Refresh the page to update the Navbar
     } catch (error: any) {
       if (error.response && error.response.status === 401) {
         setMessage('Invalid email or password.');

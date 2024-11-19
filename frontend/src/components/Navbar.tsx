@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
 import '../styles/Navbar.css';
+import { UserContext } from '../context/UserContext';
 
-const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+const Navbar: React.FC = () => {
+  const { user, setUser } = useContext(UserContext) || {}; // Access UserContext
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token); // Update state based on token presence
-  }, []);
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // Remove token from localStorage
+    setUser?.(null); // Update context state to null
+  };
 
   return (
     <nav className="navbar">
@@ -20,10 +21,18 @@ const Navbar = () => {
         <li>
           <Link to="/books">Books</Link>
         </li>
-        <li>
-          <Link to="/profile">Profile</Link>
-        </li>
-        {!isLoggedIn ? (
+        {user ? (
+          <>
+            <li>
+              <Link to="/profile">Profile</Link>
+            </li>
+            <li>
+              <button onClick={handleLogout} className="logout-button">
+                Logout
+              </button>
+            </li>
+          </>
+        ) : (
           <>
             <li>
               <Link to="/register">Register</Link>
@@ -32,10 +41,6 @@ const Navbar = () => {
               <Link to="/login">Login</Link>
             </li>
           </>
-        ) : (
-          <li>
-            <Link to="/logout">Logout</Link>
-          </li>
         )}
       </ul>
     </nav>

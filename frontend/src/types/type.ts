@@ -25,7 +25,7 @@ export interface Book {
 export interface User {
     id: number;
     name: string;
-    // Add other user attributes as needed
+    email: string;
 }
 
 export interface Author {
