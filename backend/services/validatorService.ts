@@ -4,7 +4,7 @@ export const validatePassword = (password: string): void => {
     }
 
     if (/\s/.test(password)) {
-        throw new Error("Password cannot contain spaces.");
+        throw new Error("Password cannot contain a space.");
     }
 
     if (password.length < 8) {
@@ -21,10 +21,6 @@ export const validatePassword = (password: string): void => {
 
     if (!/[0-9]/.test(password)) {
         throw new Error("Password must contain at least one digit.");
-    }
-
-    if (/\s/.test(password)) {
-        throw new Error("Password cannot contain a space.");
     }
 };
 

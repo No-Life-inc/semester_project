@@ -108,8 +108,10 @@ export const editUser = async (token: string, name: string, email: string) => {
         }
 
         await user.save();
-        return "User details have been updated successfully.";
 
+        const newToken = generateToken(user);
+
+        return { user: user, newToken };
     }
     catch (error) {
         throw error;
