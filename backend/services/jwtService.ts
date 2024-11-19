@@ -14,9 +14,9 @@ interface DecodedToken {
  * @param {object} user - The user object for which to generate the token
  * @returns {string} - The generated JWT token
  */
-export const generateToken = (user: { id: number, name: string; email: string }): string => {
+export const generateToken = (user: { name: string; email: string }): string => {
     return jwt.sign(
-        { id: user.id, name: user.name, email: user.email }, // Payload
+        { name: user.name, email: user.email }, // Payload
         JWT_SECRET,
         { expiresIn: "1h" } // Token expiration time
     );

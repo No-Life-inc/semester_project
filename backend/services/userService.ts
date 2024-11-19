@@ -93,7 +93,7 @@ export const loginUser = async (email: string, password: string) => {
 export const editUser = async (token: string, name: string, email: string) => {
     try {
         const decoded = verifyToken(token);
-        const user = await User.findOne({ where: { id: decoded.id } });
+        const user = await User.findOne({ where: { email: decoded.email } });
 
         if (!user) {
             throw new Error("User not found.");
@@ -135,7 +135,7 @@ export const editPassword = async (token: string, oldPassword: string, password:
         validatePassword(password);
 
         const user = await User.findOne({
-            where: { id: decoded.id, },
+            where: { email: decoded.email, },
             attributes: { include: ["password"] },
         });
 
