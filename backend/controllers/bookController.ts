@@ -58,7 +58,6 @@ export const getBookByIdController = async (request: Request, response: Response
 
         response.json(book);
     } catch (error) {
-        console.error("Error fetching book by ID:", error); // Log the error for debugging
         response.status(404).json({ error: "Book not found" });
     }
 };
@@ -87,7 +86,6 @@ export const getBooksByTitleController = async (req: Request, res: Response) => 
         let books = await getBooksByTitle(titleQuery);
 
         if (books.length === 0) {
-            console.log("Books not found in the database. Fetching from external API...");
             // Fetch data from external API
             const apiBooks = await fetchBooksFromExternalAPI(titleQuery);
 

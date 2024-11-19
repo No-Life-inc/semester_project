@@ -16,7 +16,7 @@ describe("validatePassword function tests", () => {
     });
 
     test("should throw an error if password contains spaces", () => {
-        expect(() => validatePassword("pass word")).toThrow("Password cannot contain spaces.");
+        expect(() => validatePassword("pass word")).toThrow("Password cannot contain a space.");
     });
 
     test("should throw an error if password does not contain a lowercase letter", () => {

@@ -22,7 +22,6 @@ export const addTagToBookController = async (request: Request, response: Respons
         const book = await addTagToBook(tag_id, user_book_id);
         response.json(book);
     } catch (error) {
-        console.error("Error adding tag to book:", error);
         response.status(500).json({ error: "An error occurred while adding tag to book" });
     }
 }
@@ -59,7 +58,6 @@ export const deleteTagFromBookController = async (request: Request, response: Re
         }
         response.json({ message: "Tag deleted from book successfully" });
     } catch (error) {
-        console.error("Error deleting tag from book:", error);
         response.status(500).json({ error: "An error occurred while deleting tag from book" });
     }
 };
