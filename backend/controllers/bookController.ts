@@ -23,8 +23,7 @@ export const getBooksController = async (request: Request, response: Response) =
         const books = await getBooks(Number(page), Number(limit));
         response.json(books);
     } catch (error) {
-        console.error("Error fetching books:", error);
-        response.status(500).json({ error: "An error occurred while fetching books" });
+        response.status(400).json({ error: "An error occurred while fetching books" });
     }
 };
 
@@ -44,8 +43,14 @@ export const getBooksController = async (request: Request, response: Response) =
 export const getBookByIdController = async (request: Request, response: Response) => {
     const { id } = request.params;
 
+    // Validate ID: Check for null, empty string, whitespace, non-numeric, or invalid numbers
+    const bookId = parseInt(id, 10);
+    if (!id || id.trim() === "" || isNaN(bookId) || bookId < 1) {
+        return response.status(400).json({ error: "ID parameter must be a valid positive number" });
+    }
+
     try {
-        const book = await getBookById(Number(id));
+        const book = await getBookById(bookId);
 
         if (!book) {
             return response.status(404).json({ error: "Book not found" });
@@ -53,10 +58,11 @@ export const getBookByIdController = async (request: Request, response: Response
 
         response.json(book);
     } catch (error) {
-        console.error("Error fetching book:", error);
-        response.status(500).json({ error: "An error occurred while fetching book" });
+        console.error("Error fetching book by ID:", error); // Log the error for debugging
+        response.status(404).json({ error: "Book not found" });
     }
 };
+
 
 /**
  * Fetches books by a subset of the title.

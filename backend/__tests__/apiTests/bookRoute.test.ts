@@ -57,6 +57,33 @@ describe('Book Routes - Get Books  Positive tests', () => {
   );
 });
 
+describe('Book Routes - Get Books Negative tests', () => {
+  // Parameterized test for getting all books
+  test.each([
+    ["should get 0 books", "/book/?limit=0", 400],
+    ["should get 0 books", "/book/?limit=-1", 400],
+    ["should get 0 books", "/book/?limit=-2", 400],
+    ["should get 0 books", "/book/?limit=101", 400],
+    ["should get 0 books", "/book/?limit=102", 400],
+    ["should get 0 books", "/book/?page=0", 400],
+    ["should get 0 books", "/book/?page=-1", 400],
+    ["should get 0 books", "/book/?page=-2", 400],
+    ["should get 0 books", "/book/?page=a", 400],
+    ["should get 0 books", "/book/?limit=a", 400],
+    ["should get 0 books", "/book/?limit= ", 400],
+    ["should get 0 books", "/book/?page= ", 400],
+  ])(
+    "%s", // Use the description for each test
+    async (description, route, expectedStatus) => {
+      const response = await request(app).get(route);
+
+      // Check the response status
+      expect(response.status).toBe(expectedStatus);
+    }
+  );
+});
+
+
 describe('Book Routes - Get Book By ID Positive tests', () => {
   // Parameterized test for getting a book by ID
   test.each([
@@ -79,3 +106,45 @@ describe('Book Routes - Get Book By ID Positive tests', () => {
   );
 });
 
+describe('Book Routes - Get Book By ID Negative tests', () => {
+  // Parameterized test for getting a book by ID
+  test.each([
+    ["should get 404 for invalid ID", "/book/id/0", 400],
+    ["should get 404 for invalid ID", "/book/id/-1", 400],
+    ["should get 404 for invalid ID", "/book/id/-2", 400],
+    ["should get 404 for invalid ID", "/book/id/101", 404],
+    ["should get 404 for invalid ID", "/book/id/102", 404],
+    ["should get 404 for invalid ID", "/book/id/a", 400],
+    ["should get 404 for invalid ID", "/book/id/ ", 404],
+  ])( // Use the description for each test
+    "%s",
+    async (description, route, expectedStatus) => {
+      const response = await request(app).get(route);
+
+      // Check the response status
+      expect(response.status).toBe(expectedStatus);
+    }
+  );
+});
+
+describe('Book Routes - Search Books Positive tests', () => {
+  // Parameterized test for searching books by title
+  test.each([
+    ["should get 1 book by title", "/book/search?title=Resting Scrooge Face: A Short Story", 200, Array.isArray, 1],
+    ["should get 1 book by title", "/book/search?title=The", 200, Array.isArray, 43],
+  ])( // Use the description for each test
+    "%s",
+    async (description, route, expectedStatus, expectedBodyType, expectedLength) => {
+      const response = await request(app).get(route);
+
+      // Check the response status
+      expect(response.status).toBe(expectedStatus);
+      
+      // Check the response body is an array
+      expect(expectedBodyType(response.body)).toBe(true);
+      
+      // Check the number of books
+      expect(response.body.length).toBe(expectedLength);
+    }
+  );
+});
