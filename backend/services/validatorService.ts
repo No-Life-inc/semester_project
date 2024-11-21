@@ -4,7 +4,7 @@ export const validatePassword = (password: string): void => {
     }
 
     if (/\s/.test(password)) {
-        throw new Error("Password cannot contain a space.");
+        throw new Error("Password cannot contain spaces.");
     }
 
     if (password.length < 8) {
@@ -32,4 +32,30 @@ export const validateEmail = (email: string): void => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         throw new Error("Invalid email format.");
     }
+
+    if (email.length > 255) {
+        throw new Error("Email cannot be more than 255 characters long.");
+    }
+}
+
+export const validateName = (name: string): void => {
+
+    console.log(`Validating name: '${name}'`); // Log the raw input
+
+    if (!name || name.trim() === "") {
+        throw new Error("Name cannot be empty or whitespace.");
+    }
+
+    if (name.length < 2) {
+        throw new Error("Name must be at least 2 characters long.");
+    }
+
+    if (name.length > 255) {
+        throw new Error("Name cannot be more than 255 characters long.");
+    }
+
+    if (!/^[a-zA-Z\s'’-]+$/.test(name)) {
+        throw new Error("Invalid characters in name.");
+    }
+
 }

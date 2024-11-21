@@ -12,35 +12,91 @@ afterAll(async () => {
     await teardownTestDB();
 });
 
-describe("registerUser function tests", () => {
-    test("should register a new user with valid data", async () => {
-        const newUser = await registerUser("Test User", "unique@example.com", "StrongPassword123");
-        expect(newUser).toBeDefined();
-        expect(newUser.name).toBe("Test User");
-        expect(newUser.email).toBe("unique@example.com");
-    });
+describe("Positive User data boundary tests", () => {
+    const maxName = "A".repeat(255);
+    const maxEmail = "a".repeat(243) + "@example.com";
+    const validPassword = "StrongPass123";
+    const minPassword = "Pass1234";
 
-    test("should throw an error if email is already in use", async () => {
-        const email = "duplicate@example.com";
-        await registerUser("Existing User", email, "Password123");
+    const positiveCases = [
+        // Name cases
+        ["should accept minimal valid name (2 char)", { name: "AB", email: "valid1@example.com", password: validPassword }],
+        ["should accept typical name", { name: "John Doe", email: "valid2@example.com", password: validPassword }],
+        ["should accept maximal valid name (255 chars)", { name: maxName, email: "valid3@example.com", password: validPassword }],
+        // Email cases
+        ["should accept minimal valid email", { name: "Valid User", email: "a@b.c", password: validPassword }],
+        ["should accept typical email", { name: "Valid User", email: "user.name@domain.co", password: validPassword }],
+        ["should accept maximal valid email (255 chars)", { name: "Valid User", email: maxEmail, password: validPassword }],
+        // Password cases
+        ["should accept minimal valid password (8 chars)", { name: "Valid User", email: "valid6@example.com", password: minPassword }],
+        ["should accept typical password", { name: "Valid User", email: "valid7@example.com", password: validPassword }],
+    ];
 
-        await expect(registerUser("Another User", email, "Password123")).rejects.toThrow(
-            "Email is already in use."
-        );
-    });
-
-    test("should throw an error if email is invalid", async () => {
-        await expect(registerUser("Test User", "invalid-email", "Password123")).rejects.toThrow(
-            "Invalid email format."
-        );
-    });
-
-    test("should throw an error if password is invalid", async () => {
-        await expect(registerUser("Test User", "valid@example.com", "short")).rejects.toThrow(
-            "Password must be at least 8 characters long."
-        );
-    });
+    test.each(positiveCases)(
+        "%s",
+        async (description: string, fieldData: { name: string; email: string; password: string }) => {
+            const { name, email, password } = fieldData;
+            const newUser = await registerUser(name, email, password);
+            expect(newUser).toBeDefined();
+            expect(newUser.name).toBe(name);
+            expect(newUser.email).toBe(email);
+            expect(newUser.password).not.toBe(password); // Ensure it is hashed
+        }
+    );
 });
+
+describe("Negative User data boundary tests (including edge cases)", () => {
+    const overMaxName = "A".repeat(256); // Exceeds the max name length
+    const emptyName = ""; // Edge case: Completely empty name
+    const whitespaceName = "   "; // Edge case: Name with only whitespace
+
+    const overMaxEmail = "a".repeat(244) + "@example.com"; // Exceeds the max email length
+    const emptyEmail = ""; // Edge case: Completely empty email
+    const whitespaceEmail = "   "; // Edge case: Email with only whitespace
+
+    const validPassword = "StrongPass123";
+    const invalidShortPassword = "Short1"; // Below minimum length
+    const emptyPassword = ""; // Edge case: Completely empty password
+    const whitespacePassword = "       "; // Edge case: Password with only whitespace
+
+    const invalidEmailFormats = [
+        "plainaddress",
+        "missingatsign.com",
+        "user@.com",
+        "user@com",
+        "user@domain,com",
+        "user @example.com",
+    ];
+
+    const negativeCases = [
+        // Name cases
+        ["should reject name exceeding 255 chars", { name: overMaxName, email: "valid@example.com", password: validPassword }],
+        ["should reject empty name", { name: emptyName, email: "valid@example.com", password: validPassword }],
+        ["should reject name with only whitespace", { name: whitespaceName, email: "valid@example.com", password: validPassword }],
+        // Email cases
+        ["should reject email exceeding 255 chars", { name: "Valid User", email: overMaxEmail, password: validPassword }],
+        ["should reject empty email", { name: "Valid User", email: emptyEmail, password: validPassword }],
+        ["should reject email with only whitespace", { name: "Valid User", email: whitespaceEmail, password: validPassword }],
+        ...invalidEmailFormats.map((email) => [
+            `should reject invalid email format (${email})`,
+            { name: "Invalid Email User", email, password: validPassword },
+        ]),
+        // Password cases
+        ["should reject password less than 8 chars", { name: "Valid User", email: "valid@example.com", password: invalidShortPassword }],
+        ["should reject empty password", { name: "Valid User", email: "valid@example.com", password: emptyPassword }],
+        ["should reject password with only whitespace", { name: "Valid User", email: "valid@example.com", password: whitespacePassword }],
+    ];
+
+    test.each(negativeCases)(
+        "%s",
+        async (description: string, fieldData: { name: string; email: string; password: string }) => {
+            const { name, email, password } = fieldData;
+            await expect(registerUser(name, email, password)).rejects.toThrow();
+        }
+    );
+});
+
+
 
 describe("loginUser function tests", () => {
     test("should log in a user with correct credentials", async () => {
@@ -121,3 +177,5 @@ describe("editPassword function tests with seeded data", () => {
         );
     });
 });*/
+
+

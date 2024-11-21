@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import User from "../models/sequelize/User";
-import {validateEmail, validatePassword} from "./validatorService";
+import {validateEmail, validateName, validatePassword} from "./validatorService";
 import {generateToken, verifyToken} from "./jwtService";
 
 /**
@@ -20,6 +20,7 @@ export const registerUser = async (name: string, email: string, password: string
     try {
         validatePassword(password);
         validateEmail(email);
+        validateName(name);
 
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
@@ -104,6 +105,7 @@ export const editUser = async (token: string, name: string, email: string) => {
             user.email = email;
         }
         if (name) {
+            validateName(name);
             user.name = name;
         }
 
