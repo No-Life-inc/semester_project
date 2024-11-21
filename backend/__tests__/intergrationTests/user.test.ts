@@ -24,7 +24,7 @@ describe("Positive User data boundary tests", () => {
         ["should accept typical name", { name: "John Doe", email: "valid2@example.com", password: validPassword }],
         ["should accept maximal valid name (255 chars)", { name: maxName, email: "valid3@example.com", password: validPassword }],
         // Email cases
-        ["should accept minimal valid email", { name: "Valid User", email: "a@b.c", password: validPassword }],
+        ["should accept minimal valid email", { name: "Valid User", email: "a@b.dk", password: validPassword }], //Shortest valid email based on RFC 5321
         ["should accept typical email", { name: "Valid User", email: "user.name@domain.co", password: validPassword }],
         ["should accept maximal valid email (255 chars)", { name: "Valid User", email: maxEmail, password: validPassword }],
         // Password cases
