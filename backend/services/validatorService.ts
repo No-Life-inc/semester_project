@@ -40,8 +40,6 @@ export const validateEmail = (email: string): void => {
 
 export const validateName = (name: string): void => {
 
-    console.log(`Validating name: '${name}'`); // Log the raw input
-
     if (!name || name.trim() === "") {
         throw new Error("Name cannot be empty or whitespace.");
     }
