@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import "./models/sequelize/Associations";
 import V1Routes from "./routes/V1";
+import MongoRoutes from "./routes/V1/mongo";
 import setupDatabase from "./database/knex/createDatabase";
 import { initializeDatabase } from "./database/knex/setupDatabase";
 import connectMongoDB from "./dbconnections/MongoConnection";
@@ -26,6 +27,7 @@ async function startServer() {
     await initializeDatabase();
 
     app.use("/v1", V1Routes);
+    app.use("/v1/mongo", MongoRoutes);
 
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
