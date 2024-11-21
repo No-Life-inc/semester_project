@@ -29,9 +29,9 @@ export const validateEmail = (email: string): void => {
         throw new Error("Email cannot be empty or whitespace.");
     }
 
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-    throw new Error("Invalid email format.");
-}
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw new Error("Invalid email format.");
+    }
 
     if (email.length > 255) {
         throw new Error("Email cannot be more than 255 characters long.");
