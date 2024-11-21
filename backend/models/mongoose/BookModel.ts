@@ -1,10 +1,16 @@
 import { Schema, model, Types, Document } from 'mongoose';
 
+interface IAuthor {
+    name: string;
+}
+
+interface ISubject {
+    name: string;
+}
+
 interface IBook extends Document {
     _id: Types.ObjectId;
-    author: {
-        name: string;
-    }[];
+    authors: IAuthor[];
     publisher: string;
     title: string;
     edition?: string;
@@ -12,9 +18,7 @@ interface IBook extends Document {
     isbn: string;
     isbn10: string;
     isbn13: string;
-    subjects: {
-        name: string;
-    }[];
+    subjects: ISubject[];
     language?: string;
     pages?: number;
     publication_date?: Date;
@@ -26,34 +30,31 @@ interface IBook extends Document {
     binding?: string;
 }
 
-const bookSchema = new Schema<IBook>({
-    author: [
-        {
-            name: { type: String, required: true }
-        }
-    ],
-    publisher: { type: String, required: true },
-    title: { type: String, required: true },
-    edition: { type: String },
-    cover_id: { type: String },
-    isbn: { type: String, required: true },
-    isbn10: { type: String, required: true },
-    isbn13: { type: String, required: true },
-    subjects: [
-        {
-            name: { type: String, required: true }
-        }
-    ],
-    language: { type: String },
-    pages: { type: Number },
-    publication_date: { type: Date },
-    image: { type: String },
-    title_long: { type: String },
-    synopsis: { type: String },
-    msrp: { type: Number },
-    dimensions: { type: String },
-    binding: { type: String }
-});
+const bookSchema = new Schema<IBook>(
+    {
+        authors: [{ type: String, required: true }],
+        publisher: { type: String, required: true },
+        title: { type: String, required: true },
+        edition: { type: String },
+        cover_id: { type: String },
+        isbn: { type: String, required: true, unique: true },
+        isbn10: { type: String },
+        isbn13: { type: String },
+        subjects: [{ type: String, required: true }],
+        language: { type: String },
+        pages: { type: Number },
+        publication_date: { type: Date  },
+        image: { type: String },
+        title_long: { type: String },
+        synopsis: { type: String },
+        msrp: { type: Number },
+        dimensions: { type: String },
+        binding: { type: String }
+    },
+    {
+        timestamps: true
+    }
+);
 
 const Book = model<IBook>('Book', bookSchema);
 

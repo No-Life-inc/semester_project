@@ -5,7 +5,7 @@ import "./models/sequelize/Associations";
 import V1Routes from "./routes/V1";
 import setupDatabase from "./database/knex/createDatabase";
 import { initializeDatabase } from "./database/knex/setupDatabase";
-import connectDB from "./dbconnections/MongoConnection";
+import connectMongoDB from "./dbconnections/MongoConnection";
 
 dotenv.config();
 const app = express();
@@ -18,7 +18,7 @@ app.use(express.json());
 async function startServer() {
   try {
 
-    // await connectDB();
+    await connectMongoDB();
 
     await setupDatabase();
 

@@ -3,23 +3,39 @@ import { HydratedDocument } from 'mongoose';
 import { IBook } from '../../models/mongoose/BookModel';
 
 const seedUsers = async (books: HydratedDocument<IBook>[]) => {
-    const userCount = await User.countDocuments();
-    if (userCount === 0) {
-        if (books && books.length > 0) {
-            await User.insertMany([
-                {
+    try {
+        const userCount = await User.countDocuments();
+        if (userCount === 0) {
+            if (books && books.length > 0) {
+                const userData = {
                     name: "Alice",
                     email: "alice@example.com",
-                    books: books.map(book => book && book._id ? { book_id: book._id, tags: ["classic", "must-read"] } : null).filter(Boolean),
+                    password: "Securepassword123",
+                    books: books
+                        .slice(0, 3)
+                        .map(book => book && book._id ? { book_id: book._id, tags: ["classic", "must-read"] } : null)
+                        .filter(Boolean),
                     collections: [
-                        { name: "Favorites", books: books.map(book => book && book._id).filter(Boolean) }
+                        {
+                            name: "Favorites",
+                            books: books.slice(0, 3) // Begræns til de første 3 bøger
+                                .map(book => book && book._id)
+                                .filter(Boolean)
+                        }
                     ]
-                },
-            ]);
-            console.log("Users seeded successfully");
+                };
+
+                await User.create(userData);
+                console.log("Users seeded successfully");
+            }
+            else {
+                console.error("No books found to link to users. Seed books first.");
+            }
         } else {
-            console.error("No books found to link to users. Seed books first.");
+            console.log("Users already exist in the database. Skipping seeding.");
         }
+    } catch (error) {
+        console.error("Error seeding users:", error);
     }
 };
 

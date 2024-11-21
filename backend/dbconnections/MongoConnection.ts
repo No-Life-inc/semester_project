@@ -6,7 +6,7 @@ import seedUsers from '../database/mongoose/seed_users';
 import {IBook, Book} from "../models/mongoose/BookModel";
 import { User } from "../models/mongoose/UserModel";
 
-const connectDB = async () => {
+const connectMongoDB = async () => {
     try {
         const uri = process.env.MONGO_URI;
         await mongoose.connect(uri);
@@ -32,4 +32,4 @@ const seedData = async () => {
     await seedUsers(books);
 };
 
-export default connectDB;
+export default connectMongoDB;
