@@ -188,7 +188,6 @@ describe("addBookToCollection function positive tests", () => {
       const userBook = await UserBook.findOne({
         where: { user_id: userId, book_id: bookId },
       });
-      console.log('UserBook fetched:', userBook);
       expect(userBook).toBeDefined();
 
       await UserBookCollection.destroy({
