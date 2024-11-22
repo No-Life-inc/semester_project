@@ -100,7 +100,7 @@ describe("Negative User data boundary tests (including edge cases)", () => {
 
 describe("loginUser function tests", () => {
     test("should log in a user with correct credentials", async () => {
-        const result = await loginUser("test@test.com", "Test1234");
+        const result = await loginUser("test@test.com", process.env.DEFAULT_PASSWORD );
 
         expect(result).toBeDefined();
         expect(result.user.email).toBe("test@test.com");
