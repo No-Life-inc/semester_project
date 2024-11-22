@@ -6,7 +6,7 @@ import UserBookCollection from "../models/sequelize/UserBookCollection";
 import sequelize from "../config/SqlConfig";
 import { Transaction } from "sequelize";
 import {NotFoundError, ValidationError, UnauthorizedError} from "../utility/errors";
-
+import { ValidationError as SequelizeValidationError } from "sequelize";
 /**
  * Creates a new collection for a user.
  *
@@ -68,13 +68,20 @@ export const getUserCollections = async (userId: number) => {
  * @throws {NotFoundError} - Throws an error if the collection is not found.
  */
 export const updateCollection = async (id: number, name: string) => {
-  const collection = await Collection.findByPk(id);
-  if (!collection) {
-    throw new NotFoundError("Collection not found");
-  }
-
-  return await collection.update({ name });
-};
+    const collection = await Collection.findByPk(id);
+    if (!collection) {
+      throw new NotFoundError("Collection not found");
+    }
+  
+    try {
+      return await collection.update({ name });
+    } catch (error) {
+      if (error instanceof SequelizeValidationError) {
+        throw new ValidationError(error.errors[0].message || "Validation failed");
+      }
+      throw error;
+    }
+  };
 
 /**
  * Deletes a collection for a specific user.

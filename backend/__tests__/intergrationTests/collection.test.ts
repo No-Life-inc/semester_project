@@ -1,6 +1,13 @@
-import { afterAll, beforeAll, describe, expect, jest, test } from "@jest/globals";
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  jest,
+  test,
+} from "@jest/globals";
 
-jest.setTimeout(120000); 
+jest.setTimeout(120000);
 
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import knex from "knex";
@@ -15,7 +22,11 @@ import {
 } from "../../services/collectionService";
 import UserBookCollection from "../../models/sequelize/UserBookCollection";
 import UserBook from "../../models/sequelize/UserBook";
-import { ValidationError, UnauthorizedError,NotFoundError } from "../../utility/errors";
+import {
+  ValidationError,
+  UnauthorizedError,
+  NotFoundError,
+} from "../../utility/errors";
 
 // Initialize Knex
 const testKnex = knex(knexConfig.test);
@@ -48,18 +59,34 @@ describe("createCollection function positive tests", () => {
 });
 
 // Negative test cases for createCollection
-type CreateCollectionNegativeTestCase = [string | null, number, string | typeof NotFoundError | typeof ValidationError];
+type CreateCollectionNegativeTestCase = [
+  string | null,
+  number,
+  typeof NotFoundError | typeof ValidationError,
+  string
+];
+
 const createCollectionNegativeCases: CreateCollectionNegativeTestCase[] = [
-  ["Invalid User Collection", 999, NotFoundError],
-  ["", 1, ValidationError],
-  [null, 1, ValidationError],
+  ["Invalid User Collection", 999, NotFoundError, "User not found"],
+  ["", 1, ValidationError, "Collection name is required"],
+  [null, 1, ValidationError, "Collection name is required"],
 ];
 
 describe("createCollection function negative tests", () => {
   test.each(createCollectionNegativeCases)(
-    "should throw an error (name: %s, userId: %i, errorClass: %s)",
-    async (name: string | null, userId: number, errorClass: string | typeof NotFoundError) => {
-      await expect(createCollection(name as string, userId)).rejects.toThrow(errorClass);
+    "should throw an error (name: %s, userId: %i, errorClass: %s, errorMessage: %s)",
+    async (
+      name: string | null,
+      userId: number,
+      errorClass: typeof NotFoundError | typeof ValidationError,
+      errorMessage: string
+    ) => {
+      await expect(createCollection(name as string, userId)).rejects.toThrow(
+        errorClass
+      );
+      await expect(createCollection(name as string, userId)).rejects.toThrow(
+        errorMessage
+      );
     }
   );
 });
@@ -83,16 +110,26 @@ describe("getUserCollections function positive tests", () => {
 });
 
 // Negative test cases for getUserCollections
-type GetUserCollectionsNegativeTestCase = [number, typeof NotFoundError];
+type GetUserCollectionsNegativeTestCase = [
+  number,
+  typeof NotFoundError,
+  string
+];
+
 const getUserCollectionsNegativeCases: GetUserCollectionsNegativeTestCase[] = [
-  [999, NotFoundError],
+  [999, NotFoundError, "User not found"],
 ];
 
 describe("getUserCollections function negative tests", () => {
   test.each(getUserCollectionsNegativeCases)(
-    "should throw an error (userId: %i, errorClass: %s)",
-    async (userId: number, errorClass: typeof NotFoundError) => {
+    "should throw an error (userId: %i, errorClass: %s, errorMessage: %s)",
+    async (
+      userId: number,
+      errorClass: typeof NotFoundError,
+      errorMessage: string
+    ) => {
       await expect(getUserCollections(userId)).rejects.toThrow(errorClass);
+      await expect(getUserCollections(userId)).rejects.toThrow(errorMessage);
     }
   );
 });
@@ -117,23 +154,29 @@ describe("updateCollection function positive tests", () => {
 });
 
 // Negative test cases for updateCollection
-type UpdateCollectionNegativeTestCase = [number, string, typeof NotFoundError | typeof ValidationError];
+type UpdateCollectionNegativeTestCase = [
+  number,
+  string,
+  typeof NotFoundError | typeof ValidationError,
+  string
+];
+
 const updateCollectionNegativeCases: UpdateCollectionNegativeTestCase[] = [
-  [999, "Nonexistent Collection", NotFoundError],
-  [1, "", ValidationError],
+  [999, "Nonexistent Collection", NotFoundError, "Collection not found"],
+  [1, "", ValidationError, "Validation notEmpty on name failed"],
 ];
 
 describe("updateCollection function negative tests", () => {
   test.each(updateCollectionNegativeCases)(
-    "should throw an error (id: %i, name: %s, errorClass: %s)",
-    async (id: number, name: string, errorClass) => {
-      if (errorClass === ValidationError) {
-        await expect(updateCollection(id, name)).rejects.toThrow(
-          /Validation notEmpty on name failed/
-        );
-      } else {
-        await expect(updateCollection(id, name)).rejects.toThrow(errorClass);
-      }
+    "should throw an error (id: %i, name: %s, errorClass: %s, errorMessage: %s)",
+    async (
+      id: number,
+      name: string,
+      errorClass: typeof NotFoundError | typeof ValidationError,
+      errorMessage: string
+    ) => {
+      await expect(updateCollection(id, name)).rejects.toThrow(errorClass);
+      await expect(updateCollection(id, name)).rejects.toThrow(errorMessage);
     }
   );
 });
@@ -156,19 +199,38 @@ describe("deleteCollection function positive tests", () => {
 });
 
 // Negative test cases for deleteCollection
-type DeleteCollectionNegativeTestCase = [number, number | null, typeof NotFoundError | typeof UnauthorizedError | typeof ValidationError];
+type DeleteCollectionNegativeTestCase = [
+  number,
+  number | null,
+  typeof NotFoundError | typeof UnauthorizedError | typeof ValidationError,
+  string //
+];
+
 const deleteCollectionNegativeCases: DeleteCollectionNegativeTestCase[] = [
-  [999, 1, NotFoundError],
-  [1, 2, UnauthorizedError],
-  [1, null, ValidationError],
-  [1, NaN as any, ValidationError],
+  [999, 1, NotFoundError, "Collection not found"],
+  [1, 2, UnauthorizedError, "You are not authorized to delete this collection"],
+  [1, null, ValidationError, "Invalid user ID"],
+  [1, NaN as any, ValidationError, "Invalid user ID"],
 ];
 
 describe("deleteCollection function negative tests", () => {
   test.each(deleteCollectionNegativeCases)(
-    "should throw an error (id: %i, userId: %i, errorClass: %s)",
-    async (id: number, userId: number | null, errorClass) => {
-      await expect(deleteCollection(id, userId as number)).rejects.toThrow(errorClass);
+    "should throw an error (id: %i, userId: %i, errorClass: %s, errorMessage: %s)",
+    async (
+      id: number,
+      userId: number | null,
+      errorClass:
+        | typeof NotFoundError
+        | typeof UnauthorizedError
+        | typeof ValidationError,
+      errorMessage: string
+    ) => {
+      await expect(deleteCollection(id, userId as number)).rejects.toThrow(
+        errorClass
+      );
+      await expect(deleteCollection(id, userId as number)).rejects.toThrow(
+        errorMessage
+      );
     }
   );
 });
@@ -199,7 +261,9 @@ describe("addBookToCollection function positive tests", () => {
       });
       expect(existingEntry).toBeNull();
 
-      await expect(addBookToCollection(userId, collectionId, bookId)).resolves.not.toThrow();
+      await expect(
+        addBookToCollection(userId, collectionId, bookId)
+      ).resolves.not.toThrow();
 
       const addedEntry = await UserBookCollection.findOne({
         where: { collection_id: collectionId, user_book_id: userBook!.id },
@@ -210,33 +274,58 @@ describe("addBookToCollection function positive tests", () => {
 });
 
 // Negative test cases for addBookToCollection
-type AddBookToCollectionNegativeTestCase = [number, number, number, typeof NotFoundError | typeof ValidationError];
-const addBookToCollectionNegativeCases: AddBookToCollectionNegativeTestCase[] = [
-  [1, 1, 999, NotFoundError],
-  [1, 1, 1, ValidationError],
+type AddBookToCollectionNegativeTestCase = [
+  number,
+  number,
+  number,
+  typeof NotFoundError | typeof ValidationError,
+  string
 ];
+
+const addBookToCollectionNegativeCases: AddBookToCollectionNegativeTestCase[] =
+  [
+    [
+      1,
+      1,
+      999,
+      NotFoundError,
+      "UserBook entry not found. Add the book to the user first.",
+    ],
+    [1, 1, 1, ValidationError, "Book already exists in the collection"],
+  ];
 
 describe("addBookToCollection function negative tests", () => {
   test.each(addBookToCollectionNegativeCases)(
-    "should throw an error (userId: %i, collectionId: %i, bookId: %i, errorClass: %s)",
-    async (userId: number, collectionId: number, bookId: number, errorClass) => {
-      await expect(addBookToCollection(userId, collectionId, bookId)).rejects.toThrow(errorClass);
+    "should throw an error (userId: %i, collectionId: %i, bookId: %i, errorClass: %s, errorMessage: %s)",
+    async (
+      userId: number,
+      collectionId: number,
+      bookId: number,
+      errorClass: typeof NotFoundError | typeof ValidationError,
+      errorMessage: string
+    ) => {
+      await expect(
+        addBookToCollection(userId, collectionId, bookId)
+      ).rejects.toThrow(errorClass);
+      await expect(
+        addBookToCollection(userId, collectionId, bookId)
+      ).rejects.toThrow(errorMessage);
     }
   );
 });
 
 // Positive test cases for removeBookFromCollection
 type RemoveBookFromCollectionTestCase = [number, number, number];
-const removeBookFromCollectionPositiveCases: RemoveBookFromCollectionTestCase[] = [
-  [1, 1, 1],
-  [2, 2, 2],
-];
+const removeBookFromCollectionPositiveCases: RemoveBookFromCollectionTestCase[] =
+  [
+    [1, 1, 1],
+    [2, 2, 2],
+  ];
 
 describe("removeBookFromCollection function positive tests", () => {
   test.each(removeBookFromCollectionPositiveCases)(
     "should remove a book from a collection (collectionId: %i, userId: %i, bookId: %i)",
     async (collectionId: number, userId: number, bookId: number) => {
-
       try {
         await addBookToCollection(userId, collectionId, bookId);
       } catch (error) {
@@ -245,25 +334,45 @@ describe("removeBookFromCollection function positive tests", () => {
         }
       }
 
-
-      await expect(removeBookFromCollection(collectionId, userId, bookId)).resolves.not.toThrow();
+      await expect(
+        removeBookFromCollection(collectionId, userId, bookId)
+      ).resolves.not.toThrow();
     }
   );
 });
 
 // Negative test cases for removeBookFromCollection
-type RemoveBookFromCollectionNegativeTestCase = [number, number, number, typeof NotFoundError];
-const removeBookFromCollectionNegativeCases: RemoveBookFromCollectionNegativeTestCase[] = [
-  [999, 1, 1, NotFoundError],
-  [1, 1, 999, NotFoundError],
-  [1, 1, 1, NotFoundError],
+type RemoveBookFromCollectionNegativeTestCase = [
+  number,
+  number,
+  number,
+  typeof NotFoundError,
+  string
 ];
+
+const removeBookFromCollectionNegativeCases: RemoveBookFromCollectionNegativeTestCase[] =
+  [
+    [999, 1, 1, NotFoundError, "Collection not found"],
+    [1, 1, 999, NotFoundError, "UserBook entry not found"],
+    [1, 1, 1, NotFoundError, "Book not found in the collection"],
+  ];
 
 describe("removeBookFromCollection function negative tests", () => {
   test.each(removeBookFromCollectionNegativeCases)(
-    "should throw an error (collectionId: %i, userId: %i, bookId: %i, errorClass: %s)",
-    async (collectionId: number, userId: number, bookId: number, errorClass) => {
-      await expect(removeBookFromCollection(collectionId, userId, bookId)).rejects.toThrow(errorClass);
+    "should throw an error (collectionId: %i, userId: %i, bookId: %i, errorClass: %s, errorMessage: %s)",
+    async (
+      collectionId: number,
+      userId: number,
+      bookId: number,
+      errorClass: typeof NotFoundError,
+      errorMessage: string
+    ) => {
+      await expect(
+        removeBookFromCollection(collectionId, userId, bookId)
+      ).rejects.toThrow(errorClass);
+      await expect(
+        removeBookFromCollection(collectionId, userId, bookId)
+      ).rejects.toThrow(errorMessage);
     }
   );
 });
