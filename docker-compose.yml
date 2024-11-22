@@ -45,6 +45,7 @@ services:
       - MONGO_URI=${MONGO_URI}
       - ISBNDB_API_KEY=${ISBNDB_API_KEY}
       - JWT_SECRET=${JWT_SECRET}
+      - DEFAULT_PASSWORD=${DEFAULT_PASSWORD}
     command: sh -c "npm install && npx ts-node ./app.ts"
 
   frontend:
