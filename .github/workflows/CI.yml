@@ -66,6 +66,7 @@ jobs:
           ISBNDB_API_KEY: ${{ secrets.ISBNDB_API_KEY }}
           NODE_ENV: test
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DEFAULT_PASSWORD: ${{ secrets.DEFAULT_PASSWORD }}
 
       - name: Install Sonar Scanner
         run: |
