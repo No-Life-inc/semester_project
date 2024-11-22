@@ -13,7 +13,8 @@ import {NotFoundError, ValidationError, UnauthorizedError} from "../utility/erro
  * @param {string} name - The name of the collection.
  * @param {number} userId - The ID of the user.
  * @returns {Promise<Collection>} - A promise that resolves to the newly created collection.
- * @throws {Error} - Throws an error if the user is not found.
+ * @throws {ValidationError} - Throws an error if the collection name is missing.
+ * @throws {NotFoundError} - Throws an error if the user is not found.
  */
 export const createCollection = async (name: string, userId: number) => {
     if (!name) {
@@ -33,7 +34,7 @@ export const createCollection = async (name: string, userId: number) => {
  *
  * @param {number} userId - The ID of the user.
  * @returns {Promise<Collection[]>} - A promise that resolves to an array of collections associated with the user.
- * @throws {Error} - Throws an error if the user is not found.
+ * @throws {NotFoundError} - Throws an error if the user is not found.
  */
 export const getUserCollections = async (userId: number) => {
   const user = await User.findByPk(userId, {
@@ -64,7 +65,7 @@ export const getUserCollections = async (userId: number) => {
  * @param {number} id - The ID of the collection.
  * @param {string} name - The new name for the collection.
  * @returns {Promise<Collection>} - A promise that resolves to the updated collection.
- * @throws {Error} - Throws an error if the collection is not found.
+ * @throws {NotFoundError} - Throws an error if the collection is not found.
  */
 export const updateCollection = async (id: number, name: string) => {
   const collection = await Collection.findByPk(id);
@@ -79,9 +80,11 @@ export const updateCollection = async (id: number, name: string) => {
  * Deletes a collection for a specific user.
  *
  * @param {number} id - The ID of the collection.
- * @param {number} userId - The ID of the user.
- * @returns {Promise<number>} - A promise that resolves to the number of deleted records.
- * @throws {Error} - Throws an error if the user ID is invalid, the collection is not found, or the user is not authorized to delete the collection.
+ * @param {number} userId - The ID of the user attempting to delete the collection.
+ * @returns {Promise<boolean>} - A promise that resolves to `true` if the collection is successfully deleted.
+ * @throws {ValidationError} - Throws an error if the user ID is invalid.
+ * @throws {NotFoundError} - Throws an error if the collection is not found.
+ * @throws {UnauthorizedError} - Throws an error if the user is not authorized to delete the collection.
  */
 export const deleteCollection = async (id: number, userId: number) => {
     const t = await sequelize.transaction();
@@ -117,8 +120,9 @@ export const deleteCollection = async (id: number, userId: number) => {
  * @param {number} userId - The ID of the user.
  * @param {number} collectionId - The ID of the collection.
  * @param {number} bookId - The ID of the book.
- * @returns {Promise<void>} - A promise that resolves when the book is added to the collection.
- * @throws {Error} - Throws an error if the userBook entry is not found or the book already exists in the collection.
+ * @returns {Promise<void>} - A promise that resolves when the book is successfully added to the collection.
+ * @throws {NotFoundError} - Throws an error if the UserBook entry is not found.
+ * @throws {ValidationError} - Throws an error if the book already exists in the collection.
  */
 export const addBookToCollection = async (
     userId: number,
@@ -173,8 +177,10 @@ export const addBookToCollection = async (
  * @param {number} collectionId - The ID of the collection.
  * @param {number} userId - The ID of the user.
  * @param {number} bookId - The ID of the book.
- * @returns {Promise<void>} - A promise that resolves when the book is removed from the collection.
- * @throws {Error} - Throws an error if the collection, userBook, or UserBookCollection entry is not found.
+ * @returns {Promise<void>} - A promise that resolves when the book is successfully removed from the collection.
+ * @throws {NotFoundError} - Throws an error if the collection is not found.
+ * @throws {NotFoundError} - Throws an error if the UserBook entry is not found.
+ * @throws {NotFoundError} - Throws an error if the book is not associated with the collection.
  */
 export const removeBookFromCollection = async (
     collectionId: number,
