@@ -1,4 +1,5 @@
 import { Knex } from "knex";
+import bcrypt from "bcrypt";
 
 export async function seed(knex: Knex): Promise<void> {
     await knex("user_book_tags").del();
@@ -10,9 +11,9 @@ export async function seed(knex: Knex): Promise<void> {
     // Seed users
     const [user1, user2, user3] = await knex("users")
         .insert([
-            { name: "user1", email: "user1@example.com", password: "$2b$10$HEBqXdcuaiDli2d78pTQ5e1WHDzfpg0UNE3Cpg5Y3lwKuGF8fWUsy" }, //password is Test1234
-            { name: "user2", email: "user2@example.com", password: "$2b$10$HEBqXdcuaiDli2d78pTQ5e1WHDzfpg0UNE3Cpg5Y3lwKuGF8fWUsy" }, //password is Test1234
-            { name: "Test Testsen", email: "test@test.com", password: "$2b$10$HEBqXdcuaiDli2d78pTQ5e1WHDzfpg0UNE3Cpg5Y3lwKuGF8fWUsy" } //password is Test1234
+            { name: "user1", email: "user1@example.com", password: await bcrypt.hash(process.env.DEFAULT_PASSWORD, 10) },
+            { name: "user2", email: "user2@example.com", password: await bcrypt.hash(process.env.DEFAULT_PASSWORD, 10) },
+            { name: "Test Testsen", email: "test@test.com", password: await bcrypt.hash(process.env.DEFAULT_PASSWORD, 10) }
         ])
         .returning("*");
 
