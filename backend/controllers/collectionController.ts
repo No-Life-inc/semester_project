@@ -1,5 +1,8 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+import { AuthenticatedRequest } from "../types/authenticatedRequest";
 import * as CollectionService from "../services/collectionService";
+import User from "../models/sequelize/User";
+import Collection from "../models/sequelize/Collection";
 
 /**
  * Creates a new collection for a user.
@@ -9,16 +12,20 @@ import * as CollectionService from "../services/collectionService";
  * @returns {Promise<Collection>} - A promise that resolves to the newly created collection.
  * @throws {Error} - Throws an error if the user is not found.
  */
-export const createCollection = async (req: Request, res: Response) => {
-  const { name, userId } = req.body;
+export const createCollection = async (req: AuthenticatedRequest, res: Response) => {
+  const { name } = req.body;
+  const { email } = req.user;
+
   try {
-    const newCollection = await CollectionService.createCollection(
-      name,
-      userId
-    );
-    res.status(201).json(newCollection);
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+          throw new Error("User not found");
+      }
+
+      const newCollection = await CollectionService.createCollection(name, user.id);
+      res.status(201).json(newCollection);
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+      res.status(500).json({ message: (error as Error).message });
   }
 };
 
@@ -28,15 +35,19 @@ export const createCollection = async (req: Request, res: Response) => {
  * @param {Request} req - The request object containing the user ID as a parameter.
  * @param {Response} res - The response object used to send the result or error.
  */
-export const getUserCollections = async (req: Request, res: Response) => {
-  const { userId } = req.params;
+export const getUserCollections = async (req: AuthenticatedRequest, res: Response) => {
+  const { email } = req.user;
+
   try {
-    const collections = await CollectionService.getUserCollections(
-      Number(userId)
-    );
-    res.json(collections);
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+          throw new Error("User not found");
+      }
+
+      const collections = await CollectionService.getUserCollections(user.id);
+      res.json(collections);
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+      res.status(500).json({ message: (error as Error).message });
   }
 };
 
@@ -48,14 +59,26 @@ export const getUserCollections = async (req: Request, res: Response) => {
  * @returns {Promise<Collection>} - A promise that resolves to the updated collection.
  * @throws {Error} - Throws an error if the collection is not found.
  */
-export const updateCollection = async (req: Request, res: Response) => {
+export const updateCollection = async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
   const { name } = req.body;
+  const { email } = req.user;
+
   try {
-    await CollectionService.updateCollection(Number(id), name);
-    res.json({ message: "Collection updated successfully" });
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+          throw new Error("User not found");
+      }
+
+      const collection = await Collection.findByPk(Number(id));
+      if (!collection || collection.userId !== user.id) {
+          throw new Error("You are not authorized to update this collection");
+      }
+
+      await CollectionService.updateCollection(Number(id), name);
+      res.json({ message: "Collection updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+      res.status(500).json({ message: (error as Error).message });
   }
 };
 
@@ -67,13 +90,20 @@ export const updateCollection = async (req: Request, res: Response) => {
  * @returns {Promise<number>} - A promise that resolves to the number of deleted records.
  * @throws {Error} - Throws an error if the user ID is invalid, the collection is not found, or the user is not authorized to delete the collection.
  */
-export const deleteCollection = async (req: Request, res: Response) => {
-  const { id, userId } = req.params;
+export const deleteCollection = async (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
+  const { email } = req.user;
+
   try {
-    await CollectionService.deleteCollection(Number(id), Number(userId));
-    res.json({ message: "Collection deleted successfully" });
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+          throw new Error("User not found");
+      }
+
+      await CollectionService.deleteCollection(Number(id), user.id);
+      res.json({ message: "Collection deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+      res.status(500).json({ message: (error as Error).message });
   }
 };
 
@@ -86,28 +116,27 @@ export const deleteCollection = async (req: Request, res: Response) => {
  * @returns {Promise<void>} - A promise that resolves when the book is added to the collection.
  * @throws {Error} - Throws an error if the userBook entry is not found or the book already exists in the collection.
  */
-export const addBookToCollection = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  let { userId, collectionId, bookId } = req.body;
+export const addBookToCollection = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  const { collectionId, bookId } = req.body;
+  const { email } = req.user;
 
   try {
-    userId = Number(userId);
-    collectionId = Number(collectionId);
-    bookId = Number(bookId);
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+          throw new Error("User not found");
+      }
 
-    if (isNaN(userId) || isNaN(collectionId) || isNaN(bookId)) {
-      throw new Error(
-        "Invalid input. userId, collectionId, and bookId must be numbers."
-      );
-    }
+      const collectionIdNum = Number(collectionId);
+      const bookIdNum = Number(bookId);
+      if (isNaN(collectionIdNum) || isNaN(bookIdNum)) {
+          throw new Error("Invalid input. collectionId and bookId must be numbers.");
+      }
 
-    await CollectionService.addBookToCollection(userId, collectionId, bookId);
-    res.status(201).json({ message: "Book added to collection successfully" });
+      await CollectionService.addBookToCollection(user.id, collectionIdNum, bookIdNum);
+      res.status(201).json({ message: "Book added to collection successfully" });
   } catch (error) {
-    console.error("Error in addBookToCollection:", error);
-    res.status(400).json({ error: (error as Error).message });
+      console.error("Error in addBookToCollection:", error);
+      res.status(400).json({ error: (error as Error).message });
   }
 };
 
@@ -118,32 +147,25 @@ export const addBookToCollection = async (
  * @param {Response} res - The response object used to send the result or error.
  * @returns {Promise<void>} - A promise that resolves when the book is removed from the collection.
  */
-export const removeBookFromCollection = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  let { userId, collectionId, bookId } = req.body;
+export const removeBookFromCollection = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  const { collectionId, bookId } = req.body;
+  const { email } = req.user;
 
   try {
-    userId = Number(userId);
-    collectionId = Number(collectionId);
-    bookId = Number(bookId);
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+          throw new Error("User not found");
+      }
 
-    if (isNaN(userId) || isNaN(collectionId) || isNaN(bookId)) {
-      throw new Error(
-        "Invalid input. userId, collectionId, and bookId must be numbers."
-      );
-    }
+      const collectionIdNum = Number(collectionId);
+      const bookIdNum = Number(bookId);
+      if (isNaN(collectionIdNum) || isNaN(bookIdNum)) {
+          throw new Error("Invalid input. collectionId and bookId must be numbers.");
+      }
 
-    await CollectionService.removeBookFromCollection(
-      collectionId,
-      userId,
-      bookId
-    );
-    res
-      .status(200)
-      .json({ message: "Book removed from collection successfully" });
+      await CollectionService.removeBookFromCollection(collectionIdNum, user.id, bookIdNum);
+      res.status(200).json({ message: "Book removed from collection successfully" });
   } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+      res.status(400).json({ error: (error as Error).message });
   }
 };
