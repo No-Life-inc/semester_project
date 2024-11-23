@@ -1,7 +1,10 @@
 import { Router} from "express";
 import * as CollectionController from "../../controllers/collectionController";
+import {authenticate} from "../../utility/authMiddleware";
 
 const router = Router();
+
+router.use(authenticate);
 
 // Route to get all collections for a specific user
 router.get("/:userId/", CollectionController.getUserCollections);

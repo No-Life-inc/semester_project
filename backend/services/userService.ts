@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import User from "../models/sequelize/User";
 import {validateEmail, validateName, validatePassword} from "./validatorService";
 import {generateToken, verifyToken} from "./jwtService";
@@ -12,8 +12,8 @@ import {generateToken, verifyToken} from "./jwtService";
  * @returns {Promise<User>} - The created User instance without the password
  *
  * @example
- * registerUser("johndoe", "johndoe@johndoe.com", "password123")
- * This will create a new user with the name "johndoe", email "johndoe@johndoe.com" and password "password123"
+ * registerUser("johndoe", "johndoe@johndoe.com", "Password123")
+ * This will create a new user with the name "johndoe", email "johndoe@johndoe.com" and password "Password123"
  * but hashing the password before storing it in the database, with the help of the User model.
  */
 export const registerUser = async (name: string, email: string, password: string) => {
@@ -47,7 +47,7 @@ export const registerUser = async (name: string, email: string, password: string
  * @returns {Promise<User>} - The logged in User instance without the password
  *
  * @example
- * loginUser("johndoe@johndoe.com", "password123")
+ * loginUser("johndoe@johndoe.com", "Password123")
  * This will log in the user with the email "johndoe@johndoe.com" if the password matches the hashed password in the database.
  */
 export const loginUser = async (email: string, password: string) => {
