@@ -5,12 +5,16 @@ import User from "../models/sequelize/User";
 import Collection from "../models/sequelize/Collection";
 
 /**
- * Creates a new collection for a user.
+ * Creates a new collection for the authenticated user.
  *
- * @param {string} name - The name of the collection.
- * @param {number} userId - The ID of the user.
- * @returns {Promise<Collection>} - A promise that resolves to the newly created collection.
- * @throws {Error} - Throws an error if the user is not found.
+ * @param {AuthenticatedRequest} req - The request object containing:
+ *   - `req.body.name`: The name of the collection to be created.
+ *   - `req.user.email`: The email of the authenticated user.
+ * @param {Response} res - The response object used to send the created collection or an error message.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ *
+ * @throws {Error} - Throws an error if the authenticated user is not found in the database.
  */
 export const createCollection = async (req: AuthenticatedRequest, res: Response) => {
   const { name } = req.body;
@@ -30,10 +34,15 @@ export const createCollection = async (req: AuthenticatedRequest, res: Response)
 };
 
 /**
- * Handles retrieving collections for a user via an HTTP request.
+ * Retrieves all collections associated with the authenticated user.
  *
- * @param {Request} req - The request object containing the user ID as a parameter.
- * @param {Response} res - The response object used to send the result or error.
+ * @param {AuthenticatedRequest} req - The request object containing:
+ *   - `req.user.email`: The email of the authenticated user.
+ * @param {Response} res - The response object used to send the user's collections or an error message.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ *
+ * @throws {Error} - Throws an error if the authenticated user is not found in the database.
  */
 export const getUserCollections = async (req: AuthenticatedRequest, res: Response) => {
   const { email } = req.user;
@@ -52,12 +61,18 @@ export const getUserCollections = async (req: AuthenticatedRequest, res: Respons
 };
 
 /**
- * Updates the name of a collection.
+ * Updates the name of a collection belonging to the authenticated user.
  *
- * @param {number} id - The ID of the collection.
- * @param {string} name - The new name for the collection.
- * @returns {Promise<Collection>} - A promise that resolves to the updated collection.
- * @throws {Error} - Throws an error if the collection is not found.
+ * @param {AuthenticatedRequest} req - The request object containing:
+ *   - `req.params.id`: The ID of the collection to be updated.
+ *   - `req.body.name`: The new name for the collection.
+ *   - `req.user.email`: The email of the authenticated user.
+ * @param {Response} res - The response object used to send a success message or an error message.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ *
+ * @throws {Error} - Throws an error if the authenticated user is not found in the database
+ *                   or if the user is not authorized to update the specified collection.
  */
 export const updateCollection = async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
@@ -83,12 +98,17 @@ export const updateCollection = async (req: AuthenticatedRequest, res: Response)
 };
 
 /**
- * Deletes a collection for a specific user.
+ * Deletes a collection belonging to the authenticated user.
  *
- * @param {number} id - The ID of the collection.
- * @param {number} userId - The ID of the user.
- * @returns {Promise<number>} - A promise that resolves to the number of deleted records.
- * @throws {Error} - Throws an error if the user ID is invalid, the collection is not found, or the user is not authorized to delete the collection.
+ * @param {AuthenticatedRequest} req - The request object containing:
+ *   - `req.params.id`: The ID of the collection to be deleted.
+ *   - `req.user.email`: The email of the authenticated user.
+ * @param {Response} res - The response object used to send a success message or an error message.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ *
+ * @throws {Error} - Throws an error if the authenticated user is not found in the database
+ *                   or if the specified collection cannot be deleted.
  */
 export const deleteCollection = async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
@@ -108,13 +128,18 @@ export const deleteCollection = async (req: AuthenticatedRequest, res: Response)
 };
 
 /**
- * Adds a book to a collection for a user.
+ * Adds a book to a collection belonging to the authenticated user.
  *
- * @param {number} userId - The ID of the user.
- * @param {number} collectionId - The ID of the collection.
- * @param {number} bookId - The ID of the book.
- * @returns {Promise<void>} - A promise that resolves when the book is added to the collection.
- * @throws {Error} - Throws an error if the userBook entry is not found or the book already exists in the collection.
+ * @param {AuthenticatedRequest} req - The request object containing:
+ *   - `req.body.collectionId`: The ID of the collection to which the book should be added.
+ *   - `req.body.bookId`: The ID of the book to be added.
+ *   - `req.user.email`: The email of the authenticated user.
+ * @param {Response} res - The response object used to send a success message or an error message.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ *
+ * @throws {Error} - Throws an error if the authenticated user is not found in the database,
+ *                   if the input IDs are invalid, or if the book cannot be added to the specified collection.
  */
 export const addBookToCollection = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const { collectionId, bookId } = req.body;
@@ -141,11 +166,18 @@ export const addBookToCollection = async (req: AuthenticatedRequest, res: Respon
 };
 
 /**
- * Handles removing a book from a user's collection via an HTTP request.
+ * Removes a book from a collection belonging to the authenticated user.
  *
- * @param {Request} req - The request object containing the user ID, collection ID, and book ID in the body.
- * @param {Response} res - The response object used to send the result or error.
- * @returns {Promise<void>} - A promise that resolves when the book is removed from the collection.
+ * @param {AuthenticatedRequest} req - The request object containing:
+ *   - `req.body.collectionId`: The ID of the collection from which the book should be removed.
+ *   - `req.body.bookId`: The ID of the book to be removed.
+ *   - `req.user.email`: The email of the authenticated user.
+ * @param {Response} res - The response object used to send a success message or an error message.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ *
+ * @throws {Error} - Throws an error if the authenticated user is not found in the database,
+ *                   if the input IDs are invalid, or if the book cannot be removed from the specified collection.
  */
 export const removeBookFromCollection = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const { collectionId, bookId } = req.body;
