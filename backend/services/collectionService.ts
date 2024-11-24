@@ -30,6 +30,7 @@ export const createCollection = async (name: string, userId: number) => {
  * @throws {Error} - Throws an error if the user is not found.
  */
 export const getUserCollections = async (userId: number) => {
+
     const user = await User.findByPk(userId, {
         include: [
             {

@@ -1,8 +1,11 @@
 import { afterAll, beforeAll, describe, expect, jest, test } from "@jest/globals";
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import { registerUser, loginUser, editUser, editPassword  } from "../../services/userService";
+import User from "../../models/sequelize/User";
 
 jest.setTimeout(30000);
+
+const validPassword = process.env.DEFAULT_PASSWORD;
 
 beforeAll(async () => {
     await setupTestDB();
@@ -15,7 +18,6 @@ afterAll(async () => {
 describe("Positive User data boundary tests", () => {
     const maxName = "A".repeat(255);
     const maxEmail = "a".repeat(243) + "@example.com";
-    const validPassword = "StrongPass123";
     const minPassword = "Pass1234";
 
     const positiveCases = [
@@ -54,7 +56,6 @@ describe("Negative User data boundary tests (including edge cases)", () => {
     const emptyEmail = ""; // Edge case: Completely empty email
     const whitespaceEmail = "   "; // Edge case: Email with only whitespace
 
-    const validPassword = "StrongPass123";
     const invalidShortPassword = "Short1"; // Below minimum length
     const emptyPassword = ""; // Edge case: Completely empty password
     const whitespacePassword = "       "; // Edge case: Password with only whitespace
@@ -75,6 +76,7 @@ describe("Negative User data boundary tests (including edge cases)", () => {
         ["should reject name with only whitespace", { name: whitespaceName, email: "valid@example.com", password: validPassword }],
         // Email cases
         ["should reject email exceeding 255 chars", { name: "Valid User", email: overMaxEmail, password: validPassword }],
+        ["should reject email already in use", { name: "Valid User", email: "test@test.com", password: validPassword }],
         ["should reject empty email", { name: "Valid User", email: emptyEmail, password: validPassword }],
         ["should reject email with only whitespace", { name: "Valid User", email: whitespaceEmail, password: validPassword }],
         ...invalidEmailFormats.map((email) => [
@@ -100,7 +102,7 @@ describe("Negative User data boundary tests (including edge cases)", () => {
 
 describe("loginUser function tests", () => {
     test("should log in a user with correct credentials", async () => {
-        const result = await loginUser("test@test.com", process.env.DEFAULT_PASSWORD );
+        const result = await loginUser("test@test.com", validPassword );
 
         expect(result).toBeDefined();
         expect(result.user.email).toBe("test@test.com");
@@ -115,7 +117,7 @@ describe("loginUser function tests", () => {
     });
 
     test("should throw an error for incorrect password", async () => {
-        const user = await registerUser("Test User", "passwordcheck@example.com", "ValidPassword123");
+        const user = await registerUser("Test User", "passwordcheck@example.com", validPassword);
 
         await expect(loginUser("passwordcheck@example.com", "WrongPassword")).rejects.toThrow(
             "Invalid email or password."
@@ -123,59 +125,64 @@ describe("loginUser function tests", () => {
     });
 });
 
-/*
-describe("editUser function tests with seeded data", () => {
-    const token = generateToken({ email: "seededuser@example.com" }); // Generer en token til den seeded bruger
+describe("editUser function tests", () => {
+    test("should update user's name and email successfully", async () => {
+        const token = { name: "user1", email: "test_email@example.com" };
 
-    test("should update the user's name and email", async () => {
-        const message = await editUser(token, "Updated Name", "updatedemail@example.com");
-        expect(message).toBe("User details have been updated successfully.");
-    });
+        const result = await editUser(token, "Updated Name", "updated@example.com");
 
-    test("should throw an error for invalid email", async () => {
-        await expect(editUser(token, "Updated Name", "invalid-email")).rejects.toThrow(
-            "Invalid email format."
-        );
+        expect(result.newToken).toBeDefined();
+        expect(result.user.name).toBe("Updated Name");
+        expect(result.user.email).toBe("updated@example.com");
     });
 
     test("should throw an error if user is not found", async () => {
-        const fakeToken = generateToken({ email: "nonexistentuser@example.com" });
+        const token = { name: "Non Existing Person", email: "nonexistent@example.com" };
 
-        await expect(editUser(fakeToken, "New Name", "newemail@example.com")).rejects.toThrow(
+        await expect(editUser(token, "Updated Name", "updated@example.com")).rejects.toThrow(
             "User not found."
+        );
+    });
+
+    test("should throw an error for invalid email", async () => {
+        const token = { name: "user1", email: "test_email@example.com" };
+
+        await expect(editUser(token, "Updated Name", "invalid-email")).rejects.toThrow(
+            "Invalid email format"
+        );
+    });
+
+    test("should throw an error for invalid name", async () => {
+        const token = { name: "user1", email: "test_email@example.com" };
+
+        await expect(editUser(token, "A", "updated@example.com")).rejects.toThrow(
+            "Name must be at least 2 characters long."
         );
     });
 });
 
+describe("editPassword function tests", () => {
+    test("should update the user's password successfully", async () => {
+        const token = { name: "user2", email: "test_password@example.com" };
 
+        const result = await editPassword(token, validPassword, "NewPassword123");
 
-describe("editPassword function tests with seeded data", () => {
-    const token = generateToken({ email: "seededuser@example.com" }); // Generer en token til den seeded bruger
-
-    test("should update the user's password with the correct old password", async () => {
-        const message = await editPassword(token, "OldPassword123", "NewPassword123"); // "OldPassword123" er den gamle adgangskode fra seed-data
-        expect(message).toBe("Your password has been updated successfully.");
+        expect(result).toBe("Your password has been updated successfully.");
     });
 
     test("should throw an error for incorrect old password", async () => {
+        const token = { name: "user2", email: "test_password@example.com" };
+
         await expect(editPassword(token, "WrongOldPassword", "NewPassword123")).rejects.toThrow(
             "Invalid password."
         );
     });
 
-    test("should throw an error for an invalid new password", async () => {
-        await expect(editPassword(token, "OldPassword123", "weak")).rejects.toThrow(
-            "Password does not meet the required criteria."
+    test("should throw an error for invalid new password", async () => {
+        const token = { name: "Test Testsen", email: "test_password@example.com" };
+
+        await expect(editPassword(token, "OldPassword123", "short")).rejects.toThrow(
+            "Password must be at least 8 characters long."
         );
     });
-
-    test("should throw an error if user is not found", async () => {
-        const fakeToken = generateToken({ email: "nonexistentuser@example.com" });
-
-        await expect(editPassword(fakeToken, "OldPassword123", "NewPassword123")).rejects.toThrow(
-            "User not found."
-        );
-    });
-});*/
-
-
+});
