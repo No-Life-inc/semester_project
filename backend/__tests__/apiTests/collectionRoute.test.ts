@@ -33,118 +33,76 @@ const user2Token = generateToken({ name: "user2", email: "user2@example.com" });
 /** Positive tests **/
 describe("Collection Routes - Positive Tests", () => {
   describe("Create Collection", () => {
-    test.each([
-      [
-        "should create a collection for user1",
-        { name: "New Collection" },
-        user1Token,
-        201,
-      ],
-    ])("%s", async (description, payload, token, expectedStatus) => {
+    test("should create a collection for user1", async () => {
+      const payload = { name: "New Collection" };
       const response = await request(app)
         .post("/collection")
-        .set("Authorization", `Bearer ${token}`)
+        .set("Authorization", `Bearer ${user1Token}`)
         .send(payload);
 
-      expect(response.status).toBe(expectedStatus);
+      expect(response.status).toBe(201);
       expect(response.body).toHaveProperty("name", payload.name);
     });
   });
 
   describe("Get Collections", () => {
-    test.each([["should retrieve collections for user1", user1Token, 200]])(
-      "%s",
-      async (description, token, expectedStatus) => {
-        const response = await request(app)
-          .get("/collection")
-          .set("Authorization", `Bearer ${token}`);
+    test("should retrieve collections for user1", async () => {
+      const response = await request(app)
+        .get("/collection")
+        .set("Authorization", `Bearer ${user1Token}`);
 
-        expect(response.status).toBe(expectedStatus);
-        expect(Array.isArray(response.body)).toBe(true);
-      }
-    );
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+    });
   });
 
   describe("Update Collection", () => {
-    test.each([
-      [
-        "should update collection for user1",
-        { name: "Updated Collection" },
-        user1Token,
-        200,
-      ],
-    ])("%s", async (description, payload, token, expectedStatus) => {
+    test("should update collection for user1", async () => {
+      const payload = { name: "Updated Collection" };
       const response = await request(app)
         .put("/collection/1")
-        .set("Authorization", `Bearer ${token}`)
+        .set("Authorization", `Bearer ${user1Token}`)
         .send(payload);
 
-      expect(response.status).toBe(expectedStatus);
-      expect(response.body).toHaveProperty(
-        "message",
-        "Collection updated successfully"
-      );
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("message", "Collection updated successfully");
     });
   });
 
   describe("Delete Collection", () => {
-    test.each([["should delete collection for user1", user1Token, 200]])(
-      "%s",
-      async (description, token, expectedStatus) => {
-        const response = await request(app)
-          .delete("/collection/1")
-          .set("Authorization", `Bearer ${token}`);
+    test("should delete collection for user1", async () => {
+      const response = await request(app)
+        .delete("/collection/1")
+        .set("Authorization", `Bearer ${user1Token}`);
 
-        expect(response.status).toBe(expectedStatus);
-        expect(response.body).toHaveProperty(
-          "message",
-          "Collection deleted successfully"
-        );
-      }
-    );
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("message", "Collection deleted successfully");
+    });
   });
 
   describe("Add Book to Collection", () => {
-    test.each([
-      [
-        "should add a book to collection for user1",
-        { collectionId: 1, bookId: 1 },
-        user1Token,
-        201,
-      ],
-    ])("%s", async (description, payload, token, expectedStatus) => {
+    test("should add a book to collection for user1", async () => {
+      const payload = { collectionId: 1, bookId: 1 };
       const response = await request(app)
         .post("/collection/addBook")
-        .set("Authorization", `Bearer ${token}`)
+        .set("Authorization", `Bearer ${user1Token}`)
         .send(payload);
 
-      expect(response.status).toBe(expectedStatus);
-      expect(response.body).toHaveProperty(
-        "message",
-        "Book added to collection successfully"
-      );
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty("message", "Book added to collection successfully");
     });
   });
 
   describe("Remove Book from Collection", () => {
-    test.each([
-      [
-        "should remove a book from collection for user1",
-        { collectionId: 1, bookId: 1 },
-        user1Token,
-        200,
-      ],
-    ])("%s", async (description, payload, token, expectedStatus) => {
+    test("should remove a book from collection for user1", async () => {
+      const payload = { collectionId: 1, bookId: 1 };
       const response = await request(app)
         .delete("/collection/removeBook")
-        .set("Authorization", `Bearer ${token}`)
+        .set("Authorization", `Bearer ${user1Token}`)
         .send(payload);
 
-      expect(response.status).toBe(expectedStatus);
-      expect(response.body).toHaveProperty(
-        "message",
-        "Book removed from collection successfully"
-      );
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("message", "Book removed from collection successfully");
     });
   });
 });

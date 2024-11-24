@@ -21,27 +21,16 @@ import {
  *
  * @throws {Error} - Throws an error if the authenticated user is not found in the database.
  */
-export const createCollection = async (
-  req: AuthenticatedRequest,
-  res: Response
-) => {
+export const createCollection = async (req: AuthenticatedRequest, res: Response) => {
   const { name } = req.body;
   const { email } = req.user;
 
   try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      throw new NotFoundError("User not found");
-    }
-
     if (!name) {
       throw new ValidationError("Collection name is required");
     }
 
-    const newCollection = await CollectionService.createCollection(
-      name,
-      user.id
-    );
+    const newCollection = await CollectionService.createCollection(name, email);
     res.status(201).json(newCollection);
   } catch (error) {
     res.status(error.statusCode || 500).json({ message: error.message });
@@ -63,13 +52,8 @@ export const getUserCollections = async (req: AuthenticatedRequest, res: Respons
   const { email } = req.user;
 
   try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      throw new NotFoundError("User not found");
-    }
-
-    const collections = await CollectionService.getUserCollections(user.id);
-    res.json(collections);
+    const collections = await CollectionService.getUserCollections(email);
+    res.status(200).json(collections);
   } catch (error) {
     res.status(error.statusCode || 500).json({ message: error.message });
   }
@@ -92,20 +76,14 @@ export const getUserCollections = async (req: AuthenticatedRequest, res: Respons
 export const updateCollection = async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
   const { name } = req.body;
-  const { email } = req.user;
 
   try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      throw new NotFoundError("User not found");
-    }
-
     if (!name) {
       throw new ValidationError("Collection name is required");
     }
 
     const updatedCollection = await CollectionService.updateCollection(Number(id), name);
-    res.json({ message: "Collection updated successfully", updatedCollection });
+    res.status(200).json({ message: "Collection updated successfully", updatedCollection });
   } catch (error) {
     res.status(error.statusCode || 500).json({ message: error.message });
   }
@@ -129,13 +107,8 @@ export const deleteCollection = async (req: AuthenticatedRequest, res: Response)
   const { email } = req.user;
 
   try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      throw new NotFoundError("User not found");
-    }
-
-    await CollectionService.deleteCollection(Number(id), user.id);
-    res.json({ message: "Collection deleted successfully" });
+    await CollectionService.deleteCollection(Number(id), email);
+    res.status(200).json({ message: "Collection deleted successfully" });
   } catch (error) {
     res.status(error.statusCode || 500).json({ message: error.message });
   }
@@ -160,16 +133,11 @@ export const addBookToCollection = async (req: AuthenticatedRequest, res: Respon
   const { email } = req.user;
 
   try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      throw new NotFoundError("User not found");
-    }
-
     if (!collectionId || !bookId) {
-      throw new ValidationError("collectionId and bookId are required");
+      throw new ValidationError("Collection ID and Book ID are required");
     }
 
-    await CollectionService.addBookToCollection(user.id, Number(collectionId), Number(bookId));
+    await CollectionService.addBookToCollection(email, Number(collectionId), Number(bookId));
     res.status(201).json({ message: "Book added to collection successfully" });
   } catch (error) {
     res.status(error.statusCode || 500).json({ message: error.message });
@@ -195,12 +163,7 @@ export const removeBookFromCollection = async (req: AuthenticatedRequest, res: R
   const { email } = req.user;
 
   try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      throw new NotFoundError("User not found");
-    }
-
-    await CollectionService.removeBookFromCollection(Number(collectionId), user.id, Number(bookId));
+    await CollectionService.removeBookFromCollection(email, Number(collectionId), Number(bookId));
     res.status(200).json({ message: "Book removed from collection successfully" });
   } catch (error) {
     res.status(error.statusCode || 500).json({ message: error.message });
