@@ -178,6 +178,14 @@ describe("editPassword function tests", () => {
         );
     });
 
+    test("should throw an error for non-existing user", async () => {
+        const token = { name: "Non Existing Person", email: "wrong_email@example.com" };
+
+        await expect(editPassword(token, "OldPassword123", "NewPassword123")).rejects.toThrow(
+            "User not found."
+        );
+    });
+
     test("should throw an error for invalid new password", async () => {
         const token = { name: "Test Testsen", email: "test_password@example.com" };
 
