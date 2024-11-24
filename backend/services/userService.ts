@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import User from "../models/sequelize/User";
 import {validateEmail, validateName, validatePassword} from "./validatorService";
-import {generateToken, verifyToken} from "./jwtService";
+import {generateToken, verifyToken, DecodedToken} from "./jwtService";
 
 /**
  * Registers a new user.
@@ -91,21 +91,25 @@ export const loginUser = async (email: string, password: string) => {
  * if the user with the given email exists.
  */
 
-export const editUser = async (token: string, name: string, email: string) => {
+export const editUser = async (token: DecodedToken, name: string, email: string) => {
     try {
-        const decoded = verifyToken(token);
-        const user = await User.findOne({ where: { email: decoded.email } });
+        if (name) {
+            validateName(name);
+        }
+        if (email) {
+            validateEmail(email);
+        }
+
+        const user = await User.findOne({ where: { email: token.email } });
 
         if (!user) {
             throw new Error("User not found.");
         }
 
         if (email) {
-            validateEmail(email);
             user.email = email;
         }
         if (name) {
-            validateName(name);
             user.name = name;
         }
 
@@ -133,14 +137,15 @@ export const editUser = async (token: string, name: string, email: string) => {
  * This will edit the user with the given password
  * if the user with the given password exists.
  */
-export const editPassword = async (token: string, oldPassword: string, password: string) => {
+export const editPassword = async (token: DecodedToken, oldPassword: string, password: string) => {
     try {
-        const decoded = verifyToken(token);
         validatePassword(password);
+        console.log(token.email);
 
         const user = await User.findOne({
-            where: { email: decoded.email, },
+            where: { email: token.email, },
             attributes: { include: ["password"] },
+            logging: console.log,
         });
 
         if (!user) {
