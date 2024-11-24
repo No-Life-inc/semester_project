@@ -140,12 +140,10 @@ export const editUser = async (token: DecodedToken, name: string, email: string)
 export const editPassword = async (token: DecodedToken, oldPassword: string, password: string) => {
     try {
         validatePassword(password);
-        console.log(token.email);
 
         const user = await User.findOne({
             where: { email: token.email, },
             attributes: { include: ["password"] },
-            logging: console.log,
         });
 
         if (!user) {
