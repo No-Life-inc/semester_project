@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET
 
-interface DecodedToken {
+export interface DecodedToken {
     name: string;
     email: string;
 }

@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../models/sequelize/User";
 import {validateEmail, validateName, validatePassword} from "./validatorService";
-import {generateToken, verifyToken} from "./jwtService";
+import {generateToken, verifyToken, DecodedToken} from "./jwtService";
 
 /**
  * Registers a new user.
@@ -17,26 +17,22 @@ import {generateToken, verifyToken} from "./jwtService";
  * but hashing the password before storing it in the database, with the help of the User model.
  */
 export const registerUser = async (name: string, email: string, password: string) => {
-    try {
-        validatePassword(password);
-        validateEmail(email);
-        validateName(name);
+    validatePassword(password);
+    validateEmail(email);
+    validateName(name);
 
-        const existingUser = await User.findOne({ where: { email } });
-        if (existingUser) {
-            throw new Error("Email is already in use.");
-        }
-
-        // Create and return the new user
-        const newUser = await User.create({ name, email, password });
-
-        const userWithoutPassword = newUser.toJSON();
-        delete userWithoutPassword.password;
-
-        return userWithoutPassword;
-    } catch (error) {
-        throw error;
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+        throw new Error("Email is already in use.");
     }
+
+    // Create and return the new user
+    const newUser = await User.create({ name, email, password });
+
+    const userWithoutPassword = newUser.toJSON();
+    delete userWithoutPassword.password;
+
+    return userWithoutPassword;
 };
 
 /**
@@ -51,30 +47,26 @@ export const registerUser = async (name: string, email: string, password: string
  * This will log in the user with the email "johndoe@johndoe.com" if the password matches the hashed password in the database.
  */
 export const loginUser = async (email: string, password: string) => {
-    try {
-        const user = await User.findOne({
-            where: { email },
-            attributes: { include: ["password"] },
-        });
-        if (!user) {
-            throw new Error("Invalid email or password.");
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            throw new Error("Invalid email or password.");
-        }
-
-        const userWithoutPassword = user.toJSON();
-        delete userWithoutPassword.password;
-
-        // Generate JWT token
-        const token = generateToken(user);
-
-        return { user: userWithoutPassword, token };
-    } catch (error) {
-        throw error;
+    const user = await User.findOne({
+        where: { email },
+        attributes: { include: ["password"] },
+    });
+    if (!user) {
+        throw new Error("Invalid email or password.");
     }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+        throw new Error("Invalid email or password.");
+    }
+
+    const userWithoutPassword = user.toJSON();
+    delete userWithoutPassword.password;
+
+    // Generate JWT token
+    const token = generateToken(user);
+
+    return { user: userWithoutPassword, token };
 };
 
 /**
@@ -91,33 +83,31 @@ export const loginUser = async (email: string, password: string) => {
  * if the user with the given email exists.
  */
 
-export const editUser = async (token: string, name: string, email: string) => {
-    try {
-        const decoded = verifyToken(token);
-        const user = await User.findOne({ where: { email: decoded.email } });
-
-        if (!user) {
-            throw new Error("User not found.");
-        }
-
-        if (email) {
-            validateEmail(email);
-            user.email = email;
-        }
-        if (name) {
-            validateName(name);
-            user.name = name;
-        }
-
-        await user.save();
-
-        const newToken = generateToken(user);
-
-        return { user: user, newToken };
+export const editUser = async (token: DecodedToken, name: string, email: string) => {
+    if (name) {
+        validateName(name);
     }
-    catch (error) {
-        throw error;
+    if (email) {
+        validateEmail(email);
     }
+
+    const user = await User.findOne({ where: { email: token.email } });
+
+    if (!user) {
+        throw new Error("User not found.");
+    }
+
+    if (email) {
+        user.email = email;
+    }
+    if (name) {
+        user.name = name;
+    }
+
+    await user.save();
+    const newToken = generateToken(user);
+
+    return { user: user, newToken };
 }
 
 /**
@@ -133,29 +123,25 @@ export const editUser = async (token: string, name: string, email: string) => {
  * This will edit the user with the given password
  * if the user with the given password exists.
  */
-export const editPassword = async (token: string, oldPassword: string, password: string) => {
-    try {
-        const decoded = verifyToken(token);
-        validatePassword(password);
+export const editPassword = async (token: DecodedToken, oldPassword: string, password: string) => {
 
-        const user = await User.findOne({
-            where: { email: decoded.email, },
-            attributes: { include: ["password"] },
-        });
+    validatePassword(password);
 
-        if (!user) {
-            throw new Error("User not found.");
-        }
+    const user = await User.findOne({
+        where: { email: token.email, },
+        attributes: { include: ["password"] },
+    });
 
-        const isMatch = await bcrypt.compare(oldPassword, user.password);
-        if (!isMatch) {
-            throw new Error("Invalid password.");
-        }
-
-        user.password = password;
-        await user.save();
-        return "Your password has been updated successfully."
-    } catch (error) {
-        throw error;
+    if (!user) {
+        throw new Error("User not found.");
     }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+        throw new Error("Invalid password.");
+    }
+
+    user.password = password;
+    await user.save();
+    return "Your password has been updated successfully."
 }
