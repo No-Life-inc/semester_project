@@ -1,0 +1,38 @@
+/* Navbar.css */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333; /* Dark background color */
+    padding: 16px 32px; /* Padding around the navbar */
+    color: #fff; /* White text */
+  }
+  
+  .navbar h1 {
+    font-size: 1.5em;
+    margin: 0;
+  }
+  
+  .navbar ul {
+    display: flex;
+    list-style: none; /* Remove default list styling */
+    margin: 0;
+    padding: 0;
+  }
+  
+  .navbar ul li {
+    margin-left: 20px; /* Spacing between links */
+  }
+  
+  .navbar ul li a {
+    color: #fff; /* White text color for links */
+    text-decoration: none; /* Remove underline */
+    font-size: 1em;
+    transition: color 0.3s; /* Smooth transition for hover effect */
+  }
+  
+  .navbar ul li a:hover {
+    color: #ffa726; /* Light orange color on hover */
+  }
+  

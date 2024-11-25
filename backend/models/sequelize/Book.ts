@@ -191,5 +191,4 @@ Book.init(
     }
 );
 
-
 export default Book;

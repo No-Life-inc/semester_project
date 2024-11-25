@@ -8,5 +8,5 @@
     "resolveJsonModule": true,
     "skipLibCheck": true
   },
-  "include": ["./app.ts", "./config/**/*.ts", "./controllers/**/*.ts", "./routes/**/*.ts"]
+  "include": ["./app.ts", "./config/**/*.ts", "./controllers/**/*.ts", "./routes/**/*.ts","./types/**/*.ts"]
 }

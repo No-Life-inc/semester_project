@@ -16,7 +16,6 @@ export const getAllSubjectsController = async (request: Request, response: Respo
         const subjects = await getAllSubjects(Number(page), Number(limit));
         response.json(subjects);
     } catch (error) {
-        console.error("Error fetching subjects:", error);
         response.status(500).json({ error: "An error occurred while fetching subjects" });
     }
 
@@ -38,7 +37,6 @@ export const getSubjectByIdController = async (req: Request, res: Response): Pro
         const subject = await getSubjectById(Number(id));
         res.json(subject);
     } catch (error) {
-        console.error("Error fetching subject by ID:", error);
         res.status(500).json({ error: "An error occurred while fetching the subject" });
     }
 };

@@ -17,13 +17,12 @@ app.use(express.json());
 
 async function startServer() {
   try {
-    // console.log("Connecting to MongoDB...");
+
     // await connectDB();
 
-    console.log("Setting up the database...");
     await setupDatabase();
 
-    console.log("Initializing database...");
+
     await initializeDatabase();
 
     app.use("/v1", V1Routes);

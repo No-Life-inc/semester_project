@@ -2,7 +2,7 @@ import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../config/SqlConfig";
 import Collection from "./Collection"; // Import the Collection model
 import Book from "./Book"; // Import the Book model
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 
 // Define the attributes for the User model
