@@ -32,8 +32,8 @@ import {
 // Initialize Knex
 const testKnex = knex(knexConfig.test);
 
-const user1Email = "user1@example.com";
-const user2Email = "user2@example.com";
+const user1Email = "test_email@example.com";
+const user2Email = "test_password@example.com";
 const user3Email = "test@test.com";
 
 beforeAll(async () => {
