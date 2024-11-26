@@ -22,7 +22,6 @@ export const getAllTagsController = async (request: Request, response: Response)
             response.json(tags);
         });
     } catch (error) {
-        console.error("Error fetching tags:", error);
         response.status(500).json({ error: "An error occurred while fetching tags" });
     }
 }
@@ -77,7 +76,6 @@ export const addTagController = async (request: Request, response: Response) => 
         const tag = await addTag(name);
         response.json(tag);
     } catch (error) {
-        console.error("Error creating tag:", error);
         response.status(500).json({ error: "An error occurred while creating tag" });
     }
 }

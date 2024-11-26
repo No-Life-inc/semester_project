@@ -1,4 +1,5 @@
 import { Knex } from "knex";
+import bcrypt from "bcrypt";
 
 export async function seed(knex: Knex): Promise<void> {
     // Deletes ALL existing entries in the relevant tables
@@ -10,9 +11,9 @@ export async function seed(knex: Knex): Promise<void> {
 
     // Inserts seed entries for users
     const [user1, user2, user3] = await knex("users").insert([
-        { name: "user1", email: "user1@example.com", password: "password" },
-        { name: "user2", email: "user2@example.com", password: "password" },
-        { name: "user3", email: "user3@example.com", password: "password" }
+        { name: "User 1", email: "test_email@example.com", password: await bcrypt.hash(process.env.DEFAULT_PASSWORD, 10) },
+        { name: "User 2", email: "test_password@example.com", password: await bcrypt.hash(process.env.DEFAULT_PASSWORD, 10) },
+        { name: "Test Testsen", email: "test@test.com", password: await bcrypt.hash(process.env.DEFAULT_PASSWORD, 10) }
     ]).returning("id");
 
     // Inserts seed entries for collections

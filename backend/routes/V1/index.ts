@@ -8,6 +8,7 @@ import subjectRouter from "./subjectRoutes";
 import bookSubjectRouter from "./bookSubjectRoutes";
 import tagRouter from "./tagRoutes";
 import userBookTagRouter from "./userBookTagRoutes";
+import userRouter from "./userRoutes";
 
 
 const router = Router();
@@ -21,5 +22,7 @@ router.use("/subject", subjectRouter);
 router.use("/bookSubject", bookSubjectRouter);
 router.use("/tag", tagRouter);
 router.use("/userBookTag", userBookTagRouter);
+router.use("/user",  userRouter);
+
 
 export default router;
