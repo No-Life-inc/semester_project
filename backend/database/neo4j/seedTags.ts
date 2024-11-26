@@ -1,9 +1,9 @@
 import connectToNeo4j from "../../dbconnections/Neo4jConnection";
 
 // Neo4j connection details
-const driver = await connectToNeo4j();
 
-  async function seedTags() {
+async function seedTags() {
+    const driver = await connectToNeo4j();
     const session = driver.session();
   
     try {

@@ -13,11 +13,10 @@ const jsonFilePath = path.join("../", "dump", "books.json");
 // Read and parse the JSON file
 const booksData = JSON.parse(fs.readFileSync(jsonFilePath, "utf-8"));
 
-
-// Neo4j connection details
-const driver = await connectToNeo4j();
-
 export async function seed(): Promise<void> {
+  // Neo4j connection details
+  const driver = await connectToNeo4j();
+
   const session: Session = driver.session();
 
   try {

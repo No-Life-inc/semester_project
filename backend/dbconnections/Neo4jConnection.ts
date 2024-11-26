@@ -1,13 +1,13 @@
 import neo4j from 'neo4j-driver';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: '../../.env' });
 
 const connectToNeo4j = async () => {
     try {
-        const uri = process.env.NEO4J_URI;
-        const user = process.env.NEO4J_USER;
-        const password = process.env.DB_PASSWORD;
+        const uri = process.env.NEO4J_URI || 'blah';
+        const user = process.env.NEO4J_USERNAME || 'blah';
+        const password = process.env.DB_PASSWORD || 'blah';
         const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
         console.log('Neo4j connected');
         return driver;
