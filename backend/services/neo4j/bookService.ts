@@ -57,3 +57,43 @@ export const getBooks = async (page: number = 1, limit: number = 50): Promise<Bo
         await driver.close();
     }
 };
+
+/**
+ * Fetches a book by its ID from the Neo4j database.
+ *
+ * @param {number} isbn - The ID of the book to fetch.
+ * @returns {Promise<BookAPIData | null>} - A promise that resolves to the book or null if not found.
+ * @throws {Error} - Throws an error if there is an issue fetching the book.
+ *
+ * @example
+ * const book = await getBookById('123');
+ */
+export const getBookByISBN = async (isbn: string): Promise<Book> => {
+    const driver = await connectToNeo4j();
+    const session = driver.session();
+  
+    try {
+      // Query Neo4j to fetch the book by ID
+      const result = await session.run(
+        'MATCH (b:Book {isbn: $isbn}) RETURN b',
+        { isbn }
+      );
+  
+      if (result.records.length === 0) {
+        return null;
+      }
+  
+      // Map the query result to your 'Book' type
+      const bookNode = result.records[0].get('b');
+      const book = bookNode.properties as Book;
+  
+      return book;
+    } catch (error) {
+      console.error("Error fetching book from Neo4j:", error);
+      throw new Error("Failed to fetch book from the database.");
+    } finally {
+      // Always close the session to prevent connection leaks
+      await session.close();
+      await driver.close();
+    }
+  };

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getBooks } from '../../services/neo4j/bookService';
+import { getBooks, getBookByISBN } from '../../services/neo4j/bookService';
 import Book from "../../types/book";
 
 /**
@@ -43,3 +43,37 @@ export const getBooksController = async (request: Request, response: Response)=>
         response.status(500).json({ error: 'An error occurred while fetching books' });
     }
 };
+
+/**
+ * Controller for fetching a book by ISBN.
+ *
+ * @param {Request} request - The incoming HTTP request.
+ * @param {Response} response - The HTTP response object to send data or errors.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ * 
+ * @example
+ * // GET /books/123
+ * getBookByISBN(request, response);
+ * // This will fetch the book with ID 123
+ */ 
+export const getBookByISBNController = async (request: Request, response: Response) => {
+    const { isbn } = request.params;
+
+    try {
+        // Call the service to fetch the book by ISBN
+        const book: Book | null = await getBookByISBN(isbn);
+
+        if (book) {
+            // Return the book as the response
+            response.json(book);
+        } else {
+            // Return a 404 Not Found if the book is not found
+            response.status(404).json({ error: 'Book not found' });
+        }
+    } catch (error) {
+        // Handle errors gracefully
+        console.error('Error fetching book:', error);
+        response.status(500).json({ error: 'An error occurred while fetching the book' });
+    }
+}
