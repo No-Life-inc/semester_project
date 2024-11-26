@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it, jest, test } from "@jest/glo
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import { getAllSubjects, getSubjectById } from "../../services/subjectService";
 import SubjectAPIData from "../../types/subjectAPIData";
+import Subject from "../../models/sequelize/Subject";
 
 jest.setTimeout(30000);
 
@@ -83,3 +84,65 @@ test.each(negativeTestCases)(
     }
 );
 });
+
+describe("Subject field boundary positive tests", () => {
+  const maxText = "a".repeat(255); // Maximal name length for a STRING type
+  const maxTextMinusOne = "a".repeat(254); // One less than maximal length
+  const minimalNonEmptyText = "a"; // Smallest valid non-empty string
+
+  const cases: [Partial<SubjectAPIData>, keyof Subject, any, string][] = [
+    // Minimal cases
+    [{ name: minimalNonEmptyText }, "name", minimalNonEmptyText, "should accept minimal non-empty name"],
+    
+    // Typical cases
+    [{ name: "Default Subject" }, "name", "Default Subject", "should accept a typical name"],
+    
+    // Boundary cases
+    [{ name: maxText }, "name", maxText, "should accept maximal name (255 chars)"],
+    [{ name: maxTextMinusOne }, "name", maxTextMinusOne, "should accept name one character below the limit"],
+  ];
+
+  test.each(cases)(
+    "%s",
+    async (fieldData, fieldToCheck, expectedValue, description) => {
+      // Prepare the subject object
+      const validSubject: Partial<SubjectAPIData> = { ...fieldData };
+
+      // Simulate Subject creation
+      const createdSubject = await Subject.create(validSubject as SubjectAPIData);
+
+      // Validate results
+      expect(createdSubject).toBeDefined();
+      expect(createdSubject[fieldToCheck]).toEqual(expectedValue);
+      expect(createdSubject.id).toBeDefined();
+      expect(createdSubject.createdAt).toBeDefined();
+    }
+  );
+});
+
+
+describe("Subject field boundary negative tests", () => {
+  const overMaxText = "A".repeat(256); // Exceeds the 255-character limit
+  const emptyText = ""; // Empty string
+  const whitespaceText = " "; // Whitespace-only string
+  const nullValue = null; // Null value
+  const undefinedValue = undefined; // Undefined value
+
+  const cases: [Partial<SubjectAPIData>, string, RegExp][] = [
+    // Name field tests
+    [{ name: overMaxText }, "should reject name exceeding 255 characters", /name|validation/i],
+    [{ name: emptyText }, "should reject empty name", /name|required/i],
+    [{ name: whitespaceText }, "should reject whitespace-only name", /name|required/i],
+    [{ name: nullValue }, "should reject null name", /name|validation/i],
+    [{ name: undefinedValue }, "should reject undefined name", /name|required/i],
+  ];
+
+  test.each(cases)(
+    "%s",
+    async (fieldData, description, expectedError) => {
+      // Attempt to create a Subject with invalid data
+      await expect(Subject.create(fieldData as SubjectAPIData)).rejects.toThrow(expectedError);
+    }
+  );
+});
+
