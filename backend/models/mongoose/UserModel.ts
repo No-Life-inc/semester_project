@@ -1,5 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 interface IUserBook {
     book_id: Types.ObjectId; // Reference to Book
@@ -7,6 +7,7 @@ interface IUserBook {
 }
 
 interface ICollection {
+    _id?: Types.ObjectId;
     name: string;
     books: Types.ObjectId[]; // Reference to Books
 }

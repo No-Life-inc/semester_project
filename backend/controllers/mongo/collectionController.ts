@@ -1,72 +1,52 @@
-import { User } from "../../models/mongoose/UserModel";
+import {
+    createCollectionService,
+    deleteCollectionService,
+    editCollectionService,
+    getCollectionsService,
+} from "../../services/mongo/collectionService";
 
-export const createCollection = async (userId: string, collectionName: string) => {
+export const createCollection = async (req, res) => {
+    const { userId } = req.params;
+    const { name } = req.body;
+
     try {
-        const user = await User.findById(userId);
-        if (!user) {
-            throw new Error('User not found');
-        }
-
-        user.collections.push({ name: collectionName, books: [] });
-        await user.save();
-
-        return { success: true, collection: user.collections[user.collections.length - 1] };
+        const collection = await createCollectionService(userId, name);
+        res.status(201).json({ success: true, collection });
     } catch (error) {
-        throw new Error(`Error creating collection: ${error.message}`);
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 
-export const deleteCollection = async (userId: string, collectionId: string) => {
-    try {
-        const user = await User.findById(userId);
-        if (!user) {
-            throw new Error('User not found');
-        }
-        
-        user.collections = user.collections.filter(
-            (collection) => collection._id.toString() !== collectionId
-        );
-        await user.save();
+export const deleteCollection = async (req, res) => {
+    const { userId, collectionId } = req.params;
 
-        return { success: true, message: 'Collection deleted successfully' };
+    try {
+        await deleteCollectionService(userId, collectionId);
+        res.status(200).json({ success: true, message: "Collection deleted successfully" });
     } catch (error) {
-        throw new Error(`Error deleting collection: ${error.message}`);
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 
-export const editCollection = async (userId: string, collectionId: string, updatedName: string) => {
+export const editCollection = async (req, res) => {
+    const { userId, collectionId } = req.params;
+    const { name } = req.body;
+
     try {
-        const user = await User.findById(userId);
-        if (!user) {
-            throw new Error('User not found');
-        }
-
-        const collection = user.collections.find(
-            (collection) => collection._id.toString() === collectionId
-        );
-
-        if (!collection) {
-            throw new Error('Collection not found');
-        }
-
-        collection.name = updatedName;
-        await user.save();
-
-        return { success: true, collection };
+        const collection = await editCollectionService(userId, collectionId, name);
+        res.status(200).json({ success: true, collection });
     } catch (error) {
-        throw new Error(`Error editing collection: ${error.message}`);
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 
-export const getCollections = async (userId: string) => {
-    try {
-        const user = await User.findById(userId).populate('collections.books');
-        if (!user) {
-            throw new Error('User not found');
-        }
+export const getCollections = async (req, res) => {
+    const { userId } = req.params;
 
-        return { success: true, collections: user.collections };
+    try {
+        const collections = await getCollectionsService(userId);
+        res.status(200).json({ success: true, collections });
     } catch (error) {
-        throw new Error(`Error fetching collections: ${error.message}`);
+        res.status(400).json({ success: false, message: error.message });
     }
 };
