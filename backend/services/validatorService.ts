@@ -29,7 +29,7 @@ export const validateEmail = (email: string): void => {
         throw new Error("Email cannot be empty or whitespace.");
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
         throw new Error("Invalid email format.");
     }
 

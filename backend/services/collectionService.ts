@@ -3,55 +3,67 @@ import Collection from "../models/sequelize/Collection";
 import UserBook from "../models/sequelize/UserBook";
 import Book from "../models/sequelize/Book";
 import UserBookCollection from "../models/sequelize/UserBookCollection";
-
+import sequelize from "../config/SqlConfig";
+import { Transaction } from "sequelize";
+import {
+  NotFoundError,
+  ValidationError,
+  UnauthorizedError,
+} from "../utility/errors";
+import { ValidationError as SequelizeValidationError } from "sequelize";
 /**
  * Creates a new collection for a user.
  *
  * @param {string} name - The name of the collection.
  * @param {number} userId - The ID of the user.
  * @returns {Promise<Collection>} - A promise that resolves to the newly created collection.
- * @throws {Error} - Throws an error if the user is not found.
+ * @throws {ValidationError} - Throws an error if the collection name is missing.
+ * @throws {NotFoundError} - Throws an error if the user is not found.
  */
-export const createCollection = async (name: string, userId: number) => {
-    const user = await User.findByPk(userId);
-    if (!user) throw new Error("User not found");
+export const createCollection = async (name: string, email: string) => {
+  if (!name) {
+    throw new ValidationError("Collection name is required");
+  }
 
-    // Create the collection with the userId as foreign key
-    const newCollection = await Collection.create({ name, userId });
-    return newCollection;
+  const user = await User.findOne({ where: { email } });
+
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+
+  return await Collection.create({ name, userId: user.id });
 };
-
 
 /**
  * Retrieves all collections for a specific user.
  *
  * @param {number} userId - The ID of the user.
  * @returns {Promise<Collection[]>} - A promise that resolves to an array of collections associated with the user.
- * @throws {Error} - Throws an error if the user is not found.
+ * @throws {NotFoundError} - Throws an error if the user is not found.
  */
-export const getUserCollections = async (userId: number) => {
-    const user = await User.findByPk(userId, {
+export const getUserCollections = async (email: string) => {
+  const user = await User.findOne({
+    where: { email },
+    include: [
+      {
+        model: Collection,
+        as: "collections",
         include: [
-            {
-                model: Collection,
-                as: "collections",
-                include: [
-                    {
-                        model: UserBook,
-                        as: "user_books",
-                        include: [
-                            {
-                                model: Book,
-                                as: "book",
-                            },
-                        ],
-                    },
-                ],
-            },
+          {
+            model: UserBook,
+            as: "user_books",
+            include: [{ model: Book, as: "book" }],
+          },
         ],
-    });
-    if (!user) throw new Error("User not found");
-    return user.collections;
+      },
+    ],
+  });
+
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+
+  return user.collections || [];
 };
 
 /**
@@ -60,39 +72,66 @@ export const getUserCollections = async (userId: number) => {
  * @param {number} id - The ID of the collection.
  * @param {string} name - The new name for the collection.
  * @returns {Promise<Collection>} - A promise that resolves to the updated collection.
- * @throws {Error} - Throws an error if the collection is not found.
+ * @throws {NotFoundError} - Throws an error if the collection is not found.
  */
 export const updateCollection = async (id: number, name: string) => {
-    const collection = await Collection.findByPk(id);
-    if (!collection) throw new Error("Collection not found");
+  const collection = await Collection.findByPk(id);
+  if (!collection) {
+    throw new NotFoundError("Collection not found");
+  }
 
-    const updatedCollection = await collection.update({ name });
-    return updatedCollection;
+  try {
+    return await collection.update({ name });
+  } catch (error) {
+    if (error instanceof SequelizeValidationError) {
+      throw new ValidationError(error.errors[0].message || "Validation failed");
+    }
+    throw error;
+  }
 };
-
 
 /**
  * Deletes a collection for a specific user.
  *
  * @param {number} id - The ID of the collection.
- * @param {number} userId - The ID of the user.
- * @returns {Promise<number>} - A promise that resolves to the number of deleted records.
- * @throws {Error} - Throws an error if the user ID is invalid, the collection is not found, or the user is not authorized to delete the collection.
+ * @param {number} userId - The ID of the user attempting to delete the collection.
+ * @returns {Promise<boolean>} - A promise that resolves to `true` if the collection is successfully deleted.
+ * @throws {ValidationError} - Throws an error if the user ID is invalid.
+ * @throws {NotFoundError} - Throws an error if the collection is not found.
+ * @throws {UnauthorizedError} - Throws an error if the user is not authorized to delete the collection.
  */
-export const deleteCollection = async (id: number, userId: number) => {
-    if (userId == null || isNaN(userId)) {
-        throw new Error("Invalid user ID");
-    }
+export const deleteCollection = async (id: number, email: string) => {
+  const user = await User.findOne({ where: { email } });
 
-    const collection = await Collection.findByPk(id);
-    if (!collection) throw new Error("Collection not found");
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
 
-    if (collection.userId !== userId) throw new Error("Unauthorized to delete this collection");
+  const collection = await Collection.findByPk(id);
 
-    await UserBookCollection.destroy({ where: { collection_id: id } });
-    await collection.destroy();
+  if (!collection) {
+    throw new NotFoundError("Collection not found");
+  }
 
-    return collection;
+  if (collection.userId !== user.id) {
+    throw new UnauthorizedError(
+      "You are not authorized to delete this collection"
+    );
+  }
+
+  const t = await sequelize.transaction();
+  try {
+    await UserBookCollection.destroy({
+      where: { collection_id: id },
+      transaction: t,
+    });
+    await collection.destroy({ transaction: t });
+    await t.commit();
+    return true;
+  } catch (error) {
+    await t.rollback();
+    throw error;
+  }
 };
 
 /**
@@ -101,42 +140,68 @@ export const deleteCollection = async (id: number, userId: number) => {
  * @param {number} userId - The ID of the user.
  * @param {number} collectionId - The ID of the collection.
  * @param {number} bookId - The ID of the book.
- * @returns {Promise<void>} - A promise that resolves when the book is added to the collection.
- * @throws {Error} - Throws an error if the userBook entry is not found or the book already exists in the collection.
+ * @returns {Promise<void>} - A promise that resolves when the book is successfully added to the collection.
+ * @throws {NotFoundError} - Throws an error if the UserBook entry is not found.
+ * @throws {ValidationError} - Throws an error if the book already exists in the collection.
  */
-export const addBookToCollection = async (userId: number, collectionId: number, bookId: number): Promise<void> => {
-    // Find the user_book entry to get user_book_id
+export const addBookToCollection = async (
+  email: string,
+  collectionId: number,
+  bookId: number
+) => {
+  const t = await sequelize.transaction();
+  try {
+    const user = await User.findOne({ where: { email }, transaction: t });
+
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+
+    const collection = await Collection.findByPk(collectionId, {
+      transaction: t,
+    });
+
+    if (!collection || collection.userId !== user.id) {
+      throw new UnauthorizedError(
+        "You are not authorized to add a book to this collection"
+      );
+    }
+
     const userBook = await UserBook.findOne({
-        where: {
-            user_id: userId,
-            book_id: bookId,
-        },
+      where: { user_id: user.id, book_id: bookId },
+      transaction: t,
     });
-    
+
     if (!userBook) {
-        throw new Error("UserBook entry not found. Add the book to the user first.");
+      throw new NotFoundError(
+        "UserBook entry not found. Add the book to the user first."
+      );
     }
-  
-    // Check if the book is already associated with the collection
+
     const existingEntry = await UserBookCollection.findOne({
-        where: { collection_id: collectionId, user_book_id: userBook.id },
+      where: { collection_id: collectionId, user_book_id: userBook.id },
+      transaction: t,
     });
-    
+
     if (existingEntry) {
-        throw new Error("Book already exists in the collection");
+      throw new ValidationError("Book already exists in the collection");
     }
-  
-    // Add the user book to the collection
+
     await UserBookCollection.bulkCreate(
-        [
-            {
-                collection_id: collectionId,
-                user_book_id: userBook.id,
-                createdAt: new Date(),
-            }
-        ],
-        { returning: false }
+      [
+        {
+          collection_id: collectionId,
+          user_book_id: userBook.id,
+        },
+      ],
+      { returning: false, transaction: t }
     );
+
+    await t.commit();
+  } catch (error) {
+    await t.rollback();
+    throw error;
+  }
 };
 
 /**
@@ -145,22 +210,61 @@ export const addBookToCollection = async (userId: number, collectionId: number, 
  * @param {number} collectionId - The ID of the collection.
  * @param {number} userId - The ID of the user.
  * @param {number} bookId - The ID of the book.
- * @returns {Promise<void>} - A promise that resolves when the book is removed from the collection.
- * @throws {Error} - Throws an error if the collection, userBook, or UserBookCollection entry is not found.
+ * @returns {Promise<void>} - A promise that resolves when the book is successfully removed from the collection.
+ * @throws {NotFoundError} - Throws an error if the collection is not found.
+ * @throws {NotFoundError} - Throws an error if the UserBook entry is not found.
+ * @throws {NotFoundError} - Throws an error if the book is not associated with the collection.
  */
-export const removeBookFromCollection = async (collectionId: number, userId: number, bookId: number): Promise<void> => {
-    const collection = await Collection.findByPk(collectionId);
-    if (!collection) throw new Error("Collection not found");
+export const removeBookFromCollection = async (
+  email: string,
+  collectionId: number,
+  bookId: number
+) => {
+  const t = await sequelize.transaction();
+  try {
+    const user = await User.findOne({ where: { email }, transaction: t });
+
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+
+    const collection = await Collection.findByPk(collectionId, {
+      transaction: t,
+    });
+
+    if (!collection) {
+      throw new NotFoundError("Collection not found");
+    }
+    
+    if (collection.userId !== user.id) {
+      throw new UnauthorizedError(
+        "You are not authorized to remove a book from this collection"
+      );
+    }
 
     const userBook = await UserBook.findOne({
-        where: { user_id: userId, book_id: bookId },
+      where: { user_id: user.id, book_id: bookId },
+      transaction: t,
     });
-    if (!userBook) throw new Error("UserBook entry not found");
 
-    const existingEntry = await UserBookCollection.findOne({
-        where: { collection_id: collectionId, user_book_id: userBook.id },
+    if (!userBook) {
+      throw new NotFoundError("UserBook entry not found");
+    }
+
+    const collectionEntry = await UserBookCollection.findOne({
+      where: { collection_id: collectionId, user_book_id: userBook.id },
+      transaction: t,
     });
-    if (!existingEntry) throw new Error("Book not found in the collection");
 
-    await existingEntry.destroy();
+    if (!collectionEntry) {
+      throw new NotFoundError("Book not found in the collection");
+    }
+
+    await collectionEntry.destroy({ transaction: t });
+
+    await t.commit();
+  } catch (error) {
+    await t.rollback();
+    throw error;
+  }
 };

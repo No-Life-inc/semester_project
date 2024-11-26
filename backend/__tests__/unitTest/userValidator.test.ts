@@ -50,7 +50,7 @@ describe("validateEmail function - Positive Tests", () => {
     });
 
     test("should pass for email with minimum valid format", () => {
-        expect(() => validateEmail("a@b.c")).not.toThrow();
+        expect(() => validateEmail("a@b.dk")).not.toThrow(); //Shortest valid email based on RFC 5321
     });
 
     test("should pass with email max length", () => {

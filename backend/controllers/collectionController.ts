@@ -1,149 +1,171 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+import { AuthenticatedRequest } from "../types/authenticatedRequest";
 import * as CollectionService from "../services/collectionService";
+import User from "../models/sequelize/User";
+import Collection from "../models/sequelize/Collection";
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from "../utility/errors";
 
 /**
- * Creates a new collection for a user.
+ * Creates a new collection for the authenticated user.
  *
- * @param {string} name - The name of the collection.
- * @param {number} userId - The ID of the user.
- * @returns {Promise<Collection>} - A promise that resolves to the newly created collection.
- * @throws {Error} - Throws an error if the user is not found.
+ * @param {AuthenticatedRequest} req - The request object containing:
+ *   - `req.body.name`: The name of the collection to be created.
+ *   - `req.user.email`: The email of the authenticated user.
+ * @param {Response} res - The response object used to send the created collection or an error message.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ *
+ * @throws {Error} - Throws an error if the authenticated user is not found in the database.
  */
-export const createCollection = async (req: Request, res: Response) => {
-  const { name, userId } = req.body;
+export const createCollection = async (req: AuthenticatedRequest, res: Response) => {
+  const { name } = req.body;
+  const { email } = req.user;
+
   try {
-    const newCollection = await CollectionService.createCollection(
-      name,
-      userId
-    );
+    if (!name) {
+      throw new ValidationError("Collection name is required");
+    }
+
+    const newCollection = await CollectionService.createCollection(name, email);
     res.status(201).json(newCollection);
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
 };
 
 /**
- * Handles retrieving collections for a user via an HTTP request.
+ * Retrieves all collections associated with the authenticated user.
  *
- * @param {Request} req - The request object containing the user ID as a parameter.
- * @param {Response} res - The response object used to send the result or error.
+ * @param {AuthenticatedRequest} req - The request object containing:
+ *   - `req.user.email`: The email of the authenticated user.
+ * @param {Response} res - The response object used to send the user's collections or an error message.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ *
+ * @throws {Error} - Throws an error if the authenticated user is not found in the database.
  */
-export const getUserCollections = async (req: Request, res: Response) => {
-  const { userId } = req.params;
+export const getUserCollections = async (req: AuthenticatedRequest, res: Response) => {
+  const { email } = req.user;
+
   try {
-    const collections = await CollectionService.getUserCollections(
-      Number(userId)
-    );
-    res.json(collections);
+    const collections = await CollectionService.getUserCollections(email);
+    res.status(200).json(collections);
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
 };
 
 /**
- * Updates the name of a collection.
+ * Updates the name of a collection belonging to the authenticated user.
  *
- * @param {number} id - The ID of the collection.
- * @param {string} name - The new name for the collection.
- * @returns {Promise<Collection>} - A promise that resolves to the updated collection.
- * @throws {Error} - Throws an error if the collection is not found.
+ * @param {AuthenticatedRequest} req - The request object containing:
+ *   - `req.params.id`: The ID of the collection to be updated.
+ *   - `req.body.name`: The new name for the collection.
+ *   - `req.user.email`: The email of the authenticated user.
+ * @param {Response} res - The response object used to send a success message or an error message.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ *
+ * @throws {Error} - Throws an error if the authenticated user is not found in the database
+ *                   or if the user is not authorized to update the specified collection.
  */
-export const updateCollection = async (req: Request, res: Response) => {
+export const updateCollection = async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
   const { name } = req.body;
-  try {
-    await CollectionService.updateCollection(Number(id), name);
-    res.json({ message: "Collection updated successfully" });
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-  }
-};
-
-/**
- * Deletes a collection for a specific user.
- *
- * @param {number} id - The ID of the collection.
- * @param {number} userId - The ID of the user.
- * @returns {Promise<number>} - A promise that resolves to the number of deleted records.
- * @throws {Error} - Throws an error if the user ID is invalid, the collection is not found, or the user is not authorized to delete the collection.
- */
-export const deleteCollection = async (req: Request, res: Response) => {
-  const { id, userId } = req.params;
-  try {
-    await CollectionService.deleteCollection(Number(id), Number(userId));
-    res.json({ message: "Collection deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-  }
-};
-
-/**
- * Adds a book to a collection for a user.
- *
- * @param {number} userId - The ID of the user.
- * @param {number} collectionId - The ID of the collection.
- * @param {number} bookId - The ID of the book.
- * @returns {Promise<void>} - A promise that resolves when the book is added to the collection.
- * @throws {Error} - Throws an error if the userBook entry is not found or the book already exists in the collection.
- */
-export const addBookToCollection = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  let { userId, collectionId, bookId } = req.body;
 
   try {
-    userId = Number(userId);
-    collectionId = Number(collectionId);
-    bookId = Number(bookId);
-
-    if (isNaN(userId) || isNaN(collectionId) || isNaN(bookId)) {
-      throw new Error(
-        "Invalid input. userId, collectionId, and bookId must be numbers."
-      );
+    if (!name) {
+      throw new ValidationError("Collection name is required");
     }
 
-    await CollectionService.addBookToCollection(userId, collectionId, bookId);
+    const updatedCollection = await CollectionService.updateCollection(Number(id), name);
+    res.status(200).json({ message: "Collection updated successfully", updatedCollection });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ message: error.message });
+  }
+};
+
+/**
+ * Deletes a collection belonging to the authenticated user.
+ *
+ * @param {AuthenticatedRequest} req - The request object containing:
+ *   - `req.params.id`: The ID of the collection to be deleted.
+ *   - `req.user.email`: The email of the authenticated user.
+ * @param {Response} res - The response object used to send a success message or an error message.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ *
+ * @throws {Error} - Throws an error if the authenticated user is not found in the database
+ *                   or if the specified collection cannot be deleted.
+ */
+export const deleteCollection = async (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
+  const { email } = req.user;
+
+  try {
+    await CollectionService.deleteCollection(Number(id), email);
+    res.status(200).json({ message: "Collection deleted successfully" });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ message: error.message });
+  }
+};
+
+/**
+ * Adds a book to a collection belonging to the authenticated user.
+ *
+ * @param {AuthenticatedRequest} req - The request object containing:
+ *   - `req.body.collectionId`: The ID of the collection to which the book should be added.
+ *   - `req.body.bookId`: The ID of the book to be added.
+ *   - `req.user.email`: The email of the authenticated user.
+ * @param {Response} res - The response object used to send a success message or an error message.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ *
+ * @throws {Error} - Throws an error if the authenticated user is not found in the database,
+ *                   if the input IDs are invalid, or if the book cannot be added to the specified collection.
+ */
+export const addBookToCollection = async (req: AuthenticatedRequest, res: Response) => {
+  const { collectionId, bookId } = req.body;
+  const { email } = req.user;
+
+  try {
+    if (!collectionId || !bookId) {
+      throw new ValidationError("Collection ID and Book ID are required");
+    }
+
+    await CollectionService.addBookToCollection(email, Number(collectionId), Number(bookId));
     res.status(201).json({ message: "Book added to collection successfully" });
   } catch (error) {
-    console.error("Error in addBookToCollection:", error);
-    res.status(400).json({ error: (error as Error).message });
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
 };
 
 /**
- * Handles removing a book from a user's collection via an HTTP request.
+ * Removes a book from a collection belonging to the authenticated user.
  *
- * @param {Request} req - The request object containing the user ID, collection ID, and book ID in the body.
- * @param {Response} res - The response object used to send the result or error.
- * @returns {Promise<void>} - A promise that resolves when the book is removed from the collection.
+ * @param {AuthenticatedRequest} req - The request object containing:
+ *   - `req.body.collectionId`: The ID of the collection from which the book should be removed.
+ *   - `req.body.bookId`: The ID of the book to be removed.
+ *   - `req.user.email`: The email of the authenticated user.
+ * @param {Response} res - The response object used to send a success message or an error message.
+ *
+ * @returns {Promise<void>} - A promise that resolves to void.
+ *
+ * @throws {Error} - Throws an error if the authenticated user is not found in the database,
+ *                   if the input IDs are invalid, or if the book cannot be removed from the specified collection.
  */
-export const removeBookFromCollection = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  let { userId, collectionId, bookId } = req.body;
+export const removeBookFromCollection = async (req: AuthenticatedRequest, res: Response) => {
+  const { collectionId, bookId } = req.body;
+  const { email } = req.user;
 
   try {
-    userId = Number(userId);
-    collectionId = Number(collectionId);
-    bookId = Number(bookId);
-
-    if (isNaN(userId) || isNaN(collectionId) || isNaN(bookId)) {
-      throw new Error(
-        "Invalid input. userId, collectionId, and bookId must be numbers."
-      );
-    }
-
-    await CollectionService.removeBookFromCollection(
-      collectionId,
-      userId,
-      bookId
-    );
-    res
-      .status(200)
-      .json({ message: "Book removed from collection successfully" });
+    await CollectionService.removeBookFromCollection(email, Number(collectionId), Number(bookId));
+    res.status(200).json({ message: "Book removed from collection successfully" });
   } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
 };

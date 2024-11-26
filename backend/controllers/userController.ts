@@ -1,5 +1,6 @@
 import {Request, Response} from "express";
 import {registerUser, loginUser, editUser, editPassword} from "../services/userService";
+import {verifyToken} from "../services/jwtService";
 
 /**
  * Registers a new user.
@@ -61,6 +62,8 @@ export const editUserController = async (request: Request, response: Response) =
     const authHeader = request.header("Authorization");
     const token = extractToken(authHeader);
 
+    const decodedToken = verifyToken(token);
+
     if (!token) {
         return response.status(400).json({ error: "Authorization header is required or invalid token format" });
     }
@@ -72,7 +75,7 @@ export const editUserController = async (request: Request, response: Response) =
     }
 
     try {
-        const result = await editUser(token, name, email.toLowerCase());
+        const result = await editUser(decodedToken, name, email.toLowerCase());
         response.json({ message: result });
     } catch (error: any) {
         const errorMessage = error.message || "An error occurred while editing user";
@@ -96,6 +99,8 @@ export const editPasswordController = async (request: Request, response: Respons
     const authHeader = request.header("Authorization");
     const token = extractToken(authHeader);
 
+    const decodedToken = verifyToken(token);
+
     if (!token) {
         return response.status(400).json({ error: "Authorization header is required or invalid token format" });
     }
@@ -108,7 +113,7 @@ export const editPasswordController = async (request: Request, response: Respons
     }
 
     try {
-        const result = await editPassword(token, oldPassword, password);
+        const result = await editPassword(decodedToken, oldPassword, password);
         response.json({ message: result });
     } catch (error: any) {
         const errorMessage = error.message || "An error occurred while editing user password";
