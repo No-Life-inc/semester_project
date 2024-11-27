@@ -1,7 +1,5 @@
 import { Router } from "express";
 import bookRouter from "./bookRoutes";
-import authorRouter from "./authorRoutes";
-import publisherRouter from "./publisherRoutes";
 import collectionRouter from "./collectionRoutes";
 import userBookRouter from "./userBookRoutes";
 import subjectRouter from "./subjectRoutes";
@@ -15,8 +13,6 @@ import neo4jrouter from '../neo4j/neoIndex';
 const router = Router();
 
 router.use("/book", bookRouter);
-router.use("/author", authorRouter);
-router.use("/publisher", publisherRouter);
 router.use("/collection", collectionRouter);
 router.use("/userBook", userBookRouter);
 router.use("/subject", subjectRouter);

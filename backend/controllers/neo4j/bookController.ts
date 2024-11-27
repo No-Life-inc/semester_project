@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getBooks } from '../../services/neo4j/bookService';
-import Book from "../../types/book";
+import Book from "../../types/neo4j/book";
 
 /**
  * Controller for fetching books.

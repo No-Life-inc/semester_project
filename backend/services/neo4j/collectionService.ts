@@ -1,6 +1,11 @@
 import connectToNeo4j from "../../dbconnections/Neo4jConnection";
-import Collection from "../../types/collection"; // Assuming a type for collections
-import Book from "../../types/book"; // Assuming a type for books
+import Collection from "../../types/neo4j/collection";
+import Book from "../../types/neo4j/book"; 
+import {
+    NotFoundError,
+    ValidationError,
+    UnauthorizedError,
+  } from "../../utility/errors";
 
 /**
  * Fetches collections for a specific user from the Neo4j database.
@@ -19,28 +24,26 @@ export const getUserCollections = async (userId: number): Promise<Collection[]> 
             `
             MATCH (u:User)
             WHERE id(u) = $userId
-            MATCH (u)-[:HAS_COLLECTION]->(c:Collection)
+            MATCH (u)-[:HAS_COLLECTION]-(c:Collection)
             OPTIONAL MATCH (c)-[:CONTAINS_BOOK]->(b:Book)
             RETURN c, collect(b) AS books
             `,
             { userId }
         );
 
-        // Process the results
         const collections: Collection[] = result.records.map(record => {
             const collectionNode = record.get("c");
             const booksNodes = record.get("books");
 
             return {
-                ...collectionNode.properties, // Include collection properties
-                books: booksNodes.map((book: any) => book.properties as Book), // Map books to their properties
+                ...collectionNode.properties, 
+                books: booksNodes.map((book: any) => book.properties as Book), 
             } as Collection;
         });
 
         return collections;
     } catch (error) {
-        console.error("Error fetching collections from Neo4j:", error);
-        throw new Error("Failed to fetch collections from the database.");
+        throw new NotFoundError("Collection not found");
     } finally {
         // Always close the session and driver
         await session.close();
@@ -48,6 +51,12 @@ export const getUserCollections = async (userId: number): Promise<Collection[]> 
     }
 };
 
+/**
+ * Fetches collections for a specific user from the Neo4j database.
+ * @param {string} email 
+ * @returns {Promise<Collection[]>} - A promise that resolves to an array of collections with their books.
+ * @throws {Error} - Throws an error if the user is not found.
+ */
 export const getUserCollectionsByEmail = async (email: string) => {
     const driver = await connectToNeo4j();
     const session = driver.session();
@@ -76,8 +85,106 @@ export const getUserCollectionsByEmail = async (email: string) => {
 
         return collections;
     } catch (error) {
-        console.error("Error fetching collections from Neo4j:", error);
-        throw new Error("Failed to fetch collections from the database.");
+        throw new NotFoundError("Collection not found");
+    } finally {
+        await session.close();
+        await driver.close();
+    }
+};
+
+/**
+ * 
+ * @param {} name 
+ * @param email 
+ * @returns 
+ */
+export const createCollection = async (name: string, email: string): Promise<Collection> => {
+    const driver = await connectToNeo4j();
+    const session = driver.session();
+
+    try {
+        // Cypher query to create a new collection for the user
+        const result = await session.run(
+            `
+            MATCH (u:User {email: $email})
+            CREATE (c:Collection {name: $name})-[:BELONGS_TO]->(u)
+            RETURN c
+            `,
+            { name, email }
+        );
+
+        const createdCollection = result.records[0].get("c");
+
+        return createdCollection.properties as Collection;
+    } catch (error) {
+        console.error("Error creating collection:", error);
+        throw new ValidationError("Collection name is required");
+    } finally {
+        await session.close();
+        await driver.close();
+    }
+};
+
+/**
+ * Updates the name of a collection.
+ *
+ * @param {string} email - The email of the user.
+ * @param {string} oldName - The current name of the collection.
+ * @param {string} newName - The new name for the collection.
+ * @returns {Promise<Collection>} - A promise that resolves to the updated collection.
+ * @throws {NotFoundError} - Throws an error if the collection is not found.
+ */
+export const updateCollection = async (email: string, oldName: string, newName: string): Promise<Collection> => {
+    const driver = await connectToNeo4j();
+    const session = driver.session();
+
+    try {
+        // Cypher query to update the collection name
+        const result = await session.run(
+            `
+            MATCH (u:User {email: $email})-[:BELONGS_TO]-(c:Collection {name: $oldName})
+            SET c.name = $name
+            RETURN c
+            `,
+            { email, oldName, name: newName }
+        );
+
+        const updatedCollection = result.records[0].get("c");
+
+        return updatedCollection.properties as Collection;
+    } catch (error) {
+        console.error("Error updating collection:", error);
+        throw new NotFoundError("Collection not found");
+    } finally {
+        await session.close();
+        await driver.close();
+    }
+};
+
+/**
+ * Deletes a collection.
+ *
+ * @param {string} email - The email of the user.
+ * @param {string} name - The name of the collection to delete.
+ * @returns {Promise<void>} - A promise that resolves when the collection is deleted.
+ * @throws {NotFoundError} - Throws an error if the collection is not found.
+ */
+export const deleteCollection = async (email: string, name: string): Promise<void> => {
+    const driver = await connectToNeo4j();
+    const session = driver.session();
+
+    try {
+        // Cypher query to delete the collection
+        await session.run(
+            `
+            MATCH (u:User {email: $email})-[:BELONGS_TO]-(c:Collection {name: $name})
+            DETACH DELETE c
+            `,
+            { email, name }
+        );
+    } catch (error) {
+        console.error("Error deleting collection:", error);
+        throw new NotFoundError("Collection not found");
     } finally {
         await session.close();
         await driver.close();

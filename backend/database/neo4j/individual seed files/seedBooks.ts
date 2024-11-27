@@ -2,7 +2,8 @@ import { Driver, session, Session } from "neo4j-driver";
 import * as fs from "fs";
 import * as path from "path";
 import dotenv from "dotenv";
-import connectToNeo4j from "../../dbconnections/Neo4jConnection";
+import connectToNeo4j from "../../../dbconnections/Neo4jConnection";
+import { v4 as uuidv4 } from "uuid";
 
 // Load environment variables from the .env file
 dotenv.config();
@@ -13,7 +14,7 @@ const jsonFilePath = path.join("../", "dump", "books.json");
 // Read and parse the JSON file
 const booksData = JSON.parse(fs.readFileSync(jsonFilePath, "utf-8"));
 
-export async function seed(): Promise<void> {
+export async function seedBooks(): Promise<void> {
   // Neo4j connection details
   const driver = await connectToNeo4j();
 
@@ -28,8 +29,12 @@ export async function seed(): Promise<void> {
       let publisherNode = null;
       if (book.publisher) {
         const publisherResult = await session.run(
-          `MERGE (p:Publisher {name: $name}) RETURN p`,
-          { name: book.publisher }
+          `
+          MERGE (p:Publisher {name: $name})
+          ON CREATE SET p.guid = $guid
+          RETURN p
+          `,
+          { name: book.publisher, guid: uuidv4() }
         );
         publisherNode = publisherResult.records[0]?.get("p");
       }
@@ -38,6 +43,7 @@ export async function seed(): Promise<void> {
       const bookResult = await session.run(
         `
           CREATE (b:Book {
+            guid: $guid,
             title: $title,
             image: $image,
             titleLong: $titleLong,
@@ -56,6 +62,7 @@ export async function seed(): Promise<void> {
           RETURN b
         `,
         {
+          guid: uuidv4(),
           title: book.title,
           image: book.image || null,
           titleLong: book.title_long || null,
@@ -89,12 +96,13 @@ export async function seed(): Promise<void> {
       for (const authorName of book.authors) {
         await session.run(
           `
-            MERGE (a:Author {name: $name})
-            WITH a
-            MATCH (b:Book {title: $bookTitle})
-            CREATE (a)-[:AUTHORED]->(b)
+          MERGE (a:Author {name: $name})
+          ON CREATE SET a.guid = $guid
+          WITH a
+          MATCH (b:Book {title: $bookTitle})
+          CREATE (a)-[:AUTHORED]->(b)
           `,
-          { name: authorName, bookTitle: book.title }
+          { name: authorName, bookTitle: book.title, guid: uuidv4() }
         );
       }
 
@@ -121,4 +129,4 @@ export async function seed(): Promise<void> {
   }
 }
 
-seed();
+export default seedBooks;

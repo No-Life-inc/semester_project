@@ -1,5 +1,5 @@
 import connectToNeo4j from "../../dbconnections/Neo4jConnection";
-import Book from "../../types/book";  // Assuming 'Book' is a proper type for your books
+import Book from "../../types/neo4j/book";  
 
 /**
  * Fetches books from the Neo4j database with pagination.
