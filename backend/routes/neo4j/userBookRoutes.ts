@@ -3,6 +3,6 @@ import getUserBookController from "../../controllers/neo4j/userBookController";
 
 const router = Router();
 
-router.get("/:email", getUserBookController);
+router.get("/", getUserBookController);
 
 export default router; 
