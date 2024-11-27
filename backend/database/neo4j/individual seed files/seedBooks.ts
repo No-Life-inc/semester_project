@@ -112,11 +112,12 @@ export async function seedBooks(): Promise<void> {
           await session.run(
             `
               MERGE (s:Subject {name: $name})
+              ON CREATE SET s.guid = $guid
               WITH s
               MATCH (b:Book {title: $bookTitle})
               CREATE (b)-[:HAS_SUBJECT]->(s)
             `,
-            { name: subjectName, bookTitle: book.title }
+            { name: subjectName, bookTitle: book.title, guid: uuidv4() }
           );
         }
       }
