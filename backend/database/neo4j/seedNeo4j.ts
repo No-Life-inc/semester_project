@@ -3,6 +3,7 @@ import seedBooks from './individual seed files/seedBooks';
 import seedTags from './individual seed files/seedTags';
 import seedUsers from './individual seed files/seedUsers';
 import connectToNeo4j from '../../dbconnections/Neo4jConnection';
+import seedIndexes from './individual seed files/seedIndexes';
 
 export default async function seedNeo4j() {
     const driver = await connectToNeo4j();
@@ -15,7 +16,7 @@ export default async function seedNeo4j() {
         console.log("Clearing the database...");
         await session.run(`MATCH (n) DETACH DELETE n`);
     
-
+        await seedIndexes();
         await seedConstraints(); 
         await seedBooks();
         await seedTags();

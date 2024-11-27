@@ -106,7 +106,7 @@ export const getBookByISBN = async (isbn: string): Promise<Book> => {
 };
 
 //get books by title
-export const getBooksByTitle = async (title: string) => {
+export const getBooksByTitle = async (title: string) => { 
   const driver = await connectToNeo4j();
   const session = driver.session();
 
