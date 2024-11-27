@@ -97,3 +97,37 @@ export const getBookByISBN = async (isbn: string): Promise<Book> => {
       await driver.close();
     }
   };
+
+//get books by title
+export const getBooksByTitle = async (title: string) => {
+  const driver = await connectToNeo4j();
+  const session = driver.session();
+
+  try {
+      console.log("Running query for title:", title); // Log the title being queried
+
+      const result = await session.run(
+          `MATCH (b:Book) 
+           WHERE toLower(b.title) CONTAINS toLower($title) 
+           RETURN b`,
+          { title }
+      );
+
+      console.log("Query result:", result.records); // Log the raw query result
+
+      const books = result.records.map(record => {
+          const bookNode = record.get('b');
+          return bookNode.properties; // Extract properties of the Book node
+      });
+
+      console.log("Mapped books:", books); // Log the mapped results
+
+      return books;
+  } catch (error) {
+      console.error("Error querying Neo4j:", error); // Log query errors
+      throw error;
+  } finally {
+      await session.close();
+      await driver.close();
+  }
+};

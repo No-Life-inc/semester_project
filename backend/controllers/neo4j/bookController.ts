@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getBooks, getBookByISBN } from '../../services/neo4j/bookService';
+import { getBooks, getBookByISBN, getBooksByTitle } from '../../services/neo4j/bookService';
 import Book from "../../types/book";
 
 /**
@@ -77,3 +77,29 @@ export const getBookByISBNController = async (request: Request, response: Respon
         response.status(500).json({ error: 'An error occurred while fetching the book' });
     }
 }
+
+export const getBooksByTitleController = async (req: Request, res: Response) => {
+    const titleQuery = req.query.title as string;
+
+    console.log("Received titleQuery:", titleQuery); // Log the incoming query
+
+    if (!titleQuery) {
+        return res.status(400).json({ error: 'Title query parameter is required' });
+    }
+
+    try {
+        const books = await getBooksByTitle(titleQuery);
+
+        console.log("Books fetched:", books); // Log the result from the database
+
+        if (books.length === 0) {
+            console.log("No books found for title:", titleQuery); // Log empty result case
+            return res.status(404).json({ error: 'No books found matching the title.' });
+        }
+
+        res.status(200).json(books);
+    } catch (error) {
+        console.error("Error fetching books:", error); // Log errors
+        res.status(500).json({ error: 'An error occurred while fetching books.' });
+    }
+};
