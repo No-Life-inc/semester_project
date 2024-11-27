@@ -138,3 +138,39 @@ export const getBooksByTitle = async (title: string) => {
     await driver.close();
   }
 };
+
+
+/**
+ * Fetches books from the Neo4j database that are related to a specific subject.
+ * 
+ * @param {string} subject - The name of the subject to search for.
+ * @returns {Promise<Book[]>} - A promise that resolves to an array of books related to the subject.
+ */
+export const getBooksBySubject = async (subject: string): Promise<Book[]> => {
+  const driver = await connectToNeo4j();
+  const session = driver.session();
+
+  try {
+    const result = await session.run(
+      `
+      MATCH (b:Book)-[:HAS_SUBJECT]->(s:Subject)
+      WHERE toLower(s.name) = toLower($subject)
+      RETURN b
+      `,
+      { subject }
+    );
+
+    const books = result.records.map((record) => {
+      const bookNode = record.get("b");
+      return bookNode.properties as Book;
+    });
+
+    return books;
+  } catch (error) {
+    console.error("Error fetching books by subject:", error);
+    throw error;
+  } finally {
+    await session.close();
+    await driver.close();
+  }
+}

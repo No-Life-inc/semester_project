@@ -3,6 +3,7 @@ import {
   getBooks,
   getBookByISBN,
   getBooksByTitle,
+  getBooksBySubject,
 } from "../../services/neo4j/bookService";
 import Book from "../../models/neo4j/book";
 
@@ -123,6 +124,33 @@ export const getBooksByTitleController = async (
     res.status(200).json(books);
   } catch (error) {
     console.error("Error fetching books:", error); // Log errors
+    res.status(500).json({ error: "An error occurred while fetching books." });
+  }
+};
+
+export const getBooksBySubjectController = async (
+  req: Request,
+  res: Response
+) => {
+    const subject = decodeURIComponent(req.query.subject as string); // Decodes %26 to '&'
+
+  if (!subject) {
+    return res
+      .status(400)
+      .json({ error: "Subject query parameter is required" });
+  }
+
+  try {
+    const books = await getBooksBySubject(subject);
+
+    if (books.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No books found matching the subject." });
+    }
+
+    res.status(200).json(books);
+  } catch (error) {
     res.status(500).json({ error: "An error occurred while fetching books." });
   }
 };
