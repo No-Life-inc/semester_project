@@ -42,7 +42,7 @@ export const createCollectionController = async (req: AuthenticatedRequest, res:
     const {name} = req.body;
     const  { email } = req.user;
 
-    if (!guid || typeof guid !== 'string') {
+    if (!name || typeof name !== 'string') {
         return new ValidationError("Collection guid is not valid");
     }
 
