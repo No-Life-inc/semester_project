@@ -7,8 +7,8 @@ router.get("/", getUserCollectionsController);
 router.post("/", createCollectionController);
 router.put("/:guid", updateCollectionController);
 router.delete("/:guid", deleteCollectionController);
-router.post("/:guid/add-book/:isbn", addBookToCollectionController);
-router.delete("/:guid/remove-book/:isbn", removeBookFromCollectionController);
+router.post("/:guid/addBook/:isbn", addBookToCollectionController);
+router.delete("/:guid/removeBook/:isbn", removeBookFromCollectionController);
 
 
 
