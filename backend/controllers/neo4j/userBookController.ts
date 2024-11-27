@@ -46,3 +46,6 @@ export const getUserBookController = async (req: AuthenticatedRequest, res: Resp
         res.status(500).json({ error: "Failed to fetch user books." });
     }
 };
+
+//add book to user
+

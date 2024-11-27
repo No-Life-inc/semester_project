@@ -47,3 +47,37 @@ export const getUserBooks = async (email: string, page: number = 1, limit: numbe
         await driver.close();
     }
 };
+
+
+//add book to user
+export const addBookToUser = async (email: string, bookId: string): Promise<void> => {
+    if (!userId || typeof userId !== "string") {
+        throw new Error("Invalid email. Email must be a non-empty string.");
+    }
+
+    if (!isbn || typeof isbn !== "string") {
+        throw new Error("Invalid ISBN. ISBN must be a non-empty string.");
+    }
+
+    // Connect to Neo4j
+    const driver = await connectToNeo4j();
+    const session = driver.session();
+
+    try {
+        const query = `
+            MATCH (u:User {email: $email})
+            MATCH (b:Book {isbn: $isbn})
+            MERGE (u)-[:HAS_BOOK]->(b)
+        `;
+
+        const params = { userId, isbn };
+
+        await session.run(query, params);
+    } catch (error) {
+        console.error("Error adding book to user:", error);
+        throw error;
+    } finally {
+        await session.close();
+        await driver.close();
+    }
+}
