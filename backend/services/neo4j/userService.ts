@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { generateToken } from "../jwtService";
 import { ValidationError } from "../../utility/errors";
 import {validateEmail, validateName, validatePassword} from "../validatorService";
+import { v4 as uuidv4 } from "uuid";
 
 
 /**
@@ -91,14 +92,15 @@ export const registerUser = async (name: string, email: string, password: string
 
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
+        const guid = uuidv4();
 
         // Cypher query to create a new user
         const result = await session.run(
             `
-            CREATE (u:User {name: $name, email: $email, password: $password})
+            CREATE (u:User {name: $name, email: $email, password: $password, guid: $guid})
             RETURN u
             `,
-            { name, email, password: hashedPassword }
+            { name, email, password: hashedPassword, guid }
         );
 
         const createdUser = result.records[0].get("u");
