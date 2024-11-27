@@ -36,7 +36,7 @@ export const getBooks = async (page: number = 1, limit: number = 50): Promise<Bo
         const result = await session.run(
             'MATCH (b:Book) RETURN b SKIP 50 LIMIT 50',
             {
-                skip: 50,
+                skip: 1,
                 limit: 50
             }
         );
