@@ -1,5 +1,6 @@
 
 interface Book {
+    guid: string;
     isbn: string;
     title: string;
     titleLong: string;

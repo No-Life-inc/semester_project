@@ -1,12 +1,15 @@
 import express from "express";
-import {getUserCollectionsController, createCollectionController, updateCollectionController, deleteCollectionController } from "../../controllers/neo4j/collectionController";
+import {getUserCollectionsController, createCollectionController, updateCollectionController, deleteCollectionController, addBookToCollectionController, removeBookFromCollectionController } from "../../controllers/neo4j/collectionController";
 
 const router = express.Router();
 
 router.get("/", getUserCollectionsController);
 router.post("/", createCollectionController);
-router.put("/:name", updateCollectionController);
-router.delete("/:name", deleteCollectionController);
+router.put("/:guid", updateCollectionController);
+router.delete("/:guid", deleteCollectionController);
+router.post("/:guid/add-book/:isbn", addBookToCollectionController);
+router.delete("/:guid/remove-book/:isbn", removeBookFromCollectionController);
+
 
 
 export default router;

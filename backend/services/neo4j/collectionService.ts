@@ -6,6 +6,7 @@ import {
     ValidationError,
     UnauthorizedError,
   } from "../../utility/errors";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Fetches collections for a specific user from the Neo4j database.
@@ -53,7 +54,7 @@ export const getUserCollections = async (userId: number): Promise<Collection[]> 
 
 /**
  * Fetches collections for a specific user from the Neo4j database.
- * @param {string} email 
+ * @param {string} email  - The email of the user.
  * @returns {Promise<Collection[]>} - A promise that resolves to an array of collections with their books.
  * @throws {Error} - Throws an error if the user is not found.
  */
@@ -102,15 +103,17 @@ export const createCollection = async (name: string, email: string): Promise<Col
     const driver = await connectToNeo4j();
     const session = driver.session();
 
+    const guid = uuidv4();
+
     try {
         // Cypher query to create a new collection for the user
         const result = await session.run(
             `
             MATCH (u:User {email: $email})
-            CREATE (c:Collection {name: $name})-[:BELONGS_TO]->(u)
+            CREATE (c:Collection {name: $name, guid: $guid})-[:BELONGS_TO]->(u)
             RETURN c
             `,
-            { name, email }
+            { name: name, guid, email }
         );
 
         const createdCollection = result.records[0].get("c");
@@ -129,12 +132,12 @@ export const createCollection = async (name: string, email: string): Promise<Col
  * Updates the name of a collection.
  *
  * @param {string} email - The email of the user.
- * @param {string} oldName - The current name of the collection.
+ * @param {string} guid - The guid of the collection.
  * @param {string} newName - The new name for the collection.
  * @returns {Promise<Collection>} - A promise that resolves to the updated collection.
  * @throws {NotFoundError} - Throws an error if the collection is not found.
  */
-export const updateCollection = async (email: string, oldName: string, newName: string): Promise<Collection> => {
+export const updateCollection = async (email: string, guid: string, newName: string): Promise<Collection> => {
     const driver = await connectToNeo4j();
     const session = driver.session();
 
@@ -142,11 +145,11 @@ export const updateCollection = async (email: string, oldName: string, newName: 
         // Cypher query to update the collection name
         const result = await session.run(
             `
-            MATCH (u:User {email: $email})-[:BELONGS_TO]-(c:Collection {name: $oldName})
-            SET c.name = $name
+            MATCH (u:User {email: $email})-[:BELONGS_TO]-(c:Collection {guid: $guid})
+            SET c.name = $newName
             RETURN c
             `,
-            { email, oldName, name: newName }
+            { email, guid, newName }
         );
 
         const updatedCollection = result.records[0].get("c");
@@ -165,11 +168,11 @@ export const updateCollection = async (email: string, oldName: string, newName: 
  * Deletes a collection.
  *
  * @param {string} email - The email of the user.
- * @param {string} name - The name of the collection to delete.
+ * @param {string} guid - The guid of the collection.
  * @returns {Promise<void>} - A promise that resolves when the collection is deleted.
  * @throws {NotFoundError} - Throws an error if the collection is not found.
  */
-export const deleteCollection = async (email: string, name: string): Promise<void> => {
+export const deleteCollection = async (email: string, guid: string): Promise<void> => {
     const driver = await connectToNeo4j();
     const session = driver.session();
 
@@ -177,10 +180,10 @@ export const deleteCollection = async (email: string, name: string): Promise<voi
         // Cypher query to delete the collection
         await session.run(
             `
-            MATCH (u:User {email: $email})-[:BELONGS_TO]-(c:Collection {name: $name})
+            MATCH (u:User {email: $email})-[:BELONGS_TO]-(c:Collection {guid: $guid})
             DETACH DELETE c
             `,
-            { email, name }
+            { email, guid }
         );
     } catch (error) {
         console.error("Error deleting collection:", error);
@@ -190,3 +193,81 @@ export const deleteCollection = async (email: string, name: string): Promise<voi
         await driver.close();
     }
 };
+
+
+/**
+ * 
+ * This function adds a book to a collection.
+ * 
+ * @param email - The email of the user.
+ * @param guid  - The guid of the collection.
+ * @param isbn  - The ISBN of the book to add to the collection.
+ * 
+ * @returns {Promise<Collection>} - A promise that resolves to the updated collection. 
+ */
+export const addBookToCollection = async (email: string, guid: string, isbn: string): Promise<Collection> => {
+    const driver = await connectToNeo4j();
+    const session = driver.session();
+
+    try {
+        // Cypher query to add a book to a collection
+        const result = await session.run(
+            `
+            MATCH (u:User {email: $email})-[:BELONGS_TO]-(c:Collection {guid: $guid})
+            MATCH (b:Book {isbn: $isbn})
+            MERGE (c)-[:CONTAINS_BOOK]->(b)
+            RETURN c
+            `,
+            { email, guid, isbn }
+        );
+
+        const updatedCollection = result.records[0].get("c");
+
+        return updatedCollection.properties as Collection;
+    } catch (error) {
+        console.error("Error adding book to collection:", error);
+        throw new NotFoundError("Collection not found");
+    } finally {
+        await session.close();
+        await driver.close();
+    }
+}
+
+/**
+ * 
+ * This function removes a book from a collection.
+ * 
+ * @param email - The email of the user.
+ * @param guid  - The guid of the collection.
+ * @param isbn  - The ISBN of the book to remove from the collection.
+ * 
+ * @returns {Promise<Collection>} - A promise that resolves to the updated collection. 
+ */
+export const removeBookFromCollection = async (email: string, guid: string, isbn: string): Promise<Collection> => {
+    const driver = await connectToNeo4j();
+    const session = driver.session();
+
+    try {
+        // Cypher query to remove a book from a collection
+        const result = await session.run(
+            `
+            MATCH (u:User {email: $email})-[:BELONGS_TO]-(c:Collection {guid: $guid})
+            MATCH (b:Book {isbn: $isbn})
+            MATCH (c)-[r:CONTAINS_BOOK]->(b)
+            DELETE r
+            RETURN c
+            `,
+            { email, guid, isbn }
+        );
+
+        const updatedCollection = result.records[0].get("c");
+
+        return updatedCollection.properties as Collection;
+    } catch (error) {
+        console.error("Error removing book from collection:", error);
+        throw new NotFoundError("Collection not found");
+    } finally {
+        await session.close();
+        await driver.close();
+    }
+}
