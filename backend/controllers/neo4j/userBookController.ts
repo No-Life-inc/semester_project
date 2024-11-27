@@ -1,4 +1,4 @@
-import { getUserBooks } from "../../services/neo4j/userBookService";
+import { getUserBooks, addBookToUser, removeBookFromUser } from "../../services/neo4j/userBookService";
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../../types/authenticatedRequest";
 import {
@@ -48,4 +48,50 @@ export const getUserBookController = async (req: AuthenticatedRequest, res: Resp
 };
 
 //add book to user
+export const addBookToUserController = async (req: AuthenticatedRequest, res: Response) => {
+    const { email } = req.user; // Extract user email from authentication middleware
+    const { isbn } = req.params; // Extract ISBN from request parameters
 
+    if (!email || typeof email !== 'string') {
+        return res.status(400).json({ error: "User email is not valid" });
+    }
+
+    if (!isbn || typeof isbn !== 'string') {
+        return res.status(400).json({ error: "Book ISBN is not valid" });
+    }
+
+    try {
+        await addBookToUser(email, isbn);
+        res.status(200).json({ message: "Book added to user." });
+    } catch (error) {
+        console.error("Error in addBookToUserController:", error);
+        res.status(500).json({ error: "Failed to add book to user." });
+    }
+};
+
+/**
+ * Controller to handle requests for removing a book from a user's collection.
+ *
+ * @param {AuthenticatedRequest} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ */
+export const removeBookFromUserController = async (req: AuthenticatedRequest, res: Response) => {
+    const { email } = req.user;
+    const { isbn } = req.params;
+
+    if (!email || typeof email !== "string") {
+        return res.status(400).json({ error: "User email is not valid." });
+    }
+
+    if (!isbn || typeof isbn !== "string") {
+        return res.status(400).json({ error: "Book ISBN is not valid." });
+    }
+
+    try {
+        await removeBookFromUser(email, isbn);
+        res.status(200).json({ message: "Book removed from user." });
+    } catch (error) {
+        console.error("Error in removeBookFromUserController:", error);
+        res.status(500).json({ error: "Failed to remove book from user." });
+    }
+};

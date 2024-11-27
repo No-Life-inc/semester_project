@@ -50,8 +50,8 @@ export const getUserBooks = async (email: string, page: number = 1, limit: numbe
 
 
 //add book to user
-export const addBookToUser = async (email: string, bookId: string): Promise<void> => {
-    if (!userId || typeof userId !== "string") {
+export const addBookToUser = async (email: string, isbn: string): Promise<void> => {
+    if (!email || typeof email !== "string") {
         throw new Error("Invalid email. Email must be a non-empty string.");
     }
 
@@ -70,7 +70,7 @@ export const addBookToUser = async (email: string, bookId: string): Promise<void
             MERGE (u)-[:HAS_BOOK]->(b)
         `;
 
-        const params = { userId, isbn };
+        const params = { email, isbn };
 
         await session.run(query, params);
     } catch (error) {
@@ -81,3 +81,35 @@ export const addBookToUser = async (email: string, bookId: string): Promise<void
         await driver.close();
     }
 }
+
+
+export const removeBookFromUser = async (email: string, isbn: string): Promise<void> => {
+    if (!email || typeof email !== "string") {
+        throw new Error("Invalid email. Email must be a non-empty string.");
+    }
+
+    if (!isbn || typeof isbn !== "string") {
+        throw new Error("Invalid ISBN. ISBN must be a non-empty string.");
+    }
+
+    // Connect to Neo4j
+    const driver = await connectToNeo4j();
+    const session = driver.session();
+
+    try {
+        const query = `
+            MATCH (u:User {email: $email})-[r:HAS_BOOK]->(b:Book {isbn: $isbn})
+            DELETE r
+        `;
+
+        const params = { email, isbn };
+
+        await session.run(query, params);
+    } catch (error) {
+        console.error("Error removing book from user:", error);
+        throw error;
+    } finally {
+        await session.close();
+        await driver.close();
+    }
+};
