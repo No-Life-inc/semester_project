@@ -78,7 +78,7 @@ async function seedUsers() {
     }
     console.log("Collections seeded.");
 
-    // Query for 10 existing books
+    // Query for 30 existing books
     const bookResult = await session.run(`
       MATCH (b:Book)
         RETURN b.isbn as isbn, b.title as title
