@@ -2,6 +2,7 @@ import { Schema, model, Document, Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 interface IUserBook {
+    _id: Types.ObjectId; 
     book_id: Types.ObjectId; // Reference to Book
     tags: string[];
 }

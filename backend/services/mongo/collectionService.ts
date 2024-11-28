@@ -140,28 +140,25 @@ export const addBookToCollectionService = async (
 ) => {
     const user = await User.findOne({ email });
     if (!user) {
-        throw new NotFoundError("User not found");
+        throw new NotFoundError("User not found.");
     }
 
+    const bookOwned = user.books.some((userBook) => userBook.book_id.equals(bookId));
+    if (!bookOwned) {
+        throw new ValidationError("User must own the book before adding it to a collection.");
+    }
 
-    const collection = user.collections.find(
-        (c) => c._id?.toString() === collectionId
-    );
-
-
+    const collection = user.collections.find((c) => c._id?.toString() === collectionId);
     if (!collection) {
-        throw new NotFoundError("Collection not found");
+        throw new NotFoundError("Collection not found.");
     }
 
-
-    if (collection.books.some((b) => b.toString() === bookId)) {
-        throw new ValidationError("Book already exists in the collection");
+    if (collection.books.some((b) => b.equals(bookId))) {
+        throw new ValidationError("Book already exists in the collection.");
     }
-
 
     collection.books.push(new Types.ObjectId(bookId));
     await user.save();
-
 
     return collection;
 };
