@@ -1,17 +1,18 @@
-import { User } from '../../models/mongoose/UserModel';
+import {IUser, User} from '../../models/mongoose/UserModel';
 
-export const getTagsService = async (userId: string, bookId: string) => {
-    const user = await User.findById(userId);
+export const getTagsService = async (email: string, bookId: string) => {
+    const user = await User.findOne({email}) as IUser;
     if (!user) throw new Error('User not found');
 
+    //Find tags for the book
     const book = user.books.find(b => b.book_id.equals(bookId));
     if (!book) throw new Error('Book not found in user library');
-
     return book.tags;
+
 }
 
-export const addTagService = async (userId: string, bookId: string, tag: string) =>  {
-    const user = await User.findById(userId);
+export const addTagService = async (email: string, bookId: string, tag: string) =>  {
+    const user = await User.findOne({email}) as IUser;
     if (!user) throw new Error('User not found');
 
     const book = user.books.find(b => b.book_id.equals(bookId));
@@ -24,8 +25,8 @@ export const addTagService = async (userId: string, bookId: string, tag: string)
     return book.tags;
 }
 
-export const removeTagService = async (userId: string, bookId: string, tag: string) => {
-    const user = await User.findById(userId);
+export const removeTagService = async (email: string, bookId: string, tag: string) => {
+    const user = await User.findOne({email}) as IUser;
     if (!user) throw new Error('User not found');
 
     const book = user.books.find(b => b.book_id.equals(bookId));
