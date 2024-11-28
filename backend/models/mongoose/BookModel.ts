@@ -4,10 +4,6 @@ interface IAuthor {
     name: string;
 }
 
-interface ISubject {
-    name: string;
-}
-
 interface IBook extends Document {
     _id: Types.ObjectId;
     authors: IAuthor[];
@@ -18,7 +14,7 @@ interface IBook extends Document {
     isbn: string;
     isbn10: string;
     isbn13: string;
-    subjects: ISubject[];
+    subjects: Types.ObjectId[];
     language?: string;
     pages?: number;
     publication_date?: Date;
@@ -40,7 +36,7 @@ const bookSchema = new Schema<IBook>(
         isbn: { type: String, required: true, unique: true },
         isbn10: { type: String },
         isbn13: { type: String },
-        subjects: [{ type: String, required: true }],
+        subjects: [{ type: Schema.Types.ObjectId, ref: "Subject" }],
         language: { type: String },
         pages: { type: Number },
         publication_date: { type: Date  },
