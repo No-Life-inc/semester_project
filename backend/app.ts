@@ -23,7 +23,6 @@ async function startServer() {
 
     await setupDatabase();
 
-
     await initializeDatabase();
 
     app.use("/v1", V1Routes);

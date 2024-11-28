@@ -1,4 +1,4 @@
-import { User } from "../../models/mongoose/UserModel";
+import { User, IUser } from "../../models/mongoose/UserModel";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../jwtService";
 import { ValidationError } from "../../utility/errors";
@@ -30,12 +30,10 @@ export const registerUser = async (
     throw new ValidationError("A user with this email already exists.");
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
   const user = new User({
     name,
     email,
-    password: hashedPassword,
+    password,
   });
   await user.save();
 
@@ -58,14 +56,15 @@ export const registerUser = async (
  * @returns The logged-in user and JWT token.
  */
 export const loginUser = async (email: string, password: string) => {
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select("+password") as IUser;
   if (!user) {
-    throw new ValidationError("Invalid email or password.");
+    throw new ValidationError("Invalid email.");
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  const isMatch = await user.comparePassword(password);
+
   if (!isMatch) {
-    throw new ValidationError("Invalid email or password.");
+    throw new ValidationError("Invalid password.");
   }
 
   const token = generateToken({ name: user.name, email: user.email });

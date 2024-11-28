@@ -20,6 +20,9 @@ interface IUser extends Document {
     books: IUserBook[];
     collections: ICollection[];
     createdAt?: Date;
+
+    comparePassword(candidatePassword: string): Promise<boolean>;
+
 }
 
 // Define schema
@@ -27,8 +30,8 @@ const userSchema = new Schema<IUser>(
     {
         _id: { type: Schema.Types.ObjectId, auto: true },
         name: { type: String, required: true },
-        email: { type: String, required: true, unique: true },
-        password: { type: String, required: true },
+        email: { type: String, required: true, unique: true},
+        password: { type: String, required: true, select: false },
         books: [
             {
                 book_id: { type: Schema.Types.ObjectId, ref: 'Book', required: true },
@@ -60,7 +63,7 @@ userSchema.pre('save', async function (next) {
     }
 });
 
-userSchema.methods.comparePassword = async function (candidatePassword: string) {
+userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
     return bcrypt.compare(candidatePassword, this.password);
 };
 
