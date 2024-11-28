@@ -1,7 +1,5 @@
-import { Book } from "../../models/mongoose/BookModel";
 import { NotFoundError } from "../../utility/errors";
 import { Subject } from "../../models/mongoose/SubjectModel";
-import {Types} from "mongoose";
 
 /**
  * Get all unique subjects from books.
@@ -26,29 +24,6 @@ export const getSubjectsByPartialName = async (partialName: string) => {
     const regex = new RegExp(partialName, "i");
     return Subject.find({ name: regex }).lean();
   };
-
-/**
- * Get books by subject ID.
- * 
- * @param subjectId - The ObjectId of the subject.
- * @returns A list of books linked to the subject.
- * @throws NotFoundError if no books or subject are found.
- */
-export const getBooksBySubject = async (subjectId: string) => {
-    // Validate if subjectId is a valid ObjectId
-    if (!Types.ObjectId.isValid(subjectId)) {
-        throw new NotFoundError(`Invalid Subject ID: ${subjectId}`);
-    }
-
-    // Fetch books linked to the subject by ObjectId
-    const books = await Book.find({ subjects: subjectId }).lean();
-
-    if (books.length === 0) {
-        throw new NotFoundError(`No books found for subject with ID: ${subjectId}`);
-    }
-
-    return books;
-};
 
 /**
  * Get subject by its ID.

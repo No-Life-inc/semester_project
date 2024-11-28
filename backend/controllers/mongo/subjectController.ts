@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import {
   getSubjects,
   getSubjectsByPartialName,
-  getBooksBySubject, getSubjectById
+  getSubjectById
 } from "../../services/mongo/subjectService";
 
 /**
@@ -40,22 +40,7 @@ export const getSubjectsByPartialNameController = async (
     }
   };
 
-/**
- * Get books by subject name.
- */
-export const getBooksBySubjectController = async (
-    req: Request,
-    res: Response
-  ) => {
-    const { subjectId } = req.params;
-  
-    try {
-      const books = await getBooksBySubject(subjectId);
-      res.status(200).json(books);
-    } catch (error) {
-      res.status(404).json({ error: error.message });
-    }
-  };
+
 
   export const getSubjectByIdController = async (req: Request, res: Response) => {
     const { subjectId } = req.params;
