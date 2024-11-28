@@ -47,6 +47,7 @@ export const registerUser = async (name: string, email: string, password: string
  * This will log in the user with the email "johndoe@johndoe.com" if the password matches the hashed password in the database.
  */
 export const loginUser = async (email: string, password: string) => {
+
     const user = await User.findOne({
         where: { email },
         attributes: { include: ["password"] },
@@ -56,9 +57,11 @@ export const loginUser = async (email: string, password: string) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
         throw new Error("Invalid email or password.");
     }
+
 
     const userWithoutPassword = user.toJSON();
     delete userWithoutPassword.password;
