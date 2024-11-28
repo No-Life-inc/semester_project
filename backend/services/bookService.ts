@@ -121,8 +121,6 @@ export const getBooksByTitle = async (title: string): Promise<Book[]> => {
 };
 
 
-
-
 /**
  * Adds new books to the database.
  *

@@ -7,6 +7,7 @@ import bookSubjectRouter from "./bookSubjectRoutes";
 import tagRouter from "./tagRoutes";
 import userBookTagRouter from "./userBookTagRoutes";
 import userRouter from "./userRoutes";
+import neo4jrouter from '../neo4j/neoIndex';
 
 const router = Router();
 
@@ -18,6 +19,6 @@ router.use("/bookSubject", bookSubjectRouter);
 router.use("/tag", tagRouter);
 router.use("/userBookTag", userBookTagRouter);
 router.use("/user",  userRouter);
-
+router.use("/neo4j", neo4jrouter);
 
 export default router;
