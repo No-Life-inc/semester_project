@@ -36,6 +36,3 @@ export const removeTagService = async (email: string, bookId: string, tag: strin
     await user.save();
     return book.tags;
 }
-
-
-
