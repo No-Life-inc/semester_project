@@ -11,19 +11,26 @@ export async function up(knex: Knex): Promise<void> {
             DECLARE @top_score INT;
 
             -- Beregn forfatterens popularitet baseret på antal brugere, der har tilføjet deres bøger til samlinger
+            ;WITH AuthorPopularity AS (
+                SELECT 
+                    ba.author_id,
+                    COUNT(DISTINCT ubc.collection_id) AS popularity
+                FROM
+                    book_authors ba
+                INNER JOIN
+                    user_books ub ON ba.book_id = ub.book_id
+                INNER JOIN
+                    collection_books ubc ON ub.id = ubc.user_book_id
+                GROUP BY
+                    ba.author_id
+            )
             SELECT TOP 1
-                @top_author_id = ba.author_id,
-                @top_score = COUNT(DISTINCT ubc.collection_id)
+                @top_author_id = author_id,
+                @top_score = popularity
             FROM
-                book_authors ba
-            INNER JOIN
-                user_books ub ON ba.book_id = ub.book_id
-            INNER JOIN
-                collection_books ubc ON ub.id = ubc.user_book_id
-            GROUP BY
-                ba.author_id
+                AuthorPopularity
             ORDER BY
-                COUNT(DISTINCT ubc.collection_id) DESC;
+                popularity DESC;
 
             -- Ryd tabellen og indsæt de nye data
             DELETE FROM most_popular_author;
