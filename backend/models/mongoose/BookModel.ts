@@ -51,7 +51,10 @@ const bookSchema = new Schema<IBook>(
         timestamps: true
     }
 );
-
+// Add indexes
+bookSchema.index({ title: 1 });
+bookSchema.index({ subjects: 1 });
+bookSchema.index({ isbn: 1 });
 const Book = model<IBook>('Book', bookSchema);
 
 export { Book, IBook };
