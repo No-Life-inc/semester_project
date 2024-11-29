@@ -19,13 +19,13 @@ interface UserAttributes {
 interface UserCreationAttributes extends Optional<UserAttributes, "id"> {}
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-    public id!: number;
-    public name!: string;
-    public email!: string;
-    public password!: string;
-    public collections?: Collection[]; // Add collections property for TypeScript
-    public books?: Book[]; // Add books property for TypeScript
-    public createdAt?: Date;
+    declare id: number;
+    declare name: string;
+    declare email: string;
+    declare password: string;
+    declare collections?: Collection[]; // Add collections property for TypeScript
+    declare books?: Book[]; // Add books property for TypeScript
+    declare createdAt?: Date;
 }
 
 // Initialize the User model
@@ -35,6 +35,7 @@ User.init(
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
+            allowNull: false,
         },
         name: {
             type: DataTypes.STRING,

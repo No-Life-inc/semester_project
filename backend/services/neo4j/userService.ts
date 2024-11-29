@@ -1,5 +1,5 @@
 import connectToNeo4j from "../../dbconnections/Neo4jConnection";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { generateToken } from "../jwtService";
 import { ValidationError } from "../../utility/errors";
 import {validateEmail, validateName, validatePassword} from "../validatorService";
