@@ -4,10 +4,10 @@ import User from "./User";
 import Book from "./Book";
 
 class UserBook extends Model {
-  public id!: number;
-  public userId!: number;
-  public book_id!: number;
-  public createdAt?: Date;
+  declare id: number;
+  declare userId: number;
+  declare book_id: number;
+  declare createdAt?: Date;
 }
 
 UserBook.init(
