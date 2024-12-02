@@ -32,27 +32,27 @@ export interface BookAttributes {
 export interface BookCreationAttributes extends Optional<BookAttributes, "id"> {}
 
 class Book extends Model<BookAttributes, BookCreationAttributes> implements BookAttributes {
-    public id!: number;
-    public title!: string;
+    declare id: number;
+    declare title: string;
     titleLong: string;
-    public publisherId!: number;
-    public edition!: string;
-    public isbn!: string;
-    public language!: string;
-    public pages!: number;
-    public publicationDate!: Date;
-    public dimensions!: string;
-    public image!: string;
-    public synopsis!: string;
-    public msrp!: number;
-    public isbn10!: string;
-    public isbn13!: string;
-    public binding!: string;
-    public createdAt?: Date;
-    public users?: User[];
-    public authors?: Author[];
-    public subjects?: Subject[];
-    public publisher?: Publisher;
+    declare publisherId: number;
+    declare edition: string;
+    declare isbn: string;
+    declare language: string;
+    declare pages: number;
+    declare publicationDate: Date;
+    declare dimensions: string;
+    declare image: string;
+    declare synopsis: string;
+    declare msrp: number;
+    declare isbn10: string;
+    declare isbn13!: string;
+    declare binding!: string;
+    declare createdAt?: Date;
+    declare users?: User[];
+    declare authors?: Author[];
+    declare subjects?: Subject[];
+    declare publisher?: Publisher;
 }
 
 // Initialize the Book model

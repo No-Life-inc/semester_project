@@ -13,9 +13,9 @@ interface TagCreationAttributes extends Optional<TagAttributes, "id"> {}
 
 // Define the Tag model
 class Tag extends Model<TagAttributes, TagCreationAttributes> {
-    public id!: number;
-    public name!: string;
-    public createdAt?: Date;
+    declare id: number;
+    declare name: string;
+    declare createdAt?: Date;
 }
 
 // Initialize the model

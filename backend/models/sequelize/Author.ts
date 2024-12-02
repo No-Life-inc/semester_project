@@ -13,9 +13,9 @@ interface AuthorCreationAttributes extends Optional<AuthorAttributes, "id"> {}
 
 // Define the Author model extending Sequelize's Model with typed attributes
 class Author extends Model<AuthorAttributes, AuthorCreationAttributes> implements AuthorAttributes {
-    public id!: number;
-    public name!: string;
-    public createdAt?: Date;
+    declare id: number;
+    declare name: string;
+    declare createdAt?: Date;
 }
 
 // Initialize the model

@@ -13,7 +13,12 @@ interface UserBookTagAttributes {
 interface UserBookTagCreationAttributes extends Optional<UserBookTagAttributes, "id"> {}
 
 // Define the UserBookTag model
-class UserBookTag extends Model<UserBookTagAttributes, UserBookTagCreationAttributes> {}
+class UserBookTag extends Model<UserBookTagAttributes, UserBookTagCreationAttributes> {
+    declare id: number;
+    declare userBookId: number;
+    declare tagId: number;
+    declare createdAt?: Date;
+}
 
 // Initialize the model
 UserBookTag.init(

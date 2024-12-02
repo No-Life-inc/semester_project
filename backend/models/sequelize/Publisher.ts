@@ -9,10 +9,10 @@ interface PublisherAttributes {
 }
 
 class Publisher extends Model<PublisherAttributes> implements PublisherAttributes {
-    public id!: number;
-    public name!: string;
-    public books?: Book[]; // Add books property for TypeScript
-    public createdAt?: Date;
+    declare id: number;
+    declare name: string;
+    declare books?: Book[]; // Add books property for TypeScript
+    declare createdAt?: Date;
 }
 
 Publisher.init({

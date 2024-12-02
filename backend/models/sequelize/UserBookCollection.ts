@@ -4,9 +4,9 @@ import UserBook from "./UserBook";
 import Collection from "./Collection";
 
 class UserBookCollection extends Model {
-    public userBookId!: number;
-    public collection_id!: number;
-    public createdAt?: Date;
+    declare userBookId: number;
+    declare collection_id: number;
+    declare createdAt?: Date;
 }
 
 UserBookCollection.init(
