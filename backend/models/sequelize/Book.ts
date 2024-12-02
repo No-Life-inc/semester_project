@@ -34,7 +34,7 @@ export interface BookCreationAttributes extends Optional<BookAttributes, "id"> {
 class Book extends Model<BookAttributes, BookCreationAttributes> implements BookAttributes {
     declare id: number;
     declare title: string;
-    titleLong: string;
+    declare titleLong: string;
     declare publisherId: number;
     declare edition: string;
     declare isbn: string;
