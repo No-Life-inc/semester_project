@@ -46,8 +46,8 @@ class Book extends Model<BookAttributes, BookCreationAttributes> implements Book
     declare synopsis: string;
     declare msrp: number;
     declare isbn10: string;
-    declare isbn13!: string;
-    declare binding!: string;
+    declare isbn13: string;
+    declare binding: string;
     declare createdAt?: Date;
     declare users?: User[];
     declare authors?: Author[];
