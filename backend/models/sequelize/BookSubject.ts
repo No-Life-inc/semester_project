@@ -11,10 +11,10 @@ interface BookSubjectAttributes {
 interface BookSubjectCreationAttributes extends Optional<BookSubjectAttributes, "id"> {}
 
 class BookSubject extends Model<BookSubjectAttributes, BookSubjectCreationAttributes> implements BookSubjectAttributes {
-    public id!: number;
-    public bookId!: number;
-    public subjectId!: number;
-    public createdAt?: Date;
+    declare id: number;
+    declare bookId: number;
+    declare subjectId: number;
+    declare createdAt?: Date;
 }
 
 BookSubject.init({

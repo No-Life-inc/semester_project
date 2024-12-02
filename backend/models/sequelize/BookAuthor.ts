@@ -11,10 +11,10 @@ interface BookAuthorAttributes {
 interface BookAuthorCreationAttributes extends Optional<BookAuthorAttributes, "id"> {}
 
 class  BookAuthor extends Model <BookAuthorAttributes, BookAuthorCreationAttributes> implements BookAuthorAttributes {
-    public id!: number;
-    public bookId!: number;
-    public authorId!: number;
-    public createdAt?: Date;
+    declare id: number;
+    declare bookId: number;
+    declare authorId: number;
+    declare createdAt?: Date;
 }
 
 BookAuthor.init(

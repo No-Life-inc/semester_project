@@ -10,9 +10,9 @@ interface SubjectAttributes {
 interface SubjectCreationAttributes extends Optional<SubjectAttributes, "id"> {}
 
 class Subject extends Model<SubjectAttributes, SubjectCreationAttributes> implements SubjectAttributes {
-  public id!: number;
-  public name!: string;
-  public createdAt?: Date;
+    declare id: number;
+    declare name: string;
+    declare createdAt?: Date;
 }
 
 Subject.init({

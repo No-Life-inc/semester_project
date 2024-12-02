@@ -11,10 +11,10 @@ interface BookStatsAttributes {
 interface BookStatsCreationAttributes extends Optional<BookStatsAttributes, "createdAt"> {}
 
 class BookStats extends Model<BookStatsAttributes, BookStatsCreationAttributes> implements BookStatsAttributes {
-    public bookId!: number;
-    public collectionCount!: number;
-    public createdAt?: Date;
-    public updatedAt?: Date;
+    declare bookId: number;
+    declare collectionCount: number;
+    declare createdAt?: Date;
+    declare updatedAt?: Date;
 }
 
 BookStats.init(

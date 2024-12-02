@@ -16,12 +16,12 @@ interface CollectionAttributes {
 interface CollectionCreationAttributes extends Optional<CollectionAttributes, "id"> {}
 
 class Collection extends Model<CollectionAttributes, CollectionCreationAttributes> implements CollectionAttributes {
-    public id!: number;
-    public name!: string;
-    public userId!: number;
-    public user?: User; // Add user property for TypeScript
-    public userBooks?: UserBook[]; // Add user_books property for TypeScript
-    public createdAt?: Date;
+    declare id: number;
+    declare name: string;
+    declare userId: number;
+    declare user?: User; // Add user property for TypeScript
+    declare userBooks?: UserBook[]; // Add user_books property for TypeScript
+    declare createdAt?: Date;
 }
 
 // Initialize the Collection model
