@@ -3,7 +3,7 @@ import {
     getBooksController,
     getBooksBySubjectTextController,
     getBookByISBNController, getBooksByTitleController
-} from "../../../controllers/mongo/bookController";
+} from "../../controllers/mongo/bookController";
 
 const router = express.Router();
 

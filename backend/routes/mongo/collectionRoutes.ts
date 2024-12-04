@@ -6,8 +6,8 @@ import {
     getUserCollections,
     addBookToCollection,
     removeBookFromCollection,
-} from "../../../controllers/mongo/collectionController";
-import { authenticate } from "../../../utility/authMiddleware";
+} from "../../controllers/mongo/collectionController";
+import { authenticate } from "../../utility/authMiddleware";
 
 const router = express.Router();
 
