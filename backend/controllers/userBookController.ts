@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { getUserBooks, addBookToUser, removeBookFromUser } from "../services/userBookService";
+import { AuthenticatedRequest } from "../types/authenticatedRequest";
 
 /**
  * Fetches user books and their associated book details.
@@ -13,13 +14,12 @@ import { getUserBooks, addBookToUser, removeBookFromUser } from "../services/use
  * getUserBooksController(req, res)
  * // This will fetch the first 50 user books for user with ID 1.
  */
-export const getUserBooksController = async (req: Request, res: Response): Promise<void> => {
-    const {id} = req.params;
+export const getUserBooksController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const { page, limit } = req.query;
+    const { email } = req.user;
 
-    console.log("id", id);
     try {
-        const result = await getUserBooks(Number(id), Number(page), Number(limit));
+        const result = await getUserBooks(email, Number(page), Number(limit));
         res.status(200).json(result);
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -39,11 +39,13 @@ export const getUserBooksController = async (req: Request, res: Response): Promi
  * addBookToUserController(req, res)
  * // This will add the book to the user's collection.
  */
-export const addBookToUserController = async (req: Request, res: Response): Promise<void> => {
-    const { userId, bookId } = req.body;
+export const addBookToUserController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const { bookId } = req.body;
+    const { email } = req.user;
+    
 
     try {
-        const userBook = await addBookToUser(Number(userId), Number(bookId));
+        const userBook = await addBookToUser(email, Number(bookId));
         res.status(201).json(userBook);
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -62,11 +64,12 @@ export const addBookToUserController = async (req: Request, res: Response): Prom
  * removeBookFromUserController(req, res)
  * // This will remove the userBook with id 1 from the user's collection.
  */
-export const removeBookFromUserController = async (req: Request, res: Response): Promise<void> => {
+export const removeBookFromUserController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const { userBookId } = req.params;
+    const { email } = req.user;
 
     try {
-        const success = await removeBookFromUser(Number(userBookId));
+        const success = await removeBookFromUser(email, Number(userBookId));
         if (success) {
             res.status(200).json({ message: "Book removed from user successfully" });
         } else {

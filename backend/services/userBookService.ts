@@ -2,12 +2,13 @@ import "../models/sequelize/Associations"
 import Book from "../models/sequelize/Book"; // Adjust the path to your Book model
 import UserBook from "../models/sequelize/UserBook";
 import User from "../models/sequelize/User";
+import { NotFoundError, UnauthorizedError, ValidationError } from "../utility/errors";
 
 
 /**
  * Fetches user books and their associated book details.
  * 
- * @param {number} userId - The ID of the user to fetch books for.
+ * @param {string} email - The email of the user to fetch books for.
  * @param {number} page - The page number to fetch (default: 1)
  * @param {number} limit - The number of records to fetch per page (default: 50)
  * @returns {Promise<{ userBooks: UserBook[]}>} - A promise that resolves to an object containing user books and their associated book details.
@@ -16,28 +17,32 @@ import User from "../models/sequelize/User";
  * getUserBooks(1, 50)
  * // This will fetch the first 50 user books and their associated book details.
  */
-export const getUserBooks = async (userId: number, page: number = 1, limit: number = 50): Promise<UserBook[]> => {
-    if (isNaN(userId) || userId < 1) {
-        throw new Error("Invalid user id. User id must be a number greater than or equal to 1.");
+export const getUserBooks = async (email: string, page: number = 1, limit: number = 50): Promise<UserBook[]> => {
+    
+    if (email === null || email === undefined) {
+        throw new ValidationError("Invalid email. Email must be a string.");
     }
 
     if (isNaN(page) || page < 1) {
-        throw new Error("Invalid page number. Page must be a number greater than or equal to 1.");
+        throw new ValidationError("Invalid page number. Page must be a number greater than or equal to 1.");
     }
 
     if (isNaN(limit) || limit < 1) {
-        throw new Error("Invalid limit. Limit must be a number greater than or equal to 1.");
+        throw new ValidationError("Invalid limit. Limit must be a number greater than or equal to 1.");
     }
 
     if (limit > 100) {
-        throw new Error("Invalid limit. Limit must be a number less than or equal to 100.");
+        throw new ValidationError("Invalid limit. Limit must be a number less than or equal to 100.");
     }
 
     const offset = (page - 1) * limit;
 
     try {
+
+        const user = await User.findOne({ where: { email } });
+
         const userBooks = await UserBook.findAll({
-            where: { user_id: userId },
+            where: { user_id: user.id },
             offset,
             limit,
             include: [
@@ -58,7 +63,7 @@ export const getUserBooks = async (userId: number, page: number = 1, limit: numb
 /**
  * Adds a book to a user's collection.
  * 
- * @param {number} userId - The ID of the user to add the book to.
+ * @param {string} email - The email of the user to add the book to.
  * @param {number} bookId - The ID of the book to add to the user.
  * @returns {Promise<void>} - A promise that resolves when the book is added to the user's collection.
  * 
@@ -66,32 +71,32 @@ export const getUserBooks = async (userId: number, page: number = 1, limit: numb
  * addBookToUser(1, 1)
  * // This will add the book with ID 1 to the user with ID 1.
  */
-export const addBookToUser = async (userId: number, bookId: number): Promise<UserBook> => {
+export const addBookToUser = async (email: string, bookId: number): Promise<UserBook> => {
 
     try {
 
-        if (isNaN(userId) || userId < 1) {
-            throw new Error("Invalid user id. User id must be a number greater than or equal to 1.");
+        if (email === null || email === undefined) {
+            throw new ValidationError("Invalid email. Email must be a string.");
         }
 
         if (isNaN(bookId) || bookId < 1) {
-            throw new Error("Invalid book id. Book id must be a number greater than or equal to 1.");
+            throw new ValidationError("Invalid book id. Book id must be a number greater than or equal to 1.");
         }
 
         const book = await Book.findByPk(bookId);
         if (!book) {
-            throw new Error("Book not found");
+            throw new NotFoundError("Book not found");
         }
 
-        const user = await User.findByPk(userId);
+        const user = await User.findOne({ where: { email } });
         if (!user) {
-            throw new Error("User not found");
+            throw new NotFoundError("User not found");
         }
 
         // Check if the user already has the book in their collection
         const existingUserBook = await UserBook.findOne({
             where: {
-                user_id: userId,
+                user_id: user.id,
                 book_id: bookId,
             },
         });
@@ -102,7 +107,7 @@ export const addBookToUser = async (userId: number, bookId: number): Promise<Use
 
         // Add the book to the user's collection
         const userBook = await UserBook.create({
-            user_id: userId,
+            user_id: user.id,
             book_id: bookId,
         });
 
@@ -115,6 +120,7 @@ export const addBookToUser = async (userId: number, bookId: number): Promise<Use
 /**
  * Removes a book from a user's collection.
  * 
+ * @param {string} email - The email of the user to remove the book from.
  * @param {number} userBookId - The ID of the userBook entry to remove.
  * @returns {Promise<boolean>} - A promise that resolves to true if the book was removed, false otherwise.
  * 
@@ -122,15 +128,26 @@ export const addBookToUser = async (userId: number, bookId: number): Promise<Use
  * removeBookFromUser(1)
  * // This will remove the userBook entry with ID 1.
  */
-export const removeBookFromUser = async (userBookId: number): Promise<boolean> => {
+export const removeBookFromUser = async (email: string, userBookId: number): Promise<boolean> => {
     try {
-        if (isNaN(userBookId) || userBookId < 1) {
-            throw new Error("Invalid userBook id. UserBook id must be a number greater than or equal to 1.");
+
+        if (email === null || email === undefined) {
+            throw new ValidationError("Invalid email. Email must be a string.");
         }
+
+        if (isNaN(userBookId) || userBookId < 1) {
+            throw new ValidationError("Invalid userBook id. UserBook id must be a number greater than or equal to 1.");
+        }
+
+        const user = await User.findOne({ where: { email } });
 
         const userBook = await UserBook.findByPk(userBookId);
         if (!userBook) {
-            throw new Error("UserBook not found");
+            throw new NotFoundError("UserBook not found");
+        }
+
+        if (userBook.userId !== user.id) {
+            throw new UnauthorizedError("UserBook does not belong to the user");
         }
 
         await userBook.destroy();

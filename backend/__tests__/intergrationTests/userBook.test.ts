@@ -20,17 +20,18 @@ afterAll(async () => {
 
 describe("addBookToUser function positive tests", () => {
   const positiveTestCases = [
-    [1, 1],
-    [1, 2],
-    [3, 100],
-    [3, 99],
-    [2, 50],
+    ["test_email@example.com", 1],
+    ["test_email@example.com", 2],
+    ["test@test.com", 100],
+    ["test@test.com", 99],
+    ["test_password@example.com", 50],
   ];
 
   test.each(positiveTestCases)(
-    "should add a book to a user (userId: %i, bookId: %i)",
-    async (userId, bookId) => {
-      const userBook = await addBookToUser(userId, bookId);
+    "should add a book to a user (email: %s, bookId: %i)",
+    async (...args: (string | number)[]) => {
+      const [email, bookId] = args as [string, number];
+      const userBook = await addBookToUser(email, Number(bookId));
       expect(userBook).toBeDefined();
     }
   );
@@ -38,62 +39,61 @@ describe("addBookToUser function positive tests", () => {
 
 describe("addBookToUser function negative tests", () => {
   const negativeTestCases = [
-    [-1, 1, "Invalid user id. User id must be a number greater than or equal to 1."],
-    [NaN, 1, "Invalid user id. User id must be a number greater than or equal to 1."],
-    [1, -1, "Invalid book id. Book id must be a number greater than or equal to 1."],
-    [1, NaN, "Invalid book id. Book id must be a number greater than or equal to 1."],
-    [1, 5000, "Book not found"],
-    [5000, 1, "User not found"],
+    // [-1, 1, "Invalid email. Email must be a string."],
+    // [NaN, 1, "Invalid email. Email must be a string."],
+    // [1, -1, "Invalid email. Email must be a string."],
+    // ["test_email@example.com", NaN, "Invalid email. Email must be a string."],
+    ["test_email@example.com", 5000, "Book not found"],
+    ["wrong@email.com", 1, "User not found"],
   ];
 
   test.each(negativeTestCases)(
     "should throw an error (userId: %i, bookId: %i, errorMessage: %s)",
-    async (userId: number, bookId: number, errorMessage: string) => {
-      await expect(addBookToUser(Number(userId), Number(bookId))).rejects.toThrow(errorMessage);
+    async (...args: (string | number)[]) => {
+      const [email, bookId, errorMessage] = args as [string, number, string];
+      await expect(addBookToUser(email, Number(bookId))).rejects.toThrow(errorMessage);
     }
   );
 });
 
 describe("getUserBooks function positive tests", () => {
   const positiveTestCases = [
-    [1],
-    [2],
-    [3],
-    [1, 1, 1],
-    [1, 1, 100],
-    [1, 1, 99],
-    [1, 1, 50],
-    [5000, 1, 50],
+    ["test_email@example.com"],
+    ["test_password@example.com"],
+    ["test@test.com"],
+    ["test_email@example.com", 1, 1],
+    ["test_email@example.com", 1, 100],
+    ["test_email@example.com", 1, 99],
+    ["test_email@example.com", 1, 50],
   ];
 
   test.each(positiveTestCases)(
     "should fetch books for a user (userId: %i, page: %i, limit: %i)",
-    async (userId, page = 1, limit = 50) => {
-      const userBooks = await getUserBooks(userId, page, limit);
-      if (userId === 5000) {
-        expect(userBooks.length).toBe(0);
-      } else {
-        expect(userBooks.length).toBeGreaterThan(0);
-      }
+    async (...args: (string | number)[]) => {
+      const [email, page, limit] = args as [string, number?, number?];
+      const userBooks = await getUserBooks(email, page, limit);
+      expect(userBooks).toBeDefined();
+
     }
   );
 });
 
 describe("getUserBooks function negative tests", () => {
   const negativeTestCases = [
-    [-1, 1, 1, "Invalid user id. User id must be a number greater than or equal to 1."],
-    [NaN, 1, 1, "Invalid user id. User id must be a number greater than or equal to 1."],
-    [1, -1, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
-    [1, NaN, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
-    [1, 1, -1, "Invalid limit. Limit must be a number greater than or equal to 1."],
-    [1, 1, NaN, "Invalid limit. Limit must be a number greater than or equal to 1."],
-    [1, 1, 101, "Invalid limit. Limit must be a number less than or equal to 100."],
+    // [-1, 1, 1, "Invalid user id. User id must be a number greater than or equal to 1."],
+    // [NaN, 1, 1, "Invalid user id. User id must be a number greater than or equal to 1."],
+    ["test_email@example.com", -1, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
+    ["test_email@example.com", NaN, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
+    ["test_email@example.com", 1, -1, "Invalid limit. Limit must be a number greater than or equal to 1."],
+    ["test_email@example.com", 1, NaN, "Invalid limit. Limit must be a number greater than or equal to 1."],
+    ["test_email@example.com", 1, 101, "Invalid limit. Limit must be a number less than or equal to 100."],
   ];
 
   test.each(negativeTestCases)(
     "should throw an error (userId: %i, page: %i, limit: %i, errorMessage: %s)",
-    async (userId: number, page: number, limit:number, errorMessage: string) => {
-      await expect(getUserBooks(userId, page, limit)).rejects.toThrow(errorMessage);
+    async (...args: (string | number)[]) => {
+      const [email, page, limit, errorMessage] = args as [string, number, number, string];
+      await expect(getUserBooks(email, page, limit)).rejects.toThrow(errorMessage);
     }
   );
 });

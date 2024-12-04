@@ -3,7 +3,7 @@ import { getUserBooksController, addBookToUserController, removeBookFromUserCont
 
 const router = express.Router();
 
-router.get("/:id", getUserBooksController);
+router.get("/", getUserBooksController);
 router.post("/", addBookToUserController);
 router.delete("/:userBookId", removeBookFromUserController);
 
