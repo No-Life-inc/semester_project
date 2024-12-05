@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import {registerUser, loginUser, editUser, editPassword} from "../services/userService";
 import {verifyToken} from "../services/jwtService";
+import {AuthenticatedRequest} from "../types/authenticatedRequest";
 
 /**
  * Registers a new user.
@@ -58,24 +59,16 @@ export const loginUserController = async (request: Request, response: Response) 
  * editUserController(request, response)
  * // This will edit the user details without the password
  */
-export const editUserController = async (request: Request, response: Response) => {
-    const authHeader = request.header("Authorization");
-    const token = extractToken(authHeader);
-
-    const decodedToken = verifyToken(token);
-
-    if (!token) {
-        return response.status(400).json({ error: "Authorization header is required or invalid token format" });
-    }
-
-    const { name, email } = request.body;
+export const editUserController = async (request: AuthenticatedRequest, response: Response) => {
+    const { name, email: newEmail } = request.body;
+    const { email  }  = request.user;
 
     if (!name && !email) {
         return response.status(400).json({ error: "At least one of 'name' or 'email' must be provided" });
     }
 
     try {
-        const result = await editUser(decodedToken, name, email.toLowerCase());
+        const result = await editUser(email, name, newEmail.toLowerCase());
         response.json({ message: result });
     } catch (error: any) {
         const errorMessage = error.message || "An error occurred while editing user";
@@ -95,17 +88,10 @@ export const editUserController = async (request: Request, response: Response) =
  * editPasswordController(request, response)
  * // This will edit the user password
  */
-export const editPasswordController = async (request: Request, response: Response) => {
-    const authHeader = request.header("Authorization");
-    const token = extractToken(authHeader);
+export const editPasswordController = async (request: AuthenticatedRequest, response: Response) => {
+    const { password, oldPassword} = request.body;
+    const { email } = request.user;
 
-    const decodedToken = verifyToken(token);
-
-    if (!token) {
-        return response.status(400).json({ error: "Authorization header is required or invalid token format" });
-    }
-
-    const { oldPassword, password } = request.body;
     if (!oldPassword || !password) {
         return response.status(400).json({ error: "Both 'oldPassword' and 'password' must be provided" });
     } else if (oldPassword === password) {
@@ -113,7 +99,7 @@ export const editPasswordController = async (request: Request, response: Respons
     }
 
     try {
-        const result = await editPassword(decodedToken, oldPassword, password);
+        const result = await editPassword(email, oldPassword, password);
         response.json({ message: result });
     } catch (error: any) {
         const errorMessage = error.message || "An error occurred while editing user password";
