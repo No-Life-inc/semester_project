@@ -100,8 +100,8 @@ export const editUser = async (email: string, name: string, newEmail: string) =>
         throw new Error("User not found.");
     }
 
-    if (email) {
-        user.email = email;
+    if (newEmail) {
+        user.email = newEmail;
     }
     if (name) {
         user.name = name;
