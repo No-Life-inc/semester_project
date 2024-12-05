@@ -127,9 +127,7 @@ describe("loginUser function tests", () => {
 
 describe("editUser function tests", () => {
     test("should update user's name and email successfully", async () => {
-        const token = { name: "user1", email: "test_email@example.com" };
-
-        const result = await editUser(token, "Updated Name", "updated@example.com");
+        const result = await editUser("test_email@example.com", "Updated Name", "updated@example.com");
 
         expect(result.newToken).toBeDefined();
         expect(result.user.name).toBe("Updated Name");
@@ -137,25 +135,19 @@ describe("editUser function tests", () => {
     });
 
     test("should throw an error if user is not found", async () => {
-        const token = { name: "Non Existing Person", email: "nonexistent@example.com" };
-
-        await expect(editUser(token, "Updated Name", "updated@example.com")).rejects.toThrow(
+        await expect(editUser("nonexistent@example.com", "Updated Name", "updated@example.com")).rejects.toThrow(
             "User not found."
         );
     });
 
     test("should throw an error for invalid email", async () => {
-        const token = { name: "user1", email: "test_email@example.com" };
-
-        await expect(editUser(token, "Updated Name", "invalid-email")).rejects.toThrow(
+        await expect(editUser("test_email@example.com", "Updated Name", "invalid-email")).rejects.toThrow(
             "Invalid email format"
         );
     });
 
     test("should throw an error for invalid name", async () => {
-        const token = { name: "user1", email: "test_email@example.com" };
-
-        await expect(editUser(token, "A", "updated@example.com")).rejects.toThrow(
+        await expect(editUser("test_email@example.com", "A", "updated@example.com")).rejects.toThrow(
             "Name must be at least 2 characters long."
         );
     });
@@ -163,33 +155,25 @@ describe("editUser function tests", () => {
 
 describe("editPassword function tests", () => {
     test("should update the user's password successfully", async () => {
-        const token = { name: "user2", email: "test_password@example.com" };
-
-        const result = await editPassword(token, validPassword, "NewPassword123");
+        const result = await editPassword("test_password@example.com", validPassword, "NewPassword123");
 
         expect(result).toBe("Your password has been updated successfully.");
     });
 
     test("should throw an error for incorrect old password", async () => {
-        const token = { name: "user2", email: "test_password@example.com" };
-
-        await expect(editPassword(token, "WrongOldPassword", "NewPassword123")).rejects.toThrow(
+        await expect(editPassword("test_password@example.com", "WrongOldPassword", "NewPassword123")).rejects.toThrow(
             "Invalid password."
         );
     });
 
     test("should throw an error for non-existing user", async () => {
-        const token = { name: "Non Existing Person", email: "wrong_email@example.com" };
-
-        await expect(editPassword(token, "OldPassword123", "NewPassword123")).rejects.toThrow(
+        await expect(editPassword("wrong_email@example.com", "OldPassword123", "NewPassword123")).rejects.toThrow(
             "User not found."
         );
     });
 
     test("should throw an error for invalid new password", async () => {
-        const token = { name: "Test Testsen", email: "test_password@example.com" };
-
-        await expect(editPassword(token, "OldPassword123", "short")).rejects.toThrow(
+        await expect(editPassword("test_password@example.com", "OldPassword123", "short")).rejects.toThrow(
             "Password must be at least 8 characters long."
         );
     });
