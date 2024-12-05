@@ -75,26 +75,26 @@ export const loginUser = async (email: string, password: string) => {
 /**
  * Edit user details without the password.
  *
- * @param {string} token - The JWT token of the user
- * @param {string} name - The new name of the user
  * @param {string} email - The email of the user
+ * @param {string} name - The new name of the user
+ * @param {string} newEmail - The new email of the user
  * @returns {Promise<void>} - A promise that resolves to void
  *
  * @example
- * editUser("JWT_TOKEN", "Johndoeee", "johndoe@hotmail.com")
+ * editUser("user@email.com", "Johndoeee", "johndoe@hotmail.com")
  * This will edit the user with the given name and email
  * if the user with the given email exists.
  */
 
-export const editUser = async (token: DecodedToken, name: string, email: string) => {
+export const editUser = async (email: string, name: string, newEmail: string) => {
     if (name) {
         validateName(name);
     }
-    if (email) {
-        validateEmail(email);
+    if (newEmail) {
+        validateEmail(newEmail);
     }
 
-    const user = await User.findOne({ where: { email: token.email } });
+    const user = await User.findOne({ where: { email: email } });
 
     if (!user) {
         throw new Error("User not found.");
@@ -116,7 +116,7 @@ export const editUser = async (token: DecodedToken, name: string, email: string)
 /**
  * Edit user password.
  *
- * @param {string} token - The JWT token of the user
+ * @param {string} email - The email of the user
  * @param {string} oldPassword - The old password of the user
  * @param {string} password - The new password of the user
  * @returns {Promise<void>} - A promise that resolves to void
@@ -126,12 +126,12 @@ export const editUser = async (token: DecodedToken, name: string, email: string)
  * This will edit the user with the given password
  * if the user with the given password exists.
  */
-export const editPassword = async (token: DecodedToken, oldPassword: string, password: string) => {
+export const editPassword = async (email: string, oldPassword: string, password: string) => {
 
     validatePassword(password);
 
     const user = await User.findOne({
-        where: { email: token.email, },
+        where: { email: email, },
         attributes: { include: ["password"] },
     });
 
