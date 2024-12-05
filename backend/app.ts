@@ -7,6 +7,7 @@ import MongoRoutes from "./routes/V1/mongo";
 import setupDatabase from "./database/knex/createDatabase";
 import { initializeDatabase } from "./database/knex/setupDatabase";
 import connectMongoDB from "./dbconnections/MongoConnection";
+import { registerHooks } from "./config/hooks";
 
 dotenv.config();
 const app = express();
@@ -24,6 +25,8 @@ async function startServer() {
     await setupDatabase();
 
     await initializeDatabase();
+
+    registerHooks();
 
     app.use("/v1", V1Routes);
     app.use("/v1/mongo", MongoRoutes);
