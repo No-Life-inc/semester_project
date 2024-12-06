@@ -3,7 +3,7 @@ import {
   getSubjectsController,
   getSubjectsByPartialNameController,
   getSubjectByIdController
-} from "../../../controllers/mongo/subjectController";
+} from "../../controllers/mongo/subjectController";
 
 const router = express.Router();
 

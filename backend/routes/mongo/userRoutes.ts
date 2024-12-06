@@ -2,7 +2,7 @@ import express from "express";
 import {
   registerUserController,
   loginUserController,
-} from "../../../controllers/mongo/userController";
+} from "../../controllers/mongo/userController";
 
 const router = express.Router();
 

@@ -3,8 +3,8 @@ import {
     getUserBooksController,
     addBookToUserController,
     removeBookFromUserController 
-} from "../../../controllers/mongo/userBookController";
-import { authenticate } from "../../../utility/authMiddleware";
+} from "../../controllers/mongo/userBookController";
+import { authenticate } from "../../utility/authMiddleware";
 
 const router = express.Router();
 
