@@ -194,7 +194,7 @@ export const addBookToCollection = async (
           user_book_id: userBook.id,
         },
       ],
-      { returning: false, transaction: t }
+      { returning: false, transaction: t}
     );
 
     await t.commit();
