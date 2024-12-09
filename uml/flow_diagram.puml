@@ -1,0 +1,34 @@
+@startuml
+actor User
+participant bookController
+participant getBooksByTitle
+participant externalAPIService
+participant ExternalAPI
+participant addBooks
+database Database
+
+
+User -> bookController: Call /v1/book/search
+activate bookController
+
+bookController -> getBooksByTitle: Query for book by title
+getBooksByTitle -> Database: Fetching books from the database
+Database --> getBooksByTitle: Returning the found books
+getBooksByTitle --> bookController: Return list of books to bookController
+
+alt Books not found on the Database
+  bookController -> externalAPIService: Query external API
+  externalAPIService -> ExternalAPI: Call API
+  ExternalAPI --> externalAPIService: Return book API data
+  externalAPIService --> bookController: Return book API data to bookController
+
+  bookController -> addBooks: Add books to database
+  addBooks -> Database: Insert new books
+  Database --> addBooks: Returning inserted books
+  addBooks --> bookController: Return list of books to bookController
+end
+
+bookController --> User: Show books to User
+
+deactivate bookController
+@enduml
