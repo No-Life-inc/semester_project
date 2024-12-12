@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import sequelize from "../../config/SqlConfig";
+import {limitedSequelize} from "../../config/SqlConfig";
 
 // Define the attributes for the Tag model
 interface TagAttributes {
@@ -38,7 +38,7 @@ Tag.init(
         },
     },
     {
-        sequelize,
+        sequelize: limitedSequelize,
         modelName: "Tag",
         tableName: "tags",
         timestamps: true,

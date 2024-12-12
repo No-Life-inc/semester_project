@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize";
-import sequelize from "../../config/SqlConfig";
+import {limitedSequelize} from "../../config/SqlConfig";
 import UserBook from "./UserBook";
 import Collection from "./Collection";
 
@@ -37,7 +37,7 @@ UserBookCollection.init(
         },
     },
     {
-        sequelize,
+        sequelize: limitedSequelize,
         modelName: "UserBookCollection",
         tableName: "collection_books",
         timestamps: false,
