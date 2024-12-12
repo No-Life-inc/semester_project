@@ -3,7 +3,6 @@ import Collection from "../models/sequelize/Collection";
 import UserBook from "../models/sequelize/UserBook";
 import Book from "../models/sequelize/Book";
 import UserBookCollection from "../models/sequelize/UserBookCollection";
-// import sequelize from "../config/SqlConfig";
 import { Transaction } from "sequelize";
 import {
   NotFoundError,
@@ -11,6 +10,7 @@ import {
   UnauthorizedError,
 } from "../utility/errors";
 import { ValidationError as SequelizeValidationError } from "sequelize";
+import { limitedSequelize } from "../config/SqlConfig";
 /**
  * Creates a new collection for a user.
  *
@@ -101,38 +101,37 @@ export const updateCollection = async (id: number, name: string) => {
  * @throws {UnauthorizedError} - Throws an error if the user is not authorized to delete the collection.
  */
 export const deleteCollection = async (id: number, email: string) => {
-  // const user = await User.findOne({ where: { email } });
+  const user = await User.findOne({ where: { email } });
 
-  // if (!user) {
-  //   throw new NotFoundError("User not found");
-  // }
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
 
-  // const collection = await Collection.findByPk(id);
+  const collection = await Collection.findByPk(id);
 
-  // if (!collection) {
-  //   throw new NotFoundError("Collection not found");
-  // }
+  if (!collection) {
+    throw new NotFoundError("Collection not found");
+  }
 
-  // if (collection.userId !== user.id) {
-  //   throw new UnauthorizedError(
-  //     "You are not authorized to delete this collection"
-  //   );
-  // }
+  if (collection.userId !== user.id) {
+    throw new UnauthorizedError(
+      "You are not authorized to delete this collection"
+    );
+  }
 
-  // const t = await sequelize.transaction();
-  // try {
-  //   await UserBookCollection.destroy({
-  //     where: { collection_id: id },
-  //     transaction: t,
-  //   });
-  //   await collection.destroy({ transaction: t });
-  //   await t.commit();
-  //   return true;
-  // } catch (error) {
-  //   await t.rollback();
-  //   throw error;
-  // }
-  return true;
+  const t = await limitedSequelize.transaction();
+  try {
+    await UserBookCollection.destroy({
+      where: { collection_id: id },
+      transaction: t,
+    });
+    await collection.destroy({ transaction: t });
+    await t.commit();
+    return true;
+  } catch (error) {
+    await t.rollback();
+    throw error;
+  }
 };
 
 /**
@@ -150,60 +149,60 @@ export const addBookToCollection = async (
   collectionId: number,
   bookId: number
 ) => {
-  // const t = await sequelize.transaction();
-  // try {
-  //   const user = await User.findOne({ where: { email }, transaction: t });
+  const t = await limitedSequelize.transaction();
+  try {
+    const user = await User.findOne({ where: { email }, transaction: t });
 
-  //   if (!user) {
-  //     throw new NotFoundError("User not found");
-  //   }
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
 
-  //   const collection = await Collection.findByPk(collectionId, {
-  //     transaction: t,
-  //   });
+    const collection = await Collection.findByPk(collectionId, {
+      transaction: t,
+    });
 
-  //   if (!collection || collection.userId !== user.id) {
-  //     throw new UnauthorizedError(
-  //       "You are not authorized to add a book to this collection"
-  //     );
-  //   }
+    if (!collection || collection.userId !== user.id) {
+      throw new UnauthorizedError(
+        "You are not authorized to add a book to this collection"
+      );
+    }
 
-  //   const userBook = await UserBook.findOne({
-  //     where: { user_id: user.id, book_id: bookId },
-  //     transaction: t,
-  //   });
+    const userBook = await UserBook.findOne({
+      where: { user_id: user.id, book_id: bookId },
+      transaction: t,
+    });
 
-  //   if (!userBook) {
-  //     throw new NotFoundError(
-  //       "UserBook entry not found. Add the book to the user first."
-  //     );
-  //   }
+    if (!userBook) {
+      throw new NotFoundError(
+        "UserBook entry not found. Add the book to the user first."
+      );
+    }
 
-  //   const existingEntry = await UserBookCollection.findOne({
-  //     where: { collection_id: collectionId, user_book_id: userBook.id },
-  //     transaction: t,
-  //   });
+    const existingEntry = await UserBookCollection.findOne({
+      where: { collection_id: collectionId, user_book_id: userBook.id },
+      transaction: t,
+    });
 
-  //   if (existingEntry) {
-  //     throw new ValidationError("Book already exists in the collection");
-  //   }
+    if (existingEntry) {
+      throw new ValidationError("Book already exists in the collection");
+    }
 
-  //   await UserBookCollection.bulkCreate(
-  //     [
-  //       {
-  //         collection_id: collectionId,
-  //         user_book_id: userBook.id,
-  //       },
-  //     ],
-  //     { returning: false, transaction: t }
-  //   );
+    await UserBookCollection.bulkCreate(
+      [
+        {
+          collection_id: collectionId,
+          user_book_id: userBook.id,
+        },
+      ],
+      { returning: false, transaction: t }
+    );
 
-  //   await t.commit();
-  // } catch (error) {
-  //   await t.rollback();
-  //   throw error;
-  // }
-  return true;
+    await t.commit();
+  } catch (error) {
+    await t.rollback();
+    throw error;
+  }
+
 };
 
 /**
@@ -222,52 +221,51 @@ export const removeBookFromCollection = async (
   collectionId: number,
   bookId: number
 ) => {
-  // const t = await sequelize.transaction();
-  // try {
-  //   const user = await User.findOne({ where: { email }, transaction: t });
+  const t = await limitedSequelize.transaction();
+  try {
+    const user = await User.findOne({ where: { email }, transaction: t });
 
-  //   if (!user) {
-  //     throw new NotFoundError("User not found");
-  //   }
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
 
-  //   const collection = await Collection.findByPk(collectionId, {
-  //     transaction: t,
-  //   });
+    const collection = await Collection.findByPk(collectionId, {
+      transaction: t,
+    });
 
-  //   if (!collection) {
-  //     throw new NotFoundError("Collection not found");
-  //   }
+    if (!collection) {
+      throw new NotFoundError("Collection not found");
+    }
     
-  //   if (collection.userId !== user.id) {
-  //     throw new UnauthorizedError(
-  //       "You are not authorized to remove a book from this collection"
-  //     );
-  //   }
+    if (collection.userId !== user.id) {
+      throw new UnauthorizedError(
+        "You are not authorized to remove a book from this collection"
+      );
+    }
 
-  //   const userBook = await UserBook.findOne({
-  //     where: { user_id: user.id, book_id: bookId },
-  //     transaction: t,
-  //   });
+    const userBook = await UserBook.findOne({
+      where: { user_id: user.id, book_id: bookId },
+      transaction: t,
+    });
 
-  //   if (!userBook) {
-  //     throw new NotFoundError("UserBook entry not found");
-  //   }
+    if (!userBook) {
+      throw new NotFoundError("UserBook entry not found");
+    }
 
-  //   const collectionEntry = await UserBookCollection.findOne({
-  //     where: { collection_id: collectionId, user_book_id: userBook.id },
-  //     transaction: t,
-  //   });
+    const collectionEntry = await UserBookCollection.findOne({
+      where: { collection_id: collectionId, user_book_id: userBook.id },
+      transaction: t,
+    });
 
-  //   if (!collectionEntry) {
-  //     throw new NotFoundError("Book not found in the collection");
-  //   }
+    if (!collectionEntry) {
+      throw new NotFoundError("Book not found in the collection");
+    }
 
-  //   await collectionEntry.destroy({ transaction: t });
+    await collectionEntry.destroy({ transaction: t });
 
-  //   await t.commit();
-  // } catch (error) {
-  //   await t.rollback();
-  //   throw error;
-  // }
-  return true;
+    await t.commit();
+  } catch (error) {
+    await t.rollback();
+    throw error;
+  }
 };

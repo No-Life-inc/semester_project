@@ -5,8 +5,8 @@ import Author from "../models/sequelize/Author";
 import Publisher from "../models/sequelize/Publisher";
 import { Op, Transaction } from "sequelize";
 import BookAPIData from "../types/bookAPIData";
-// import sequelize from "../config/SqlConfig";
 import { BookCreationAttributes } from "../models/sequelize/Book";
+import { limitedSequelize } from "../config/SqlConfig";
 
 /**
  * Fetches all books from the database.
@@ -132,143 +132,141 @@ export const getBooksByTitle = async (title: string): Promise<Book[]> => {
  * // This will add new books to the database.
  */
 export const addBooks = async (booksData: BookAPIData[]): Promise<Book[]> => {
-//   const t = await sequelize.transaction();
+  const t = await limitedSequelize.transaction();
 
-//   try {
-//     const addedBooks = [];
+  try {
+    const addedBooks = [];
 
-//     for (const bookData of booksData) {
-//       const bookCreationDetails = prepareBookDetails(bookData);
+    for (const bookData of booksData) {
+      const bookCreationDetails = prepareBookDetails(bookData);
 
-//       const publisherInstance = await handlePublisher(
-//         bookData.publisher,
-//         t
-//       );
+      const publisherInstance = await handlePublisher(
+        bookData.publisher,
+        t
+      );
 
-//       if (publisherInstance) {
-//         bookCreationDetails.publisherId = publisherInstance.id;
-//       }
+      if (publisherInstance) {
+        bookCreationDetails.publisherId = publisherInstance.id;
+      }
 
-//       const book = await Book.create(bookCreationDetails, { transaction: t });
+      const book = await Book.create(bookCreationDetails, { transaction: t });
 
-//       // if (bookData.subjects) {
-//       //   await handleSubjects(book.id, bookData.subjects, t);
-//       // }
+      if (bookData.subjects) {
+        await handleSubjects(book.id, bookData.subjects, t);
+      }
 
-//       // if (bookData.authors) {
-//       //   await handleAuthors(book.id, bookData.authors, t);
-//       // }
+      if (bookData.authors) {
+        await handleAuthors(book.id, bookData.authors, t);
+      }
 
-//       addedBooks.push(book);
-//     }
+      addedBooks.push(book);
+    }
 
-//     await t.commit();
-//     return addedBooks;
-//   } catch (error) {
-//     await t.rollback();
-//     throw error;
-//   }
-// };
-return [];
-}
+    await t.commit();
+    return addedBooks;
+  } catch (error) {
+    await t.rollback();
+    throw error;
+  }
+};
 
-// // Helper function to prepare book details
-// const prepareBookDetails = (bookData: BookAPIData): BookCreationAttributes => {
-//   const { date_published, ...details } = bookData;
+// Helper function to prepare book details
+const prepareBookDetails = (bookData: BookAPIData): BookCreationAttributes => {
+  const { date_published, ...details } = bookData;
 
-//   return {
-//     title: details.title,
-//     titleLong: details.title_long || "",
-//     edition: details.edition || "",
-//     isbn: details.isbn || "",
-//     language: details.language || "",
-//     pages: details.pages || 0,
-//     publicationDate: date_published ? new Date(date_published) : null,
-//     dimensions: details.dimensions || "",
-//     image: details.image || "",
-//     synopsis: details.synopsis || "",
-//     msrp: details.msrp || 0,
-//     isbn10: details.isbn10 || "",
-//     isbn13: details.isbn13 || "",
-//     binding: details.binding || "",
-//   };
-// };
+  return {
+    title: details.title,
+    titleLong: details.title_long || "",
+    edition: details.edition || "",
+    isbn: details.isbn || "",
+    language: details.language || "",
+    pages: details.pages || 0,
+    publicationDate: date_published ? new Date(date_published) : null,
+    dimensions: details.dimensions || "",
+    image: details.image || "",
+    synopsis: details.synopsis || "",
+    msrp: details.msrp || 0,
+    isbn10: details.isbn10 || "",
+    isbn13: details.isbn13 || "",
+    binding: details.binding || "",
+  };
+};
 
-// // Helper function to handle publisher
-// const handlePublisher = async (
-//   publisherName: string | undefined,
-//   transaction: Transaction
-// ): Promise<Publisher | null> => {
-//   if (!publisherName) return null;
+// Helper function to handle publisher
+const handlePublisher = async (
+  publisherName: string | undefined,
+  transaction: Transaction
+): Promise<Publisher | null> => {
+  if (!publisherName) return null;
 
-//   let publisher = await Publisher.findOne({
-//     where: { name: publisherName },
-//     transaction,
-//   });
+  let publisher = await Publisher.findOne({
+    where: { name: publisherName },
+    transaction,
+  });
 
-//   if (!publisher) {
-//     publisher = await Publisher.create({ name: publisherName }, { transaction });
-//   }
+  if (!publisher) {
+    publisher = await Publisher.create({ name: publisherName }, { transaction });
+  }
 
-//   return publisher;
-// };
+  return publisher;
+};
 
-// // Helper function to handle subjects
-// const handleSubjects = async (
-//   bookId: number,
-//   subjects: string[],
-//   transaction: Transaction
-// ): Promise<void> => {
-//   for (const subjectName of subjects) {
-//     let subject = await Subject.findOne({
-//       where: { name: subjectName },
-//       transaction,
-//     });
+// Helper function to handle subjects
+const handleSubjects = async (
+  bookId: number,
+  subjects: string[],
+  transaction: Transaction
+): Promise<void> => {
+  for (const subjectName of subjects) {
+    let subject = await Subject.findOne({
+      where: { name: subjectName },
+      transaction,
+    });
 
-//     if (!subject) {
-//       subject = await Subject.create({ name: subjectName }, { transaction });
-//     }
+    if (!subject) {
+      subject = await Subject.create({ name: subjectName }, { transaction });
+    }
 
-//     const existingAssociation = await sequelize.models.book_subjects.findOne({
-//       where: { book_id: bookId, subject_id: subject.id },
-//       transaction,
-//     });
+    const existingAssociation = await limitedSequelize.models.book_subjects.findOne({
+      where: { book_id: bookId, subject_id: subject.id },
+      transaction,
+    });
 
-//     if (!existingAssociation) {
-//       await sequelize.models.book_subjects.create(
-//         { book_id: bookId, subject_id: subject.id },
-//         { transaction }
-//       );
-//     }
-//   }
-// };
+    if (!existingAssociation) {
+      await limitedSequelize.models.book_subjects.create(
+        { book_id: bookId, subject_id: subject.id },
+        { transaction }
+      );
+    }
+  }
+};
 
-// // Helper function to handle authors
-// const handleAuthors = async (
-//   bookId: number,
-//   authors: string[],
-//   transaction: Transaction
-// ): Promise<void> => {
-//   for (const authorName of authors) {
-//     let author = await Author.findOne({
-//       where: { name: authorName },
-//       transaction,
-//     });
+// Helper function to handle authors
+const handleAuthors = async (
+  bookId: number,
+  authors: string[],
+  transaction: Transaction
+): Promise<void> => {
+  for (const authorName of authors) {
+    let author = await Author.findOne({
+      where: { name: authorName },
+      transaction,
+    });
 
-//     if (!author) {
-//       author = await Author.create({ name: authorName }, { transaction });
-//     }
+    if (!author) {
+      author = await Author.create({ name: authorName }, { transaction });
+    }
 
-//     const existingAssociation = await sequelize.models.book_authors.findOne({
-//       where: { book_id: bookId, author_id: author.id },
-//       transaction,
-//     });
+    const existingAssociation = await limitedSequelize.models.book_authors.findOne({
+      where: { book_id: bookId, author_id: author.id },
+      transaction,
+    });
 
-//     if (!existingAssociation) {
-//       await sequelize.models.book_authors.create(
-//         { book_id: bookId, author_id: author.id },
-//         { transaction }
-//       );
-//     }
-//   }
-// };
+    if (!existingAssociation) {
+      await limitedSequelize.models.book_authors.create(
+        { book_id: bookId, author_id: author.id },
+        { transaction }
+      );
+    }
+  }
+};
