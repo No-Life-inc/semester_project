@@ -1,6 +1,8 @@
 import knex from "knex";
 import knexConfig from "../../knexfile";
 import dotenv from "dotenv";
+import connectToNeo4j from "../../dbconnections/Neo4jConnection";
+import seedNeo4j from "../neo4j/seedNeo4j";
 dotenv.config();
 
 const db = knex(knexConfig.development);
@@ -29,7 +31,24 @@ export async function initializeDatabase(): Promise<void> {
             console.log("Seeding completed:", seedResults);
         }
 
-        console.log("Database is ready.");
+        console.log("SQL Database is ready.");
+
+        // Seed the Neo4j database if needed
+        // query the database to check if the data exists
+
+        const driver = await connectToNeo4j();
+        const session = driver.session();
+
+        const result = await session.run(`MATCH (b:Book) RETURN count(b) as book LIMIT 1`);
+
+        if (result.records[0].get("book").low > 0) {
+            console.log("Data already exists in the Neo4j database. Skipping seeding.");
+        } else {
+            console.log("Seeding Neo4j database...");
+            await seedNeo4j();
+            console.log("Neo4j database seeded successfully.");
+        }
+        
     } catch (error) {
         console.error("Database initialization failed:", error);
         process.exit(1);

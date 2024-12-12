@@ -7,6 +7,7 @@ import setupDatabase from "./database/knex/createDatabase";
 import { initializeDatabase } from "./database/knex/setupDatabase";
 import connectMongoDB from "./dbconnections/MongoConnection";
 import { registerHooks } from "./config/hooks";
+import  seedNeo4j  from "./database/neo4j/seedNeo4j";
 
 dotenv.config();
 const app = express();
@@ -19,7 +20,7 @@ app.use(express.json());
 async function startServer() {
   try {
 
-    await connectMongoDB();
+    // await connectMongoDB();
 
     await setupDatabase();
 
@@ -28,6 +29,8 @@ async function startServer() {
     registerHooks();
 
     app.use("/v1", V1Routes);
+
+    // await seedNeo4j();
 
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
