@@ -75,3 +75,5 @@ userSchema.index({ "collections.name": 1 });
 const User = model<IUser>('User', userSchema);
 
 export { User, IUser };
+
+

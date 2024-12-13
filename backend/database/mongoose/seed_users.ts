@@ -1,8 +1,6 @@
 import { User } from '../../models/mongoose/UserModel';
 import { HydratedDocument } from 'mongoose';
 import { IBook } from '../../models/mongoose/BookModel';
-import bcrypt from "bcryptjs";
-
 
 const seedUsers = async (books: HydratedDocument<IBook>[]) => {
     try {

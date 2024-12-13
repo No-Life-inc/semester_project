@@ -3,6 +3,14 @@ import knexConfig from "../../knexfile";
 import dotenv from "dotenv";
 import connectToNeo4j from "../../dbconnections/Neo4jConnection";
 import seedNeo4j from "../neo4j/seedNeo4j";
+import seedDatabaseUser from "../mongoose/seed_dbUser";
+import seedBooks from "../mongoose/seed_books";
+import seedUsers from "../mongoose/seed_users";
+import { Book, createBookModel }  from "../../models/mongoose/BookModel";
+import {connectMongoDB, connectMongoDBWithGranularUser} from "../../dbconnections/MongoConnection";
+import mongoose from "mongoose";
+
+
 dotenv.config();
 
 const db = knex(knexConfig.development);
@@ -12,7 +20,7 @@ export async function initializeDatabase(): Promise<void> {
         console.log("Running migrations...");
         const [batchNo, log] = await db.migrate.latest();
         console.log("Migrations completed:", log);
-
+ 
         // Check if the latest migration has been applied
         const [completedMigrations, pendingMigrations] = await db.migrate.list();
         if (pendingMigrations.length === 0) {
@@ -49,6 +57,24 @@ export async function initializeDatabase(): Promise<void> {
             console.log("Neo4j database seeded successfully.");
         }
         
+        const seedConnection = await connectMongoDBWithGranularUser() as unknown as mongoose.Connection;
+        const Book = createBookModel(seedConnection);
+
+        console.log("Checking MongoDB user and seeding if necessary...");
+        await seedDatabaseUser();
+
+        // Check if a user exists
+        const userExists = await Book.exists({});
+        if (userExists) {
+            console.log("Users already exist in MongoDB. Skipping seeding users and books.");
+        } else {
+            console.log("Seeding books...");
+            await seedBooks();
+            const books = await Book.find();
+            console.log("Seeding users...");
+            await seedUsers(books);
+            console.log("Books and users seeded successfully.");
+        }
     } catch (error) {
         console.error("Database initialization failed:", error);
         process.exit(1);

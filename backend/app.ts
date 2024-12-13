@@ -5,7 +5,7 @@ import "./models/sequelize/Associations";
 import V1Routes from "./routes/V1";
 import setupDatabase from "./database/knex/createDatabase";
 import { initializeDatabase } from "./database/knex/setupDatabase";
-import connectMongoDB from "./dbconnections/MongoConnection";
+import {connectMongoDB} from "./dbconnections/MongoConnection";
 import { registerHooks } from "./config/hooks";
 import  seedNeo4j  from "./database/neo4j/seedNeo4j";
 
@@ -19,8 +19,6 @@ app.use(express.json());
 
 async function startServer() {
   try {
-
-    // await connectMongoDB();
 
     await setupDatabase();
 

@@ -1,5 +1,4 @@
-import { Schema, model, Types, Document } from 'mongoose';
-
+import { Schema, model, Types, Document, Connection } from 'mongoose';
 interface IAuthor {
     name: string;
 }
@@ -57,4 +56,8 @@ bookSchema.index({ subjects: 1 });
 bookSchema.index({ isbn: 1 });
 const Book = model<IBook>('Book', bookSchema);
 
-export { Book, IBook };
+const createBookModel = (connection: Connection) => {
+    return connection.model<IBook>('Book', bookSchema);
+};
+
+export { Book, IBook, createBookModel };
