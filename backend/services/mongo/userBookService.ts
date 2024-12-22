@@ -44,10 +44,36 @@ export const addBookToUser = async (email: string, bookId: string) => {
         throw new ValidationError("User already owns this book.");
     }
 
-    // Add the book to user's books
-    user.books.push({ _id: new mongoose.Types.ObjectId(), book_id: book._id, tags: [] });
-    await user.save();
+    // Build embeddedBook from the fields in the book document
+    const embeddedBook = {
+        authors: book.authors,            // or map them if needed
+        publisher: book.publisher,
+        title: book.title,
+        isbn: book.isbn,
+        isbn10: book.isbn10,
+        isbn13: book.isbn13,
+        subjects: book.subjects,
+        language: book.language,
+        pages: book.pages,
+        publication_date: book.publication_date,
+        image: book.image,
+        title_long: book.title_long,
+        synopsis: book.synopsis,
+        msrp: book.msrp,
+        dimensions: book.dimensions,
+        binding: book.binding,
+        edition: book.edition
+    };
 
+    // Now include 'embeddedBook' in the push
+    user.books.push({
+        _id: new mongoose.Types.ObjectId(),
+        book_id: book._id,
+        tags: [],
+        embeddedBook: embeddedBook,
+    });
+
+    await user.save();
     return user.books;
 };
 

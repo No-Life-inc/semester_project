@@ -28,7 +28,7 @@ const connectMongoDB = async () => {
 
 const seedData = async () => {
     await seedBooks();
-    const books = await Book.find() as IBook[];
+    const books = await Book.find();
     await seedUsers(books);
 };
 

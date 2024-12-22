@@ -1,6 +1,6 @@
 import { Schema, model, Types, Document } from 'mongoose';
 
-interface IAuthor {
+export interface IAuthor {
     name: string;
 }
 
@@ -14,7 +14,9 @@ interface IBook extends Document {
     isbn: string;
     isbn10: string;
     isbn13: string;
-    subjects: Types.ObjectId[];
+    subjects: {
+        name: string;
+    }[];
     language?: string;
     pages?: number;
     publication_date?: Date;
@@ -36,7 +38,7 @@ const bookSchema = new Schema<IBook>(
         isbn: { type: String, required: true, unique: true },
         isbn10: { type: String },
         isbn13: { type: String },
-        subjects: [{ type: Schema.Types.ObjectId, ref: "Subject" }],
+        subjects: [{name: { type: String, required: true }}],
         language: { type: String },
         pages: { type: Number },
         publication_date: { type: Date  },
@@ -54,7 +56,7 @@ const bookSchema = new Schema<IBook>(
 // Add indexes
 bookSchema.index({ title: 1 });
 bookSchema.index({ subjects: 1 });
-bookSchema.index({ isbn: 1 });
+//bookSchema.index({ isbn: 1 });
 const Book = model<IBook>('Book', bookSchema);
 
 export { Book, IBook };
