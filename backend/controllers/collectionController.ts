@@ -129,6 +129,7 @@ export const deleteCollection = async (req: AuthenticatedRequest, res: Response)
  *                   if the input IDs are invalid, or if the book cannot be added to the specified collection.
  */
 export const addBookToCollection = async (req: AuthenticatedRequest, res: Response) => {
+  console.log("Request received at /addBook with body:", req.body);
   const { collectionId, bookId } = req.body;
   const { email } = req.user;
 

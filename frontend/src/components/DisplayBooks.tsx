@@ -1,23 +1,57 @@
+import React, { useState } from 'react';
 import '../styles/Books.css';
-import { Book } from '../types/type';
+import { Book, Collection } from '../types/type';
+import axios from 'axios';
 
 interface DisplayBooksProps {
   books: Book[];
-  lastBookRef?: (node: HTMLDivElement | null) => void; // Add ref for infinite scroll
+  collections: Collection[];
+  lastBookRef?: (node: HTMLDivElement | null) => void;
+  onBookAdded?: (message: string) => void;
 }
 
 const truncateTitle = (title: string, maxLength: number = 30) => {
   return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
 };
 
-const DisplayBooks: React.FC<DisplayBooksProps> = ({ books, lastBookRef }) => {
+const DisplayBooks: React.FC<DisplayBooksProps> = ({ books, collections, lastBookRef, onBookAdded }) => {
+  const [selectedCollection, setSelectedCollection] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleAddToCollection = async (bookId: number) => {
+    setError(null);
+
+    if (!selectedCollection) {
+      setError('Please select a collection.');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Authorization token is missing. Please log in again.');
+        return;
+      }
+
+      const response = await axios.post(
+        'http://localhost:5000/v1/collection/addBook',
+        { collectionId: selectedCollection, bookId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (onBookAdded) onBookAdded(response.data.message || 'Book added successfully.');
+    } catch (error: any) {
+      setError(error.response?.data?.message || 'An error occurred while adding the book to the collection.');
+    }
+  };
+
   return (
     <div className="book-list">
       {books.map((book, index) => (
         <div
           key={book.id}
           className="card"
-          ref={index === books.length - 1 ? lastBookRef : null} // Attach ref to the last book
+          ref={index === books.length - 1 ? lastBookRef : null}
         >
           <div className="card-image-container">
             {book.image && <img src={book.image} alt={`${book.title} cover`} className="card-image" />}
@@ -26,16 +60,31 @@ const DisplayBooks: React.FC<DisplayBooksProps> = ({ books, lastBookRef }) => {
             {truncateTitle(book.title)}
           </div>
           <div className="card-content">
-            {book.authors && <p>By: {book.authors.map(author => author.name).join(", ")}</p>}
+            {book.authors && <p>By: {book.authors.map((author) => author.name).join(', ')}</p>}
             {book.edition && <p>Edition: {book.edition}</p>}
             {book.isbn && <p>ISBN: {book.isbn}</p>}
             {book.language && <p>Language: {book.language}</p>}
-            {book.publicationDate && (
-              <p>Publication Date: {new Date(book.publicationDate).toLocaleDateString()}</p>
-            )}
+            {book.publicationDate && <p>Publication Date: {new Date(book.publicationDate).toLocaleDateString()}</p>}
+          </div>
+          <div className="add-to-collection">
+            <select
+              onChange={(e) => setSelectedCollection(Number(e.target.value))}
+              defaultValue=""
+            >
+              <option value="" disabled>
+                Select Collection
+              </option>
+              {collections.map((collection) => (
+                <option key={collection.id} value={collection.id}>
+                  {collection.name}
+                </option>
+              ))}
+            </select>
+            <button onClick={() => book.id !== undefined && handleAddToCollection(book.id)}>Add to Collection</button>
           </div>
         </div>
       ))}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 };

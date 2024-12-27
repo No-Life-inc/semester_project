@@ -15,7 +15,7 @@ const EditPassword: React.FC = () => {
         setSuccess(null); // Clear previous success messages
 
         try {
-            const token = localStorage.getItem("token"); // Assume JWT token stored in localStorage
+            const token = localStorage.getItem("token");
             if (!token) {
                 setError("Authorization token is missing. Please log in again.");
                 return;
@@ -24,7 +24,7 @@ const EditPassword: React.FC = () => {
             const response = await axios.patch(
                 "http://localhost:5000/v1/user/editPassword",
                 { oldPassword, password: newPassword },
-                { headers: { Authorization: `${token}` } }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
             setSuccess(response.data.message || "Password updated successfully!");

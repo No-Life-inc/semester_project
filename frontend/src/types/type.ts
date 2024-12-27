@@ -45,3 +45,15 @@ export interface Subject {
     name: string;
     // Add other subject attributes as needed
 }
+
+export interface Collection {
+    id: number;
+    name: string;
+    user_id?: User; // Add user_books property for TypeScript
+}
+
+export interface UserBook {
+    id: number;
+    book: Book;
+    user: User;
+}

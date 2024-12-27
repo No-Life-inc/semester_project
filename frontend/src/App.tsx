@@ -20,7 +20,11 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/books" element={<Books />} />
+          <Route path="/books" element={
+            <ProtectedRoute>
+            <Books />
+            </ProtectedRoute>
+          } />
           <Route
           path="/profile"
           element={

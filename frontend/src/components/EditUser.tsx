@@ -28,7 +28,7 @@ const EditUser: React.FC = () => {
       const response = await axios.patch(
         "http://localhost:5000/v1/user/editUser",
         { name, email },
-        { headers: { Authorization: `${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       // Update context with the new user data
