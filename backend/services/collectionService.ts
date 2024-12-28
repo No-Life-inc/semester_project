@@ -167,14 +167,18 @@ export const addBookToCollection = async (
       );
     }
 
-    const userBook = await UserBook.findOne({
+    let userBook = await UserBook.findOne({
       where: { user_id: user.id, book_id: bookId },
       transaction: t,
     });
 
     if (!userBook) {
-      throw new NotFoundError(
-        "UserBook entry not found. Add the book to the user first."
+      userBook = await UserBook.create(
+        {
+          user_id: user.id,
+          book_id: bookId,
+        },
+        { transaction: t }
       );
     }
 
@@ -194,7 +198,7 @@ export const addBookToCollection = async (
           user_book_id: userBook.id,
         },
       ],
-      { returning: false, transaction: t}
+      { returning: false, transaction: t }
     );
 
     await t.commit();
