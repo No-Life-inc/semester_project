@@ -69,6 +69,7 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
     };
 
     const handleRemoveBook = async (collectionId: number, bookId: number) => {
+        console.log("Attempting to remove book:", { collectionId, bookId }); // Log dataen sendt fra frontend
         try {
           const token = localStorage.getItem("token"); 
           await axios.delete("http://localhost:5000/v1/collection/removeBook", {
@@ -77,6 +78,7 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
             },
             data: { collectionId, bookId },
           });
+
           setCollections((prevCollections) =>
             prevCollections.map((collection) =>
               collection.id === collectionId
@@ -89,6 +91,9 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
           );
         } catch (error) {
           console.error("Error removing book from collection:", error);
+          if (axios.isAxiosError(error) && error.response) {
+            console.error("Server response:", error.response.data); // Log serverens svar
+        }
         }
       };
       

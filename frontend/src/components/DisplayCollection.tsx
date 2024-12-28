@@ -21,10 +21,10 @@ const DisplayCollection: React.FC<DisplayCollectionsProps> = ({ collections, onE
                   <button onClick={() => onDelete(collection.id)}>Delete Collection</button>
                   {collection.user_books && collection.user_books.length > 0 ? (
                     <ul>
-                      {collection.user_books.map((book) => (
-                        <li key={book.id}>
-                          {book.book.title}
-                          <button onClick={() => onRemoveBook(collection.id, book.id)}>Remove Book</button>
+                      {collection.user_books.map((userBook) => (
+                        <li key={userBook.id}>
+                          {userBook.book.title}
+                          <button onClick={() => userBook.book.id !== undefined && onRemoveBook(collection.id, userBook.book.id)}>Remove Book</button>
                         </li>
                       ))}
                     </ul>
