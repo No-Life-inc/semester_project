@@ -161,7 +161,11 @@ export const addBookToCollection = async (
       transaction: t,
     });
 
-    if (!collection || collection.userId !== user.id) {
+    if (!collection) {
+      throw new NotFoundError("Collection not found");
+    }
+    
+    if (collection.userId !== user.id) {
       throw new UnauthorizedError(
         "You are not authorized to add a book to this collection"
       );
