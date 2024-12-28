@@ -1,4 +1,5 @@
 import { Schema, model, Types, Document } from 'mongoose';
+import {User} from "./UserModel";
 
 export interface IAuthor {
     name: string;
@@ -52,11 +53,63 @@ const bookSchema = new Schema<IBook>(
     {
         timestamps: true
     }
+
 );
+
+bookSchema.post('findOneAndUpdate', async function (doc) {
+    if (!doc) return;
+
+    const updatedBook = doc.toObject();
+    const { _id, authors, publisher, title, edition, cover_id, isbn, isbn10, isbn13, subjects, language, pages, publication_date, image, title_long, synopsis, msrp, dimensions, binding } = updatedBook;
+
+    try {
+
+        const users = await User.find({ 'books.book_id': _id });
+
+        for (const user of users) {
+            user.books.forEach((userBook) => {
+                if (userBook.book_id.toString() === _id.toString()) {
+                    userBook.embeddedBook = {
+                        authors,
+                        publisher,
+                        title,
+                        edition,
+                        cover_id,
+                        isbn,
+                        isbn10,
+                        isbn13,
+                        subjects,
+                        language,
+                        pages,
+                        publication_date,
+                        image,
+                        title_long,
+                        synopsis,
+                        msrp,
+                        dimensions,
+                        binding,
+                    };
+                }
+            });
+            await user.save();
+        }
+
+        console.log(`Users updated successfully for book ID ${_id}`);
+    } catch (error) {
+        console.error('Error syncing book updates to users:', error);
+    }
+});
+
+
+
 // Add indexes
 bookSchema.index({ title: 1 });
 bookSchema.index({ subjects: 1 });
 //bookSchema.index({ isbn: 1 });
+
+
+
+
 const Book = model<IBook>('Book', bookSchema);
 
 export { Book, IBook };

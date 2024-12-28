@@ -24,9 +24,7 @@ const seedUsers = async (books: HydratedDocument<IBook>[]) => {
                 books: books.slice(0, 3).map((book) => ({
                     book_id: book._id,
                     embeddedBook: {
-                        authors: book.authors.map((author) => ({
-                            name: author?.name || 'Unknown Author',
-                        })),
+                        authors: book.authors,
                         publisher: book.publisher,
                         title: book.title,
                         edition: book.edition,
@@ -55,9 +53,7 @@ const seedUsers = async (books: HydratedDocument<IBook>[]) => {
                         books: books.slice(0, 3).map((book) => ({
                             book_id: book._id,
                             embeddedBook: {
-                                authors: book.authors.map((author) => ({
-                                    name: author?.name || 'Unknown Author',
-                                })),
+                                authors: book.authors,
                                 publisher: book.publisher,
                                 title: book.title,
                                 edition: book.edition,
@@ -89,9 +85,7 @@ const seedUsers = async (books: HydratedDocument<IBook>[]) => {
                 books: books.slice(3, 6).map((book) => ({
                     book_id: book._id,
                     embeddedBook: {
-                        authors: book.authors.map((author) => ({
-                            name: author?.name || 'Unknown Author',
-                        })),
+                        authors: book.authors,
                         publisher: book.publisher,
                         title: book.title,
                         edition: book.edition,
@@ -120,9 +114,7 @@ const seedUsers = async (books: HydratedDocument<IBook>[]) => {
                         books: books.slice(3, 6).map((book) => ({
                             book_id: book._id,
                             embeddedBook: {
-                                authors: book.authors.map((author) => ({
-                                    name: author?.name || 'Unknown Author',
-                                })),
+                                authors: book.authors,
                                 publisher: book.publisher,
                                 title: book.title,
                                 edition: book.edition,
@@ -154,9 +146,7 @@ const seedUsers = async (books: HydratedDocument<IBook>[]) => {
                 books: books.slice(6, 9).map((book) => ({
                     book_id: book._id,
                     embeddedBook: {
-                        authors: book.authors.map((author) => ({
-                            name: author?.name || 'Unknown Author',
-                        })),
+                        authors: book.authors,
                         publisher: book.publisher,
                         title: book.title,
                         edition: book.edition,
@@ -185,9 +175,7 @@ const seedUsers = async (books: HydratedDocument<IBook>[]) => {
                         books: books.slice(6, 9).map((book) => ({
                             book_id: book._id,
                             embeddedBook: {
-                                authors: book.authors.map((author) => ({
-                                    name: author?.name || 'Unknown Author',
-                                })),
+                                authors: book.authors,
                                 publisher: book.publisher,
                                 title: book.title,
                                 edition: book.edition,

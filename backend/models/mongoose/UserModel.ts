@@ -30,7 +30,6 @@ interface IUserBook {
     tags: string[];
 }
 
-
 interface ICollection {
     _id?: Types.ObjectId;
     name: string;
@@ -54,7 +53,7 @@ export interface IUser extends Document {
 
 const embeddedBookSchema = new Schema<IEmbeddedBook>(
     {
-        authors: [{ name: { type: String, required: true } }],
+        authors: [ { type: String, required: true } ],
         publisher: { type: String, required: true },
         title: { type: String, required: true },
         edition: { type: String },
