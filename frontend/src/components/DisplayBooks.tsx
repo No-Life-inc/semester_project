@@ -38,7 +38,6 @@ const DisplayBooks: React.FC<DisplayBooksProps> = ({ books, collections, lastBoo
         { collectionId: selectedCollection, bookId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log(response.data.message);
       if (onBookAdded) onBookAdded(response.data.message || 'Book added successfully.');
     } catch (error: any) {
       setError(error.response?.data?.message || 'An error occurred while adding the book to the collection.');

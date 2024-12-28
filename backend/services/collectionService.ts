@@ -226,8 +226,6 @@ export const removeBookFromCollection = async (
 ) => {
   const t = await sequelize.transaction();
   try {
-    console.log("Removing book with data:", { email, collectionId, bookId }); // Log inddata
-
     const user = await User.findOne({ where: { email }, transaction: t });
 
     if (!user) {
@@ -239,17 +237,10 @@ export const removeBookFromCollection = async (
     });
 
     if (!collection) {
-      console.error("Collection not found for ID:", collectionId); // Log hvis samlingen ikke findes
       throw new NotFoundError("Collection not found");
     }
     
     if (collection.userId !== user.id) {
-      console.error(
-        "Unauthorized access: User ID:",
-        user.id,
-        "Collection User ID:",
-        collection.userId
-      );
       throw new UnauthorizedError(
         "You are not authorized to remove a book from this collection"
       );
@@ -261,7 +252,6 @@ export const removeBookFromCollection = async (
     });
 
     if (!userBook) {
-      console.error("UserBook not found for user_id:", user.id, "book_id:", bookId); // Log hvis UserBook ikke findes
       throw new NotFoundError("UserBook entry not found");
     }
 
@@ -271,10 +261,6 @@ export const removeBookFromCollection = async (
     });
 
     if (!collectionEntry) {
-      console.error(
-        "Book not found in collection:",
-        { collectionId, userBookId: userBook.id }
-      ); 
       throw new NotFoundError("Book not found in the collection");
     }
 

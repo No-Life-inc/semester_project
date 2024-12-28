@@ -69,7 +69,6 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
     };
 
     const handleRemoveBook = async (collectionId: number, bookId: number) => {
-        console.log("Attempting to remove book:", { collectionId, bookId }); // Log dataen sendt fra frontend
         try {
           const token = localStorage.getItem("token"); 
           await axios.delete("http://localhost:5000/v1/collection/removeBook", {
