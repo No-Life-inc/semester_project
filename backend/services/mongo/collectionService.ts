@@ -113,7 +113,7 @@ export const updateCollectionService = async (
  * @throws NotFoundError - If the user is not found.
  */
 export const getUserCollectionsService = async (email: string) => {
-    const user = await User.findOne({ email }).populate("collections.books");
+    const user = await User.findOne({ email }).populate("collections.books.book_id");
     if (!user) {
         throw new NotFoundError("User not found");
     }
@@ -143,8 +143,8 @@ export const addBookToCollectionService = async (
         throw new NotFoundError("User not found.");
     }
 
-    const bookOwned = user.books.some((userBook) => userBook.book_id.equals(bookId));
-    if (!bookOwned) {
+    const userBook = user.books.find((ub) => ub.book_id.equals(bookId));
+    if (!userBook) {
         throw new ValidationError("User must own the book before adding it to a collection.");
     }
 
@@ -153,13 +153,16 @@ export const addBookToCollectionService = async (
         throw new NotFoundError("Collection not found.");
     }
 
-    if (collection.books.some((b) => b.equals(bookId))) {
+    if (collection.books.some((b) => b.book_id.equals(bookId))) {
         throw new ValidationError("Book already exists in the collection.");
     }
 
-    collection.books.push(new Types.ObjectId(bookId));
-    await user.save();
+    collection.books.push({
+        book_id: userBook.book_id,
+        embeddedBook: userBook.embeddedBook,
+    });
 
+    await user.save();
     return collection;
 };
 
@@ -194,7 +197,7 @@ export const removeBookFromCollectionService = async (
     }
 
 
-    const bookIndex = collection.books.findIndex((b) => b.toString() === bookId);
+    const bookIndex = collection.books.findIndex((b) => b.book_id.toString() === bookId);
     if (bookIndex === -1) {
         throw new NotFoundError("Book not found in the collection");
     }
