@@ -62,12 +62,36 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
             const response = await axios.get("http://localhost:5000/v1/collection", {
                 headers: { Authorization: `Bearer ${token}` },
             });
-
             setCollections(response.data);
         } catch (error: any) {
             setError(error.response?.data?.message || "An error occurred while fetching collections.");
         }
     };
+
+    const handleRemoveBook = async (collectionId: number, bookId: number) => {
+        try {
+          const token = localStorage.getItem("token"); 
+          await axios.delete("http://localhost:5000/v1/collection/removeBook", {
+            headers: {
+              Authorization: `Bearer ${token}`, 
+            },
+            data: { collectionId, bookId },
+          });
+          setCollections((prevCollections) =>
+            prevCollections.map((collection) =>
+              collection.id === collectionId
+                ? {
+                    ...collection,
+                    user_books: collection.user_books.filter((book) => book.book.id !== bookId),
+                  }
+                : collection
+            )
+          );
+        } catch (error) {
+          console.error("Error removing book from collection:", error);
+        }
+      };
+      
 
     const handleEdit = (collection: Collection) => {
         setEditingCollection(collection);
@@ -125,6 +149,7 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
                     collections={collections}
                     onEdit={handleEdit}
                     onDelete={handleDeleteCollection}
+                    onRemoveBook={handleRemoveBook}
                 />
             )}
         </div>

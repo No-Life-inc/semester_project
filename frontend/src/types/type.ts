@@ -49,7 +49,7 @@ export interface Subject {
 export interface Collection {
     id: number;
     name: string;
-    user_id?: User; // Add user_books property for TypeScript
+    user_books: UserBook[];
 }
 
 export interface UserBook {
