@@ -7,15 +7,13 @@ import mongoose from "mongoose";
  * Fetch books owned by the user.
  */
 export const getUserBooks = async (email: string, page: number = 1, limit: number = 50) => {
+    const skip = (page - 1) * limit;
+
     const user = await User.findOne({ email })
-        .populate({
-            path: "books.book_id",
-            options: {
-                skip: (page - 1) * limit,
-                limit,
-            },
+        .select({
+            books: { $slice: [skip, limit] }, // Begræns antallet af bøger med $slice
         })
-        .exec();
+        .lean();
 
     if (!user) {
         throw new NotFoundError("User not found.");
@@ -44,10 +42,36 @@ export const addBookToUser = async (email: string, bookId: string) => {
         throw new ValidationError("User already owns this book.");
     }
 
-    // Add the book to user's books
-    user.books.push({ _id: new mongoose.Types.ObjectId(), book_id: book._id, tags: [] });
-    await user.save();
+    // Build embeddedBook from the fields in the book document
+    const embeddedBook = {
+        authors: book.authors,            // or map them if needed
+        publisher: book.publisher,
+        title: book.title,
+        isbn: book.isbn,
+        isbn10: book.isbn10,
+        isbn13: book.isbn13,
+        subjects: book.subjects,
+        language: book.language,
+        pages: book.pages,
+        publication_date: book.publication_date,
+        image: book.image,
+        title_long: book.title_long,
+        synopsis: book.synopsis,
+        msrp: book.msrp,
+        dimensions: book.dimensions,
+        binding: book.binding,
+        edition: book.edition
+    };
 
+    // Now include 'embeddedBook' in the push
+    user.books.push({
+        _id: new mongoose.Types.ObjectId(),
+        book_id: book._id,
+        tags: [],
+        embeddedBook: embeddedBook,
+    });
+
+    await user.save();
     return user.books;
 };
 
@@ -60,12 +84,13 @@ export const removeBookFromUser = async (email: string, userBookId: string) => {
         throw new NotFoundError("User not found.");
     }
 
-    // Match the `userBookId` to the `_id` of the user-book object
+    // Find the index of the book using a type-safe comparison
     const bookIndex = user.books.findIndex((userBook) =>
-        userBook._id.toString() === userBookId
+        userBook._id.toString() === userBookId // Ensure both are strings for comparison
     );
 
     if (bookIndex === -1) {
+        console.log(`Book ID ${userBookId} not found in user's collection. User's books:`, user.books.map(book => book._id.toString()));
         throw new NotFoundError("Book not found in user's collection.");
     }
 

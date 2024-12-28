@@ -1,6 +1,10 @@
-import {getBookByISBN, getBooks, getBooksBySubjectText, getBooksByTitle} from "../../services/mongo/bookService";
+import {
+    getBookByISBN,
+    getBooks,
+    getBooksBySubjectName, // Bemærk ændring her
+    getBooksByTitle,
+} from "../../services/mongo/bookService";
 import { Request, Response } from "express";
-
 
 /**
  * Get all books with optional pagination.
@@ -14,21 +18,22 @@ export const getBooksController = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-}
-
+};
 
 /**
  * Get books by subject name.
  */
-export const getBooksBySubjectTextController = async (req: Request, res: Response) => {
+export const getBooksBySubjectNameController = async (req: Request, res: Response) => {
     const { subject } = req.query;
 
     try {
-        if (!subject || typeof subject !== 'string') {
-            return res.status(400).json({ error: 'Subject query parameter is required and must be a string' });
+        if (!subject || typeof subject !== "string") {
+            return res.status(400).json({
+                error: "Subject query parameter is required and must be a string",
+            });
         }
 
-        const books = await getBooksBySubjectText(subject);
+        const books = await getBooksBySubjectName(subject); // Bemærk ændring her
         res.status(200).json(books);
     } catch (error) {
         res.status(404).json({ error: error.message });
@@ -36,15 +41,16 @@ export const getBooksBySubjectTextController = async (req: Request, res: Respons
 };
 
 /**
- * Get books by ISBN
+ * Get books by ISBN.
  */
 export const getBookByISBNController = async (req: Request, res: Response) => {
     const { isbn } = req.query;
 
     try {
-        console.log(isbn)
-        if (!isbn || typeof isbn !== 'string') {
-            return res.status(400).json({ error: 'ISBN parameter is required and must be a string' });
+        if (!isbn || typeof isbn !== "string") {
+            return res.status(400).json({
+                error: "ISBN parameter is required and must be a string",
+            });
         }
 
         const book = await getBookByISBN(isbn);
@@ -52,27 +58,19 @@ export const getBookByISBNController = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(404).json({ error: error.message });
     }
-}
+};
 
-// getBooksByTitle
 /**
- * Fetches books from the MongoDB database by title.
- *
- * @param title - The title to search for.
- *
- * @returns A list of books.
- * @throws NotFoundError if no books are found.
- *
- * @example
- * const books = await getBooksByTitle("math");
- * // Fetches books with titles containing the text "math".
+ * Get books by title.
  */
 export const getBooksByTitleController = async (req: Request, res: Response) => {
     const { title } = req.query;
 
     try {
-        if (!title || typeof title !== 'string') {
-            return res.status(400).json({ error: 'Title query parameter is required and must be a string' });
+        if (!title || typeof title !== "string") {
+            return res.status(400).json({
+                error: "Title query parameter is required and must be a string",
+            });
         }
 
         const books = await getBooksByTitle(title);
@@ -80,4 +78,4 @@ export const getBooksByTitleController = async (req: Request, res: Response) => 
     } catch (error) {
         res.status(404).json({ error: error.message });
     }
-}
+};

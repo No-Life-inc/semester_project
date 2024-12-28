@@ -20,7 +20,7 @@ app.use(express.json());
 async function startServer() {
   try {
 
-    // await connectMongoDB();
+    await connectMongoDB();
 
     await setupDatabase();
 
