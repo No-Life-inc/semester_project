@@ -29,6 +29,9 @@ export const createCollection = async (req: AuthenticatedRequest, res: Response)
     if (!name) {
       throw new ValidationError("Collection name is required");
     }
+    if (name.length > 255) {
+      return res.status(422).json({ message: "Collection name must be between 1 and 255 characters" });
+    }
 
     const newCollection = await CollectionService.createCollection(name, email);
     res.status(201).json(newCollection);

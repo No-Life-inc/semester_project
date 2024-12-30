@@ -25,6 +25,10 @@ export const createCollection = async (name: string, email: string) => {
     throw new ValidationError("Collection name is required");
   }
 
+  if (name.length > 255) {
+    throw new ValidationError("Collection name must be between 1 and 255 characters");
+  }
+
   const user = await User.findOne({ where: { email } });
 
   if (!user) {

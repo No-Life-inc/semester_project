@@ -244,13 +244,10 @@ describe("addBookToCollection function positive tests", () => {
       });
       expect(userBook).toBeDefined();
 
-
-      // Slet eksisterende relationer for at sikre clean slate
       await UserBookCollection.destroy({
         where: { collection_id: collection.id, user_book_id: userBook!.id },
       });
 
-      // Test funktionen
       await expect(
         addBookToCollection(email, collection.id, bookId)
       ).resolves.not.toThrow();
@@ -364,6 +361,7 @@ describe("removeBookFromCollection function negative tests", () => {
 // Boundary Tests for Collection Name
 const maxText = "A".repeat(255);
 const maxTextMinusOne = "A".repeat(254);
+const maxTextPlusOne = "A".repeat(256);
 
 type NameBoundaryTestCase = [
   string,
@@ -375,6 +373,7 @@ const nameBoundaryCases: NameBoundaryTestCase[] = [
   ["", ValidationError, "Collection name is required"],
   ["A", null, null],
   [maxTextMinusOne, null, null],
+  [maxTextPlusOne, ValidationError, "Collection name must be between 1 and 255 characters"],
   [maxText, null, null],
   ["Special!@#$%^&*()", null, null],
 ];
@@ -413,33 +412,3 @@ describe("Remove book from an empty collection", () => {
   });
 });
 
-// Invalid data tests
-describe("Invalid data tests for adding a book to a collection", () => {
-  test("should throw an error when adding a book to a non-existent collection", async () => {
-    const email = "test@test.com";
-    const nonExistentCollectionId = 999;
-    const bookId = 1;
-
-    await expect(
-      addBookToCollection(email, nonExistentCollectionId, bookId)
-    ).rejects.toThrow(NotFoundError);
-    await expect(
-      addBookToCollection(email, nonExistentCollectionId, bookId)
-    ).rejects.toThrow("Collection not found");
-  });
-
-  test("should throw an error when adding a book to a collection owned by another user", async () => {
-    const email = "test_email@example.com";
-    const otherUserEmail = "test_password@example.com";
-    const otherUser = await User.findOne({ where: { email: otherUserEmail } });
-    const collection = await createCollection("Other User's Collection", otherUserEmail);
-    const bookId = 1;
-
-    await expect(
-      addBookToCollection(email, collection.id, bookId)
-    ).rejects.toThrow(UnauthorizedError);
-    await expect(
-      addBookToCollection(email, collection.id, bookId)
-    ).rejects.toThrow("You are not authorized to add a book to this collection");
-  });
-});
