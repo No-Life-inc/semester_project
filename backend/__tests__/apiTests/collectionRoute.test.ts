@@ -31,7 +31,6 @@ app.use(express.json());
 app.use("/collections", collectionRoutes);
 
 
-
 // Positive Tests for GET /collections
 test.each([
     ["should fetch collections for User 1", () => getUserToken(0), 200, true],
@@ -54,11 +53,11 @@ test.each([
     }
   );
 
-  // Negative Tests for GET /collections
+ // Negative Tests for GET /collections
 describe("Collection Routes - Get Collections Negative tests", () => {
     test.each([
-      ["should return 401 for missing token", null, 401, { message: "Authentication token is required" }],
-      ["should return 401 for invalid token", "invalidToken", 401, { message: "Invalid token" }],
+      ["should return 401 for missing token", null, 401, { message: "Token not provided" }],
+      ["should return 401 for invalid token", "invalidToken", 401, { message: "Invalid or expired token" }],
     ])(
       "%s",
       async (description, token, expectedStatus, expectedBody) => {
