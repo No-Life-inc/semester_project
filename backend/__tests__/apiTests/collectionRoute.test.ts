@@ -34,7 +34,6 @@ const app = express();
 app.use(express.json());
 app.use("/collections", collectionRoutes);
 
-
 // Positive Tests for GET /collections
 describe("Collection Routes - Get Collections Positive tests", () => {
   test.each([
@@ -86,40 +85,270 @@ describe("Collection Routes - Get Collections Negative tests", () => {
 
 // Positive Tests for POST /collections
 describe("Collection Routes - POST /collections Positive Tests", () => {
-    test.each([
-      ["should create a collection with a valid name", { name: "Test Collection" }, () => getUserToken(0), 201],
-      ["should create a collection with minimum length name", { name: "A" }, () => getUserToken(0), 201],
-      ["should create a collection with maximum length name", { name: "A".repeat(255) }, () => getUserToken(0), 201],
-    ])(
-      "%s",
-      async (description, payload, getTokenFn, expectedStatus) => {
-        const token = getTokenFn();
-        const response = await request(app)
-          .post("/collections")
-          .set("Authorization", `Bearer ${token}`)
-          .send(payload);
-  
-        expect(response.status).toBe(expectedStatus);
-        expect(response.body).toHaveProperty("id");
-        expect(response.body.name).toBe(payload.name);
-      }
-    );
-  });
+  test.each([
+    [
+      "should create a collection with a valid name",
+      { name: "Test Collection" },
+      () => getUserToken(0),
+      201,
+    ],
+    [
+      "should create a collection with minimum length name",
+      { name: "A" },
+      () => getUserToken(0),
+      201,
+    ],
+    [
+      "should create a collection with maximum length name",
+      { name: "A".repeat(255) },
+      () => getUserToken(0),
+      201,
+    ],
+  ])("%s", async (description, payload, getTokenFn, expectedStatus) => {
+    const token = getTokenFn();
+    const response = await request(app)
+      .post("/collections")
+      .set("Authorization", `Bearer ${token}`)
+      .send(payload);
 
-  // Negative Tests for POST /collections
-  describe("Collection Routes - POST /collections Negative Tests", () => {
+    expect(response.status).toBe(expectedStatus);
+    expect(response.body).toHaveProperty("id");
+    expect(response.body.name).toBe(payload.name);
+  });
+});
+
+// Negative Tests for POST /collections
+describe("Collection Routes - POST /collections Negative Tests", () => {
+  test.each([
+    [
+      "should return 422 for missing name",
+      {},
+      () => getUserToken(0),
+      422,
+      { message: "Collection name is required" },
+    ],
+    [
+      "should return 422 for empty name",
+      { name: "" },
+      () => getUserToken(0),
+      422,
+      { message: "Collection name is required" },
+    ],
+    [
+      "should return 422 for name exceeding max length",
+      { name: "A".repeat(256) },
+      () => getUserToken(0),
+      422,
+      { message: "Collection name must be between 1 and 255 characters" },
+    ],
+    [
+      "should return 401 for missing token",
+      { name: "Valid Name" },
+      () => null,
+      401,
+      { message: "Token not provided" },
+    ],
+    [
+      "should return 401 for invalid token",
+      { name: "Valid Name" },
+      () => "invalidToken",
+      401,
+      { message: "Invalid or expired token" },
+    ],
+  ])(
+    "%s",
+    async (description, payload, getTokenFn, expectedStatus, expectedBody) => {
+      const token = getTokenFn();
+      const response = await request(app)
+        .post("/collections")
+        .set("Authorization", token ? `Bearer ${token}` : "")
+        .send(payload);
+
+      expect(response.status).toBe(expectedStatus);
+      if (expectedBody) {
+        expect(response.body).toMatchObject(expectedBody);
+      }
+    }
+  );
+});
+
+// Positive Tests for POST /addBook
+describe("Collection Routes - POST /addBook Positive Tests", () => {
+  test.each([
+    [
+      "should add a book to a collection",
+      { collectionId: 1, bookId: 3 },
+      () => getUserToken(0),
+      201,
+      { message: "Book added to collection successfully" },
+    ],
+    [
+      "should add another book to a collection",
+      { collectionId: 1, bookId: 2 },
+      () => getUserToken(0),
+      201,
+      { message: "Book added to collection successfully" },
+    ],
+  ])(
+    "%s",
+    async (description, payload, getTokenFn, expectedStatus, expectedBody) => {
+      const token = getTokenFn();
+      const response = await request(app)
+        .post("/collections/addBook")
+        .set("Authorization", `Bearer ${token}`)
+        .send(payload);
+
+      expect(response.status).toBe(expectedStatus);
+      expect(response.body).toMatchObject(expectedBody);
+    }
+  );
+});
+
+// Negative Tests for POST /addBook
+describe("Collection Routes - POST /addBook Negative Tests", () => {
+  test.each([
+    [
+      "should return 400 for missing collectionId",
+      { bookId: 1 },
+      () => getUserToken(0),
+      400,
+      { message: "Collection ID is required" },
+    ],
+    [
+      "should return 400 for missing bookId",
+      { collectionId: 1 },
+      () => getUserToken(0),
+      400,
+      { message: "Book ID is required" },
+    ],
+    [
+      "should return 401 for missing token",
+      { collectionId: 1, bookId: 3 },
+      () => null,
+      401,
+      { message: "Token not provided" },
+    ],
+    [
+      "should return 401 for invalid token",
+      { collectionId: 1, bookId: 3 },
+      () => "invalidToken",
+      401,
+      { message: "Invalid or expired token" },
+    ],
+    [
+      "should return 404 for non-existent collection",
+      { collectionId: 999, bookId: 1 },
+      () => getUserToken(0),
+      404,
+      { message: "Collection not found" },
+    ],
+    [
+      "should return 422 for duplicate book in collection",
+      { collectionId: 1, bookId: 1 },
+      () => getUserToken(0),
+      422,
+      { message: "Book already exists in the collection" },
+    ],
+  ])(
+    "%s",
+    async (description, payload, getTokenFn, expectedStatus, expectedBody) => {
+      const token = getTokenFn();
+      const response = await request(app)
+        .post("/collections/addBook")
+        .set("Authorization", token ? `Bearer ${token}` : "")
+        .send(payload);
+
+      expect(response.status).toBe(expectedStatus);
+      if (expectedBody) {
+        expect(response.body).toMatchObject(expectedBody);
+      }
+    }
+  );
+});
+
+// Positive Tests for DELETE /removeBook
+describe("Collection Routes - DELETE /removeBook Positive Tests", () => {
+  test.each([
+    [
+      "should remove a book from a collection successfully",
+      { collectionId: 1, bookId: 1 },
+      () => getUserToken(0),
+      200,
+      { message: "Book removed from collection successfully" },
+    ],
+    [
+      "should remove another book from a collection successfully",
+      { collectionId: 1, bookId: 2 },
+      () => getUserToken(0),
+      200,
+      { message: "Book removed from collection successfully" },
+    ],
+  ])(
+    "%s",
+    async (description, payload, getTokenFn, expectedStatus, expectedBody) => {
+      const token = getTokenFn();
+      const response = await request(app)
+        .delete("/collections/removeBook")
+        .set("Authorization", `Bearer ${token}`)
+        .send(payload);
+
+      expect(response.status).toBe(expectedStatus);
+      expect(response.body).toMatchObject(expectedBody);
+    }
+  );
+});
+
+// Negative Tests for DELETE /removeBook
+describe("Collection Routes - DELETE /removeBook Negative Tests", () => {
     test.each([
-      ["should return 422 for missing name", {}, () => getUserToken(0), 422, { message: "Collection name is required" }],
-      ["should return 422 for empty name", { name: "" }, () => getUserToken(0), 422, { message: "Collection name is required" }],
-      ["should return 422 for name exceeding max length", { name: "A".repeat(256) }, () => getUserToken(0), 422, { message: "Collection name must be between 1 and 255 characters" }],
-      ["should return 401 for missing token", { name: "Valid Name" }, () => null, 401, { message: "Token not provided" }],
-      ["should return 401 for invalid token", { name: "Valid Name" }, () => "invalidToken", 401, { message: "Invalid or expired token" }],
+      [
+        "should return 400 for missing collectionId",
+        { bookId: 1 },
+        () => getUserToken(0),
+        400,
+        { message: "Collection ID is required" },
+      ],
+      [
+        "should return 400 for missing bookId",
+        { collectionId: 1 },
+        () => getUserToken(0),
+        400,
+        { message: "Book ID is required" },
+      ],
+      [
+        "should return 401 for missing token",
+        { collectionId: 1, bookId: 1 },
+        () => null,
+        401,
+        { message: "Token not provided" },
+      ],
+      [
+        "should return 401 for invalid token",
+        { collectionId: 1, bookId: 1 },
+        () => "invalidToken",
+        401,
+        { message: "Invalid or expired token" },
+      ],
+      [
+        "should return 404 for non-existent collection",
+        { collectionId: 999, bookId: 1 },
+        () => getUserToken(0),
+        404,
+        { message: "Collection not found" },
+      ],
+      [
+        "should return 404 for book not in collection",
+        { collectionId: 1, bookId: 999 },
+        () => getUserToken(0),
+        404,
+        { message: "UserBook entry not found" },
+      ],
     ])(
       "%s",
       async (description, payload, getTokenFn, expectedStatus, expectedBody) => {
         const token = getTokenFn();
         const response = await request(app)
-          .post("/collections")
+          .delete("/collections/removeBook")
           .set("Authorization", token ? `Bearer ${token}` : "")
           .send(payload);
   
@@ -130,3 +359,4 @@ describe("Collection Routes - POST /collections Positive Tests", () => {
       }
     );
   });
+  
