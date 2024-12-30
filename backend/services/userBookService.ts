@@ -19,7 +19,7 @@ import { NotFoundError, UnauthorizedError, ValidationError } from "../utility/er
  */
 export const getUserBooks = async (email: string, page: number = 1, limit: number = 50): Promise<UserBook[]> => {
     
-    if (email === null || email === undefined) {
+    if (email === null || email === undefined || typeof email !== "string") {
         throw new ValidationError("Invalid email. Email must be a string.");
     }
 
@@ -34,6 +34,7 @@ export const getUserBooks = async (email: string, page: number = 1, limit: numbe
     if (limit > 100) {
         throw new ValidationError("Invalid limit. Limit must be a number less than or equal to 100.");
     }
+
 
     const offset = (page - 1) * limit;
 
@@ -68,14 +69,14 @@ export const getUserBooks = async (email: string, page: number = 1, limit: numbe
  * @returns {Promise<void>} - A promise that resolves when the book is added to the user's collection.
  * 
  * @example
- * addBookToUser(1, 1)
- * // This will add the book with ID 1 to the user with ID 1.
+ * addBookToUser("email@email.com", 1)
+ * // This will add the book with ID 1 to the user with the specified email.
  */
 export const addBookToUser = async (email: string, bookId: number): Promise<UserBook> => {
 
     try {
 
-        if (email === null || email === undefined) {
+        if (email === null || email === undefined || typeof email !== "string") {
             throw new ValidationError("Invalid email. Email must be a string.");
         }
 
@@ -85,12 +86,14 @@ export const addBookToUser = async (email: string, bookId: number): Promise<User
 
         const book = await Book.findByPk(bookId);
         if (!book) {
+            console.log("Book not found");
             throw new NotFoundError("Book not found");
         }
 
         const user = await User.findOne({ where: { email } });
         if (!user) {
-            throw new NotFoundError("User not found");
+            console.log("User not found");
+            throw new ValidationError("User not found");
         }
 
         // Check if the user already has the book in their collection
@@ -121,27 +124,36 @@ export const addBookToUser = async (email: string, bookId: number): Promise<User
  * Removes a book from a user's collection.
  * 
  * @param {string} email - The email of the user to remove the book from.
- * @param {number} userBookId - The ID of the userBook entry to remove.
+ * @param {number} bookId - The ID of the userBook entry to remove.
  * @returns {Promise<boolean>} - A promise that resolves to true if the book was removed, false otherwise.
  * 
  * @example
  * removeBookFromUser(1)
  * // This will remove the userBook entry with ID 1.
  */
-export const removeBookFromUser = async (email: string, userBookId: number): Promise<boolean> => {
+export const removeBookFromUser = async (email: string, bookId: number): Promise<boolean> => {
     try {
 
-        if (email === null || email === undefined) {
+        if (email === null || email === undefined || typeof email !== "string") {
             throw new ValidationError("Invalid email. Email must be a string.");
         }
 
-        if (isNaN(userBookId) || userBookId < 1) {
-            throw new ValidationError("Invalid userBook id. UserBook id must be a number greater than or equal to 1.");
+        if (isNaN(bookId) || bookId < 1) {
+            throw new ValidationError("Invalid Book id. Book id must be a number greater than or equal to 1.");
         }
 
         const user = await User.findOne({ where: { email } });
+        if (!user) {
+            console.log("User not found");
+            throw new ValidationError("User not found");
+        }
 
-        const userBook = await UserBook.findByPk(userBookId);
+        const userBook = await UserBook.findOne({
+            where: {
+                user_id: user.id,
+                book_id: bookId,
+            },
+        });
         if (!userBook) {
             throw new NotFoundError("UserBook not found");
         }

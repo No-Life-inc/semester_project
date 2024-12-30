@@ -15,11 +15,15 @@ import { AuthenticatedRequest } from "../types/authenticatedRequest";
  * // This will fetch the first 50 user books for user with ID 1.
  */
 export const getUserBooksController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-    const { page, limit } = req.query;
+    const { page = "1", limit = "50" } = req.query;
     const { email } = req.user;
 
     try {
-        const result = await getUserBooks(email, Number(page), Number(limit));
+
+        const pageNumber = parseInt(page as string, 10);
+        const limitNumber = parseInt(limit as string, 10);
+
+        const result = await getUserBooks(email, pageNumber, limitNumber);
         res.status(200).json(result);
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -65,11 +69,11 @@ export const addBookToUserController = async (req: AuthenticatedRequest, res: Re
  * // This will remove the userBook with id 1 from the user's collection.
  */
 export const removeBookFromUserController = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-    const { userBookId } = req.params;
+    const { bookId } = req.params;
     const { email } = req.user;
 
     try {
-        const success = await removeBookFromUser(email, Number(userBookId));
+        const success = await removeBookFromUser(email, Number(bookId));
         if (success) {
             res.status(200).json({ message: "Book removed from user successfully" });
         } else {

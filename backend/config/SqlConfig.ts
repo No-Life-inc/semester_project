@@ -17,7 +17,6 @@ const sequelize = new Sequelize(
                 trustServerCertificate: true,
             },
         },
-        logging: console.log,
     }
 );
 
