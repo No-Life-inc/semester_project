@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import {addTagToBook, deleteTagFromBook} from "../services/userBookTagService";
+import {addTagToBook, deleteTagFromBook, getTagsForBook } from "../services/userBookTagService";
 
 /**
  * Adds a tag to a book.
@@ -17,6 +17,9 @@ import {addTagToBook, deleteTagFromBook} from "../services/userBookTagService";
  */
 export const addTagToBookController = async (request: Request, response: Response) => {
     const { tag_id, user_book_id } = request.body;
+
+    console.log("Received data in controller:", { tag_id, user_book_id }); // Log input
+
 
     try {
         const book = await addTagToBook(tag_id, user_book_id);
@@ -65,4 +68,18 @@ export const deleteTagFromBookController = async (request: Request, response: Re
 //TODO 1: Implement Get all user tags
 
 
+export const getTagsForBookController = async (req: Request, res: Response) => {
+    const { userBookId } = req.params;
 
+    if (!userBookId) {
+        return res.status(400).json({ error: "userBookId is required" });
+    }
+
+    try {
+        const tags = await getTagsForBook(Number(userBookId));
+        res.status(200).json(tags);
+    } catch (error) {
+        console.error("Error fetching tags for book:", error);
+        res.status(500).json({ error: "An error occurred while fetching tags for the book" });
+    }
+};

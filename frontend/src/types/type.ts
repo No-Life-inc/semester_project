@@ -57,3 +57,8 @@ export interface UserBook {
     book: Book;
     user: User;
 }
+
+export interface Tag {
+    id: number;
+    name: string;
+}

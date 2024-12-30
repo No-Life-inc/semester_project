@@ -26,3 +26,38 @@ export const fetchBookById = async (id: number): Promise<Book> => {
     throw error;
   }
 };
+
+export const getAllTags = async () => {
+  const response = await axios.get(`${API_BASE_URL}/tag/`);
+  return response.data;
+};
+
+export const getTagById = async (id: number) => {
+  const response = await axios.get(`${API_BASE_URL}/tag/${id}`);
+  return response.data;
+};
+
+export const createTag = async (name: string) => {
+  const response = await axios.post(`${API_BASE_URL}/tag/`, { name });
+  return response.data;
+};
+
+export const deleteTagById = async (id: number) => {
+  const response = await axios.delete(`${API_BASE_URL}/tag/${id}`);
+  return response.data;
+};
+
+export const addTagToBook = async (userBookId: number, tagId: number) => {
+  return axios.post(`${API_BASE_URL}/userBookTag`, { userBookId, tagId });
+};
+
+export const deleteTagFromBook = async (userBookId: number, tagId: number) => {
+  return axios.delete(`${API_BASE_URL}/userBookTag`, {
+    data: { userBookId, tagId },
+  });
+};
+
+export const getTagsForBook = async (userBookId: number) => {
+  const response = await axios.get(`${API_BASE_URL}/userBookTag/${userBookId}`);
+  return response.data;
+};

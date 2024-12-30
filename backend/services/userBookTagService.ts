@@ -1,6 +1,7 @@
 import {getBookById} from "./bookService";
 import UserBookTag from "../models/sequelize/UserBookTag";
 import {getTagById} from "./tagService";
+import Tag from "../models/sequelize/Tag";
 
 
 //Add docstrings to the following functions'
@@ -15,16 +16,18 @@ import {getTagById} from "./tagService";
  * addTagToBook(1, 1)
  * // This will add the tag with ID 1 to the book with ID 1
  */
-export const addTagToBook = async (tagId: number, bookId: number) => {
+export const addTagToBook = async (tagId: number, userBookId: number) => {
     try{
-        const tag = await getTagById(tagId);
-        const book = await getBookById(bookId);
+        console.log("Validating tag and book existence:", { tagId, userBookId }); // Log input
 
-        if(!tag || !book){
+        const tag = await getTagById(tagId);
+        const userBook = await getBookById(userBookId);
+
+        if(!tag || !userBook){
             throw new Error("Tag or book not found");
         }
 
-        return await UserBookTag.create({tagId: tagId, userBookId: bookId});
+        return await UserBookTag.create({tagId: tagId, userBookId: userBookId});
 
     } catch (error) {
         throw new Error("An error occurred while adding tag to book");
@@ -52,5 +55,17 @@ export const deleteTagFromBook = async (tagId: number, bookId: number) => {
         });
     } catch (error) {
         throw new Error("An error occurred while deleting tag from book");
+    }
+};
+
+export const getTagsForBook = async (userBookId: number) => {
+    try {
+        return await UserBookTag.findAll({
+            where: { userBookId },
+            include: [{ model: Tag, as: "tag" }],
+        });
+    } catch (error) {
+        console.error("Error fetching tags for book:", error);
+        throw error;
     }
 };

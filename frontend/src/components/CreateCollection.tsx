@@ -4,6 +4,7 @@ import axios from "axios";
 import { Collection } from "../types/type";
 import DisplayCollection from "./DisplayCollection";
 import EditCollection from "./EditCollection";
+import { Tag } from "../types/type";
 
 interface CreateCollectionProps {
     onSuccess: (message: string) => void;
@@ -14,9 +15,20 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
     const [collections, setCollections] = useState<Collection[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [editingCollection, setEditingCollection] = useState<Collection | null>(null);
+    const [tagsForBooks, setTagsForBooks] = useState<{ [key: number]: Tag[] }>({});
+    const [availableTags, setAvailableTags] = useState([]);
 
     useEffect(() => {
         fetchCollections();
+    }, []);
+
+    useEffect(() => {
+        const fetchTags = async () => {
+            const response = await axios.get("http://localhost:5000/v1/tag");
+            setAvailableTags(response.data);
+        };
+
+        fetchTags();
     }, []);
 
     const handleCreateCollection = async (e: FormEvent) => {
@@ -95,6 +107,31 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
         }
         }
       };
+
+    // Fetch tags for a specific book
+    const fetchTagsForBook = async (userBookId: number) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/v1/userBookTag/${userBookId}`);
+            setTagsForBooks((prev) => ({ ...prev, [userBookId]: response.data }));
+        } catch (error) {
+            console.error("Error fetching tags for book:", error);
+        }
+    };
+
+    // Add a tag to a specific book
+    const handleAddTag = async (userBookId: number, tagId: number) => {
+        console.log("Adding tag:", { userBookId, tagId });
+        try {
+            await axios.post("http://localhost:5000/v1/userBookTag", {
+                user_book_id: userBookId,
+                tag_id: tagId,
+            });
+            await fetchTagsForBook(userBookId); // Opdater tags
+        } catch (error) {
+            console.error("Error adding tag to book:", error);
+        }
+    };
+    
       
 
     const handleEdit = (collection: Collection) => {
@@ -154,6 +191,10 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
                     onEdit={handleEdit}
                     onDelete={handleDeleteCollection}
                     onRemoveBook={handleRemoveBook}
+                    onFetchTags={fetchTagsForBook}
+                    tagsForBooks={tagsForBooks}
+                    onAddTag={handleAddTag}
+                    availableTags={availableTags}
                 />
             )}
         </div>
