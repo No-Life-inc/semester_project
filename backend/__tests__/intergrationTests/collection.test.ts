@@ -8,7 +8,7 @@ import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import knex from "knex";
 import knexConfig from "../../knexfile";
 import {createCollection, getUserCollections, updateCollection, deleteCollection, addBookToCollection, removeBookFromCollection} from "../../services/collectionService";
-import {ValidationError, NotFoundError, UnauthorizedError} from "../../utility/errors";
+import {ValidationError, NotFoundError, UnauthorizedError, ForbiddenError} from "../../utility/errors";
 import UserBook from "../../models/sequelize/UserBook";
 import User from "../../models/sequelize/User";
 import UserBookCollection from "../../models/sequelize/UserBookCollection";
@@ -200,7 +200,7 @@ type DeleteCollectionNegativeTestCase = [
 const deleteCollectionNegativeCases: DeleteCollectionNegativeTestCase[] = [
   [999, "test_email@example.com", NotFoundError, "Collection not found"],
   [1, "non_existent_user@example.com", NotFoundError, "User not found"],
-  [3, "test_email@example.com", UnauthorizedError, "You are not authorized to delete this collection"],
+  [3, "test_email@example.com", ForbiddenError, "You are not authorized to delete this collection"],
 ];
 
 describe("deleteCollection function negative tests", () => {

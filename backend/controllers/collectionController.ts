@@ -92,6 +92,10 @@ export const updateCollection = async (
       throw new ValidationError("Collection name is required");
     }
 
+    if (name.length > 255) {
+      throw new ValidationError("Collection name exceeds the maximum length of 255 characters");
+    }
+
     const updatedCollection = await CollectionService.updateCollection(
       Number(id),
       name

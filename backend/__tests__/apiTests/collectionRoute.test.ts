@@ -359,4 +359,129 @@ describe("Collection Routes - DELETE /removeBook Negative Tests", () => {
       }
     );
   });
+
+  // Positive Tests for PUT /collections/:id
+describe("Collection Routes - PUT /collections/:id Positive Tests", () => {
+    test.each([
+      ["should update a collection successfully", 1, { name: "Updated Collection Name" }, () => getUserToken(0), 200, { message: "Collection updated successfully" }],
+      ["should update another collection successfully", 2, { name: "Another Updated Name" }, () => getUserToken(1), 200, { message: "Collection updated successfully" }],
+    ])(
+      "%s",
+      async (description, id, payload, getTokenFn, expectedStatus, expectedBody) => {
+        const token = getTokenFn();
+        const response = await request(app)
+          .put(`/collections/${id}`)
+          .set("Authorization", `Bearer ${token}`)
+          .send(payload);
   
+        expect(response.status).toBe(expectedStatus);
+        expect(response.body).toMatchObject(expectedBody);
+      }
+    );
+  });
+  
+  // Negative Tests for PUT /collections/:id
+describe("Collection Routes - PUT /collections/:id Negative Tests", () => {
+    test.each([
+      ["should return 401 for missing token", 1, { name: "Valid Name" }, () => null, 401, { message: "Token not provided" }],
+      ["should return 401 for invalid token", 1, { name: "Valid Name" }, () => "invalidToken", 401, { message: "Invalid or expired token" }],
+      ["should return 404 for non-existent collection", 999, { name: "Valid Name" }, () => getUserToken(0), 404, { message: "Collection not found" }],
+      ["should return 422 for missing name", 1, {}, () => getUserToken(0), 422, { message: "Collection name is required" }],
+      ["should return 422 for empty name", 1, { name: "" }, () => getUserToken(0), 422, { message: "Collection name is required" }],
+      ["should return 422 for name exceeding max length", 1, { name: "A".repeat(256) }, () => getUserToken(0), 422, { message: "Collection name exceeds the maximum length of 255 characters" }],
+    ])(
+      "%s",
+      async (description, id, payload, getTokenFn, expectedStatus, expectedBody) => {
+        const token = getTokenFn();
+        const response = await request(app)
+          .put(`/collections/${id}`)
+          .set("Authorization", token ? `Bearer ${token}` : "")
+          .send(payload);
+  
+        expect(response.status).toBe(expectedStatus);
+        if (expectedBody) {
+          expect(response.body).toMatchObject(expectedBody);
+        }
+      }
+    );
+  });
+  
+  // Positive Tests for DELETE /collections/:id
+describe("Collection Routes - DELETE /collections/:id Positive Tests", () => {
+    test.each([
+      [
+        "should delete a valid collection for User 1",
+        1, // Collection ID
+        () => getUserToken(0),
+        200,
+        { message: "Collection deleted successfully" },
+      ],
+      [
+        "should delete another valid collection for User 2",
+        2,
+        () => getUserToken(1),
+        200,
+        { message: "Collection deleted successfully" },
+      ],
+    ])(
+      "%s",
+      async (description, collectionId, getTokenFn, expectedStatus, expectedBody) => {
+        const token = getTokenFn();
+        const response = await request(app)
+          .delete(`/collections/${collectionId}`)
+          .set("Authorization", `Bearer ${token}`);
+  
+        expect(response.status).toBe(expectedStatus);
+        if (expectedBody) {
+          expect(response.body).toMatchObject(expectedBody);
+        }
+      }
+    );
+  });
+
+  // Negative Tests for DELETE /collections/:id
+describe("Collection Routes - DELETE /collections/:id Negative Tests", () => {
+    test.each([
+      [
+        "should return 401 for missing token",
+        1,
+        () => null,
+        401,
+        { message: "Token not provided" },
+      ],
+      [
+        "should return 401 for invalid token",
+        1,
+        () => "invalidToken",
+        401,
+        { message: "Invalid or expired token" },
+      ],
+      [
+        "should return 404 for non-existent collection",
+        999,
+        () => getUserToken(0),
+        404,
+        { message: "Collection not found" },
+      ],
+      [
+        "should return 403 for unauthorized access to collection",
+        3,
+        () => getUserToken(1),
+        403,
+        { message: "You are not authorized to delete this collection" },
+      ],
+    ])(
+      "%s",
+      async (description, collectionId, getTokenFn, expectedStatus, expectedBody) => {
+        const token = getTokenFn();
+        const response = await request(app)
+          .delete(`/collections/${collectionId}`)
+          .set("Authorization", token ? `Bearer ${token}` : "");
+  
+        expect(response.status).toBe(expectedStatus);
+        if (expectedBody) {
+          expect(response.body).toMatchObject(expectedBody);
+        }
+      }
+    );
+  });

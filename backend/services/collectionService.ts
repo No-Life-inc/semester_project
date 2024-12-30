@@ -8,7 +8,7 @@ import { Transaction } from "sequelize";
 import {
   NotFoundError,
   ValidationError,
-  UnauthorizedError,
+  UnauthorizedError,ForbiddenError
 } from "../utility/errors";
 import { ValidationError as SequelizeValidationError } from "sequelize";
 /**
@@ -118,9 +118,7 @@ export const deleteCollection = async (id: number, email: string) => {
   }
 
   if (collection.userId !== user.id) {
-    throw new UnauthorizedError(
-      "You are not authorized to delete this collection"
-    );
+    throw new ForbiddenError("You are not authorized to delete this collection");
   }
 
   const t = await sequelize.transaction();
