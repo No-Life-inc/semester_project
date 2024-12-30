@@ -26,7 +26,6 @@ export const addTagToBookController = async (request: Request, response: Respons
     }
 }
 
-
 /**
  * Deletes a tag from a book.
  *
@@ -61,8 +60,3 @@ export const deleteTagFromBookController = async (request: Request, response: Re
         response.status(500).json({ error: "An error occurred while deleting tag from book" });
     }
 };
-
-//TODO 1: Implement Get all user tags
-
-
-

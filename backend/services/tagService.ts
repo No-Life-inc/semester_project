@@ -56,12 +56,17 @@ export const addTag = async (name: string) => {
     if (!name) {
         throw new Error("Tag name is required");
     }
-    try{
-        return await Tag.create({name});
-    } catch (error) {
-        throw new Error("An error occurred while creating tag");
+    // check if tag name already exists
+    const tag = await Tag.findOne({ where: { name } });
+    if (tag) {
+        throw new Error("Tag name already exists");
     }
-}
+    const addTag = await Tag.create({ name });
+    if (!addTag) {
+        throw new Error("Tag not created");
+    }
+    return addTag;
+};
 
 /**
  * Delete a tag by its ID.
@@ -75,6 +80,10 @@ export const addTag = async (name: string) => {
  *
  */
 export const deleteTagById = async (id: number) => {
+    if (isNaN(id) || id < 1) {
+        throw new Error("Invalid tag id. Tag id must be a number greater than or equal to 1.");
+    }
+
     try {
         const deletedCount = await Tag.destroy({ where: { id } });
         if (deletedCount === 0) {
@@ -82,6 +91,9 @@ export const deleteTagById = async (id: number) => {
         }
         return deletedCount;
     } catch (error) {
+        if (error.message === "Tag not found") {
+            throw error;
+        }
         throw new Error("An error occurred while deleting tag");
     }
 };
