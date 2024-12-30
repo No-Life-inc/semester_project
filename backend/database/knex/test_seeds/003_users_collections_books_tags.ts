@@ -46,9 +46,11 @@ export async function seed(knex: Knex): Promise<void> {
     await knex("collection_books").insert(userBookCollections);
 
     const tags = await knex("tags").select("id");
-    const userBookTags = insertedUserBooks.map((userBook, index) => ({
-        user_book_id: userBook.id,
-        tag_id: tags[index % tags.length].id,
-    }));
+    const userBookTags = insertedUserBooks.flatMap((userBook) => {
+        return tags.slice(0, 2).map((tag) => ({
+            user_book_id: userBook.id,
+            tag_id: tag.id
+        }));
+    });
     await knex("user_book_tags").insert(userBookTags);
 }
