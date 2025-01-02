@@ -119,19 +119,19 @@ describe("getUserCollections function negative tests", () => {
   );
 });
 
-type UpdateCollectionPositiveTestCase = [number, string];
+type UpdateCollectionPositiveTestCase = [number, string, string];
 
 // Positive test cases for updateCollection
 const updateCollectionPositiveCases: UpdateCollectionPositiveTestCase[] = [
-  [1, "Updated Collection Name"],
-  [2, "Another Valid Name"],
+  [1, "Updated Collection Name", "test_email@example.com"],
+  [2, "Another Valid Name", "test_password@example.com"],
 ];
 
 describe("updateCollection function positive tests", () => {
   test.each(updateCollectionPositiveCases)(
-    "should update collection (id: %d, name: %s)",
-    async (id, name) => {
-      const updatedCollection = await updateCollection(id, name);
+    "should update collection (id: %d, name: %s, email: %s)",
+    async (id, name, email) => {
+      const updatedCollection = await updateCollection(id, name, email);
       expect(updatedCollection).toBeDefined();
       expect(updatedCollection.name).toBe(name);
     }
@@ -142,14 +142,16 @@ type UpdateCollectionNegativeTestCase = [
   number,
   string | null,
   typeof NotFoundError | typeof ValidationError,
+  string,
   string
 ];
 
 // Negative test cases for updateCollection
 const updateCollectionNegativeCases: UpdateCollectionNegativeTestCase[] = [
-  [999, "Non-existent Collection", NotFoundError, "Collection not found"],
-  [1, "", ValidationError, "Validation notEmpty on name failed"],
-  [1, null, ValidationError, "Name cannot be null"],
+  [999, "Non-existent Collection", NotFoundError, "Collection not found", "test_email@example.com"],
+  [1, "", ValidationError, "Validation notEmpty on name failed","test_email@example.com"],
+  [1, null, ValidationError, "Name cannot be null", "test_email@example.com"],
+  [1, "Updated Name", ForbiddenError, "You are not authorized to update this collection", "test@test.com"],
 ];
 
 describe("updateCollection function negative tests", () => {
@@ -159,10 +161,11 @@ describe("updateCollection function negative tests", () => {
       id: number,
       name: string | null,
       errorClass: typeof NotFoundError | typeof ValidationError,
-      errorMessage: string
+      errorMessage: string,
+      email: string
     ) => {
-      await expect(updateCollection(id, name as string)).rejects.toThrow(errorClass);
-      await expect(updateCollection(id, name as string)).rejects.toThrow(errorMessage);
+      await expect(updateCollection(id, name as string, email)).rejects.toThrow(errorClass);
+      await expect(updateCollection(id, name as string, email)).rejects.toThrow(errorMessage);
     }
   );
 });
@@ -333,7 +336,7 @@ type RemoveBookFromCollectionNegativeTestCase = [
 const removeBookFromCollectionNegativeCases: RemoveBookFromCollectionNegativeTestCase[] = [
   ["non_existent_user@example.com", 1, 1, NotFoundError, "User not found"],
   ["test_email@example.com", 999, 1, NotFoundError, "Collection not found"],
-  ["test_email@example.com", 3, 1, UnauthorizedError, "You are not authorized to remove a book from this collection"],
+  ["test_email@example.com", 3, 1, ForbiddenError, "You are not authorized to remove a book from this collection"],
   ["test@test.com", 3, 999, NotFoundError, "UserBook entry not found"],
 ];
 
