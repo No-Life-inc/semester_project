@@ -11,7 +11,6 @@ export const bookSetup = async () => {
 }
 
 export const getBookId = (index: number) => {
-    console.log("Accessing book ID at index:", index, "Current book IDs:", bookIds); // Debugging log
     return bookIds[index];
   };
 
