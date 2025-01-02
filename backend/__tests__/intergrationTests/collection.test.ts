@@ -19,8 +19,7 @@ const testKnex = knex(knexConfig.test);
 
 beforeAll(async ()=>{
   await setupTestDB();
-  const collections = await Collection.findAll();
-  console.log("All Collections in DB:", collections);
+  await Collection.findAll();
 });
 
 afterAll(async ()=>{

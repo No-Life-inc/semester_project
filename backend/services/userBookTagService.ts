@@ -29,7 +29,6 @@ export const addTagToBook = async (tagId: number, bookId: number) => {
         return await UserBookTag.create({tagId: tagId, userBookId: bookId});
 
     } catch (error) {
-        console.log(error);
         throw new Error("An error occurred while adding tag to book");
     }
 }

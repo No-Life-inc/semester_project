@@ -87,7 +87,6 @@ export const loginUser = async (email: string, password: string) => {
  */
 
 export const editUser = async (email: string, name: string, newEmail: string) => {
-    console.log("hej")
     if (name) {
         validateName(name);
     }
@@ -96,8 +95,6 @@ export const editUser = async (email: string, name: string, newEmail: string) =>
     }
 
     const user = await User.findOne({ where: { email: email } });
-
-    console.log(user + " The user")
 
     if (!user) {
         throw new Error("User not found.");
@@ -110,7 +107,6 @@ export const editUser = async (email: string, name: string, newEmail: string) =>
         user.name = name;
     }
 
-    console.log("hejsa" + user)
     await user.save();
     const newToken = generateToken(user);
 

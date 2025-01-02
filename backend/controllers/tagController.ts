@@ -46,7 +46,6 @@ export const getTagByIdController = async (request: Request, response: Response)
         const tag = await getTagById(id);
         response.json(tag);
     } catch (error) {
-        console.error("Error fetching tag:", error);
 
         if (error.message === "Tag not found") {
             return response.status(404).json({ error: error.message });
@@ -112,7 +111,6 @@ export const deleteTagByIdController = async (request: Request, response: Respon
         await deleteTagById(parseInt(id));
         response.json({ message: "Tag deleted successfully" });
     } catch (error) {
-        console.error("Error deleting tag:", error);
 
         if (error.message === "Tag not found") {
             return response.status(404).json({ error: error.message });
