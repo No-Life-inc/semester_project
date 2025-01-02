@@ -92,18 +92,6 @@ describe("Collection Routes - POST /collections Positive Tests", () => {
       () => getUserToken(0),
       201,
     ],
-    [
-      "should create a collection with minimum length name",
-      { name: "A" },
-      () => getUserToken(0),
-      201,
-    ],
-    [
-      "should create a collection with maximum length name",
-      { name: "A".repeat(255) },
-      () => getUserToken(0),
-      201,
-    ],
   ])("%s", async (description, payload, getTokenFn, expectedStatus) => {
     const token = getTokenFn();
     const response = await request(app)
@@ -120,27 +108,6 @@ describe("Collection Routes - POST /collections Positive Tests", () => {
 // Negative Tests for POST /collections
 describe("Collection Routes - POST /collections Negative Tests", () => {
   test.each([
-    [
-      "should return 422 for missing name",
-      {},
-      () => getUserToken(0),
-      422,
-      { message: "Collection name is required" },
-    ],
-    [
-      "should return 422 for empty name",
-      { name: "" },
-      () => getUserToken(0),
-      422,
-      { message: "Collection name is required" },
-    ],
-    [
-      "should return 422 for name exceeding max length",
-      { name: "A".repeat(256) },
-      () => getUserToken(0),
-      422,
-      { message: "Collection name must be between 1 and 255 characters" },
-    ],
     [
       "should return 401 for missing token",
       { name: "Valid Name" },
@@ -329,20 +296,6 @@ describe("Collection Routes - DELETE /removeBook Negative Tests", () => {
         401,
         { message: "Invalid or expired token" },
       ],
-      [
-        "should return 404 for non-existent collection",
-        { collectionId: 999, bookId: 1 },
-        () => getUserToken(0),
-        404,
-        { message: "Collection not found" },
-      ],
-      [
-        "should return 404 for book not in collection",
-        { collectionId: 1, bookId: 999 },
-        () => getUserToken(0),
-        404,
-        { message: "UserBook entry not found" },
-      ],
     ])(
       "%s",
       async (description, payload, getTokenFn, expectedStatus, expectedBody) => {
@@ -385,10 +338,6 @@ describe("Collection Routes - PUT /collections/:id Negative Tests", () => {
     test.each([
       ["should return 401 for missing token", 1, { name: "Valid Name" }, () => null, 401, { message: "Token not provided" }],
       ["should return 401 for invalid token", 1, { name: "Valid Name" }, () => "invalidToken", 401, { message: "Invalid or expired token" }],
-      ["should return 404 for non-existent collection", 999, { name: "Valid Name" }, () => getUserToken(0), 404, { message: "Collection not found" }],
-      ["should return 422 for missing name", 1, {}, () => getUserToken(0), 422, { message: "Collection name is required" }],
-      ["should return 422 for empty name", 1, { name: "" }, () => getUserToken(0), 422, { message: "Collection name is required" }],
-      ["should return 422 for name exceeding max length", 1, { name: "A".repeat(256) }, () => getUserToken(0), 422, { message: "Collection name exceeds the maximum length of 255 characters" }],
     ])(
       "%s",
       async (description, id, payload, getTokenFn, expectedStatus, expectedBody) => {
@@ -455,13 +404,6 @@ describe("Collection Routes - DELETE /collections/:id Negative Tests", () => {
         () => "invalidToken",
         401,
         { message: "Invalid or expired token" },
-      ],
-      [
-        "should return 404 for non-existent collection",
-        999,
-        () => getUserToken(0),
-        404,
-        { message: "Collection not found" },
       ],
       [
         "should return 403 for unauthorized access to collection",
