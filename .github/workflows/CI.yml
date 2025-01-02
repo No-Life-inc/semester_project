@@ -87,7 +87,7 @@ jobs:
           **/controllers/mongo/**,**/controllers/neo4j/**,**/database/**/**,\
           **/dbconnections/MongoConnection.ts,**/dbconnections/Neo4jConnection.ts,\
           **/models/mongoose/**,**/models/neo4j/**,**/routes/mongo/**,**/routes/neo4j/**,\
-          **/services/mongo/**,**/services/neo4j/**,\
+          **/services/mongo/**,**/services/neo4j/**, **/config/**, frontend/**\
             -Dsonar.javascript.lcov.reportPaths=./backend/coverage/lcov.info \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
