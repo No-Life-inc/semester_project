@@ -86,6 +86,7 @@ export const updateCollection = async (
 ) => {
   const { id } = req.params;
   const { name } = req.body;
+  const { email } = req.user;
 
   try {
     if (!name) {
@@ -98,7 +99,8 @@ export const updateCollection = async (
 
     const updatedCollection = await CollectionService.updateCollection(
       Number(id),
-      name
+      name,
+      email
     );
     res
       .status(200)

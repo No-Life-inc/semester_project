@@ -78,10 +78,19 @@ export const getUserCollections = async (email: string) => {
  * @returns {Promise<Collection>} - A promise that resolves to the updated collection.
  * @throws {NotFoundError} - Throws an error if the collection is not found.
  */
-export const updateCollection = async (id: number, name: string) => {
+export const updateCollection = async (id: number, name: string, email: string) => {
   const collection = await Collection.findByPk(id);
   if (!collection) {
     throw new NotFoundError("Collection not found");
+  }
+
+  const user = await User.findOne({ where: { email } });
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+
+  if (collection.userId !== user.id) {
+    throw new ForbiddenError("You are not authorized to update this collection");
   }
 
   try {
@@ -247,7 +256,7 @@ export const removeBookFromCollection = async (
     }
     
     if (collection.userId !== user.id) {
-      throw new UnauthorizedError(
+      throw new ForbiddenError(
         "You are not authorized to remove a book from this collection"
       );
     }
