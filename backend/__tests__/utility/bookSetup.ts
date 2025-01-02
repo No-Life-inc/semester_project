@@ -7,7 +7,6 @@ export const bookSetup = async () => {
     books.forEach((book) => {
         bookIds.push(book.id);
     });
-    console.log(bookIds);
 }
 
 export const getBookId = (index: number) => {
