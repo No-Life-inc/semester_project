@@ -61,6 +61,9 @@ export const addTag = async (name: string) => {
     if (tag) {
         throw new Error("Tag name already exists");
     }
+    if (name.length > 255) {
+        throw new Error("Tag name cannot exceed 255 characters.");
+    }
     const addTag = await Tag.create({ name });
     if (!addTag) {
         throw new Error("Tag not created");
