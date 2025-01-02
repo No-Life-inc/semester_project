@@ -44,6 +44,7 @@ describe("addBookToUser function negative tests", () => {
     [NaN, 1, "Invalid email. Email must be a string."],
     [1, -1, "Invalid email. Email must be a string."],
     ["test_email@example.com", NaN, "Invalid book id. Book id must be a number greater than or equal to 1."],
+    ["test_email@example.com", 0, "Invalid book id. Book id must be a number greater than or equal to 1."],
     ["test_email@example.com", 5000, "Book not found"],
     ["wrong@email.com", 1, "User not found"],
   ];
@@ -82,10 +83,12 @@ describe("getUserBooks function positive tests", () => {
 describe("getUserBooks function negative tests", () => {
   const negativeTestCases = [
     ["test_email@example.com", -1, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
+    ["test_email@example.com", 0, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
     ["test_email@example.com", NaN, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
     ["test_email@example.com", 1, -1, "Invalid limit. Limit must be a number greater than or equal to 1."],
     ["test_email@example.com", 1, NaN, "Invalid limit. Limit must be a number greater than or equal to 1."],
     ["test_email@example.com", 1, 101, "Invalid limit. Limit must be a number less than or equal to 100."],
+    ["test_email@example.com", 1, 0, "Invalid limit. Limit must be a number greater than or equal to 1."],
   ];
 
   test.each(negativeTestCases)(
@@ -120,6 +123,7 @@ describe("removeBookFromUser function negative tests", () => {
     [NaN, 1, "Invalid email. Email must be a string."],
     [1, -1, "Invalid email. Email must be a string."],
     ["test_email@example.com", NaN, "Invalid Book id. Book id must be a number greater than or equal to 1."],
+    ["test_email@example.com", 0, "Invalid Book id. Book id must be a number greater than or equal to 1."],
     ["email_test@example.com", 1, "User not found"],
   ];
 

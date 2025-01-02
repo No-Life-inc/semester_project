@@ -67,6 +67,11 @@ describe("getBooks function negative tests", () => {
       "Invalid page number. Page must be a number greater than or equal to 1.",
     ],
     [
+      0,
+      10,
+      "Invalid page number. Page must be a number greater than or equal to 1.",
+    ],
+    [
       1,
       -10,
       "Invalid limit. Limit must be a number greater than or equal to 1.",
@@ -80,6 +85,11 @@ describe("getBooks function negative tests", () => {
       1,
       101,
       "Invalid limit. Limit must be a number less than or equal to 100.",
+    ],
+    [
+      1,
+      0,
+      "Invalid limit. Limit must be a number greater than or equal to 1.",
     ],
   ];
 
@@ -389,8 +399,6 @@ describe("BookData field associations - Authors (Negative Tests)", () => {
     [{ authors: [undefined as any], isbn: "0000000107"}, "should ignore empty or invalid author names"],
     [{ authors: [maxInt.toString()], isbn: "0000000108"}, "should ignore empty or invalid author names"],
     [{ authors: [negativeMaxInt.toString()], isbn: "0000000109"}, "should ignore empty or invalid author names"],
-    // [{ authors: [1], isbn: "0000000112"}, "should ignore empty or invalid author names"],
-    // [{ authors: [-1], isbn: "0000000113"}, "should ignore empty or invalid author names"],
   ];
 
   test.each(cases)(
