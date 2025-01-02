@@ -84,7 +84,7 @@ jobs:
             -Dsonar.organization=no-life-inc \
             -Dsonar.sources=./backend,./frontend/src \
             -Dsonar.exclusions=**/__tests__/**,**/__tests__/integrationTests/**, \
-          **/controllers/mongo/**,**/controllers/neo4j/**,**/database/**/** \
+          **/controllers/mongo/**,**/controllers/neo4j/**,**/database/**/**, \
           **/dbconnections/MongoConnection.ts,**/dbconnections/Neo4jConnection.ts, \
           **/models/mongoose/**,**/models/neo4j/**,**/routes/mongo/**,**/routes/neo4j/**, \
           **/services/mongo/**,**/services/neo4j/**, \
