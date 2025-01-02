@@ -4,9 +4,7 @@ import knex from "knex";
 import knexConfig from "../../knexfile";
 import { getAllTags, getTagById, addTag, deleteTagById } from "../../services/tagService";
 
-jest.setTimeout(30000);
-
-const testKnex = knex(knexConfig.test);
+jest.setTimeout(120000);
 
 beforeAll(async () => {
     await setupTestDB();

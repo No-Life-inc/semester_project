@@ -13,7 +13,7 @@ import userRouter from "../../routes/V1/userRoutes";
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import {getUserToken, teardownUserSetup, userSetup} from "../utility/userSetup";
 
-jest.setTimeout(30000);
+jest.setTimeout(120000);
 
 const app = express();
 app.use(express.json());

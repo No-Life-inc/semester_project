@@ -74,7 +74,5 @@ export const teardownTestDB = async () => {
 
   Model.knex(undefined);
 
-  await sequelize.close();
-
   await knex.destroy();
 };

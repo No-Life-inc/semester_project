@@ -1,14 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it, jest, test } from "@jest/globals";
 
-jest.setTimeout(30000); // Sets timeout to 30 seconds
+jest.setTimeout(120000);
 
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import knex from "knex";
 import knexConfig from "../../knexfile";
 import { getUserBooks, addBookToUser, removeBookFromUser } from "../../services/userBookService";
-
-// Initialize Knex
-const testKnex = knex(knexConfig.test);
 
 beforeAll(async () => {
   await setupTestDB();

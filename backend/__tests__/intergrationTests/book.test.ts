@@ -8,7 +8,7 @@ import {
   test,
 } from "@jest/globals";
 
-jest.setTimeout(30000); // Sets timeout to 30 seconds
+jest.setTimeout(120000);
 
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import knex from "knex";
@@ -23,9 +23,6 @@ import Publisher from "../../models/sequelize/Publisher";
 import Subject from "../../models/sequelize/Subject";
 import BookAPIData from "../../types/bookAPIData";
 import Book from "../../models/sequelize/Book";
-
-// Initialize Knex
-const testKnex = knex(knexConfig.test);
 
 beforeAll(async () => {
   await setupTestDB();

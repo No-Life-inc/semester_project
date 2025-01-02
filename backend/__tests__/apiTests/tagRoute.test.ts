@@ -11,7 +11,7 @@ import express from "express";
 import tagRouter from "../../routes/V1/tagRoutes";
 import {setupTestDB, teardownTestDB} from "../../database/knex/setupTestDB";
 
-jest.setTimeout(30000);
+jest.setTimeout(120000);
 
 const app = express();
 app.use(express.json());

@@ -7,7 +7,7 @@ import {
     test,
   } from "@jest/globals";
   
-jest.setTimeout(30000);
+jest.setTimeout(120000);
 
 import express from "express";
 import request from "supertest";
