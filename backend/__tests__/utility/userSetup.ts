@@ -7,9 +7,6 @@ export const userSetup = async () => {
     const user2 = await loginUser("test_password@example.com", process.env.DEFAULT_PASSWORD);
     const user3 = await loginUser("test@test.com", process.env.DEFAULT_PASSWORD);
 
-    console.log("Generated Token 1:", user1.token);
-console.log("Generated Token 2:", user2.token);
-console.log("Generated Token 3:", user3.token);
 
     userTokens.push(user1.token);
     userTokens.push(user2.token);

@@ -86,13 +86,11 @@ export const addBookToUser = async (email: string, bookId: number): Promise<User
 
         const book = await Book.findByPk(bookId);
         if (!book) {
-            console.log("Book not found");
             throw new NotFoundError("Book not found");
         }
 
         const user = await User.findOne({ where: { email } });
         if (!user) {
-            console.log("User not found");
             throw new ValidationError("User not found");
         }
 
@@ -144,7 +142,6 @@ export const removeBookFromUser = async (email: string, bookId: number): Promise
 
         const user = await User.findOne({ where: { email } });
         if (!user) {
-            console.log("User not found");
             throw new ValidationError("User not found");
         }
 

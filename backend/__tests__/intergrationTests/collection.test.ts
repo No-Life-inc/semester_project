@@ -12,19 +12,18 @@ import {ValidationError, NotFoundError, UnauthorizedError, ForbiddenError} from 
 import UserBook from "../../models/sequelize/UserBook";
 import User from "../../models/sequelize/User";
 import UserBookCollection from "../../models/sequelize/UserBookCollection";
-import Book from "../../models/sequelize/Book";
 import Collection from "../../models/sequelize/Collection";
 
 const testKnex = knex(knexConfig.test);
 
 beforeAll(async ()=>{
   await setupTestDB();
-  const collections = await Collection.findAll();
-  console.log("All Collections in DB:", collections);
+  await Collection.findAll();
 });
 
 afterAll(async ()=>{
   await teardownTestDB();
+  testKnex.destroy();
 });
 
 //Positive test cases for createCollection
@@ -176,7 +175,7 @@ type DeleteCollectionPositiveTestCase = [number, string];
 const deleteCollectionPositiveCases: DeleteCollectionPositiveTestCase[] = [
   [1, "test_email@example.com"],
   [2, "test_password@example.com"],
-];;
+];
 
 describe("deleteCollection function positive tests", () => {
   test.each(deleteCollectionPositiveCases)(

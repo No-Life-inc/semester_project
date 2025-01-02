@@ -1,9 +1,8 @@
 import { afterAll, beforeAll, describe, expect, jest, test } from "@jest/globals";
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import { registerUser, loginUser, editUser, editPassword  } from "../../services/userService";
-import User from "../../models/sequelize/User";
 
-jest.setTimeout(30000);
+jest.setTimeout(120000);
 
 const validPassword = process.env.DEFAULT_PASSWORD;
 

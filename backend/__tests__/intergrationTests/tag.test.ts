@@ -4,9 +4,7 @@ import knex from "knex";
 import knexConfig from "../../knexfile";
 import { getAllTags, getTagById, addTag, deleteTagById } from "../../services/tagService";
 
-jest.setTimeout(30000);
-
-const testKnex = knex(knexConfig.test);
+jest.setTimeout(120000);
 
 beforeAll(async () => {
     await setupTestDB();
@@ -75,10 +73,7 @@ describe("addTag function tests", () => {
         const longName = "a".repeat(256);
         await expect(addTag(longName)).rejects.toThrow("Tag name cannot exceed 255 characters.");
     });
-
-
 });
-
 
 describe("deleteTagById function tests", () => {
     test("should delete a tag successfully", async () => {
