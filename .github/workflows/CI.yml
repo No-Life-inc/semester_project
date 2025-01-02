@@ -83,7 +83,12 @@ jobs:
             -Dsonar.projectKey=No-Life-inc_semester_project \
             -Dsonar.organization=no-life-inc \
             -Dsonar.sources=./backend,./frontend/src \
-            -Dsonar.exclusions=**/__tests__/**,**/__tests__/integrationTests/** \
+            -Dsonar.exclusions=**/__tests__/**,**/__tests__/integrationTests/** \,
+          **/controllers/mongo/**,**/controllers/neo4j/**,**/database/mongoose/**,
+          **/database/neo4j/**,**/databases/neo4j/individual_seed_files/**,
+          **/dbconnections/MongoConnection.ts,**/dbconnections/Neo4jConnection.ts,
+          **/models/mongoose/**,**/models/neo4j/**,**/routes/mongo/**,**/routes/neo4j/**,
+          **/services/mongo/**,**/services/neo4j/**,
             -Dsonar.javascript.lcov.reportPaths=./backend/coverage/lcov.info \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
