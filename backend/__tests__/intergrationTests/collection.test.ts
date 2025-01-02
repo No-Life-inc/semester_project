@@ -18,12 +18,10 @@ const testKnex = knex(knexConfig.test);
 
 beforeAll(async ()=>{
   await setupTestDB();
-  await Collection.findAll();
 });
 
 afterAll(async ()=>{
   await teardownTestDB();
-  testKnex.destroy();
 });
 
 //Positive test cases for createCollection
@@ -45,7 +43,7 @@ describe("createCollection function positive tests", () => {
 });
 
 type CreateCollectionNegativeTestCase = [
-  string,
+  string | null | undefined,
   string,
   typeof ValidationError | typeof NotFoundError,
   string
@@ -54,6 +52,8 @@ type CreateCollectionNegativeTestCase = [
 // Negative test cases for createCollection
 const createCollectionNegativeCases: CreateCollectionNegativeTestCase[] = [
   ["", "test_email@example.com", ValidationError, "Collection name is required"],
+  [null, "test_email@example.com", ValidationError, "Collection name is required"],
+  [undefined, "test_email@example.com", ValidationError, "Collection name is required"],
   ["Invalid Collection", "invalid@example.com", NotFoundError, "User not found"],
 ];
 
@@ -61,8 +61,8 @@ describe("createCollection function negative tests", () => {
   test.each(createCollectionNegativeCases)(
     "should throw an error (name: %s, email: %s, errorClass: %s, errorMessage: %s)",
     async (name, email, errorClass, errorMessage) => {
-      await expect(createCollection(name, email)).rejects.toThrow(errorClass);
-      await expect(createCollection(name, email)).rejects.toThrow(errorMessage);
+      await expect(createCollection(name as any, email)).rejects.toThrow(errorClass);
+      await expect(createCollection(name as any, email)).rejects.toThrow(errorMessage);
     }
   );
 });
@@ -184,9 +184,8 @@ describe("deleteCollection function positive tests", () => {
       const result = await deleteCollection(id, email);
       expect(result).toBe(true);
 
-      // Verify that the collection no longer exists
-      const collectionExists = await testKnex("collections").where({ id }).first();
-      expect(collectionExists).toBeUndefined();
+      const collectionExists = await Collection.findByPk(id);
+      expect(collectionExists).toBeNull();
     }
   );
 });
@@ -194,7 +193,7 @@ describe("deleteCollection function positive tests", () => {
 type DeleteCollectionNegativeTestCase = [
   number,
   string,
-  typeof NotFoundError | typeof UnauthorizedError,
+  typeof NotFoundError | typeof UnauthorizedError | typeof ValidationError,
   string
 ];
 
@@ -203,6 +202,9 @@ const deleteCollectionNegativeCases: DeleteCollectionNegativeTestCase[] = [
   [999, "test_email@example.com", NotFoundError, "Collection not found"],
   [1, "non_existent_user@example.com", NotFoundError, "User not found"],
   [3, "test_email@example.com", ForbiddenError, "You are not authorized to delete this collection"],
+  [0, "test_email@example.com", ValidationError, "Invalid collection ID"],
+  [-1, "test_email@example.com", ValidationError, "Invalid collection ID"],
+  [-999, "test_email@example.com", ValidationError, "Invalid collection ID"],
 ];
 
 describe("deleteCollection function negative tests", () => {
@@ -211,7 +213,7 @@ describe("deleteCollection function negative tests", () => {
     async (
       id: number,
       email: string,
-      errorClass: typeof NotFoundError | typeof UnauthorizedError,
+      errorClass: typeof NotFoundError | typeof UnauthorizedError | typeof ValidationError,
       errorMessage: string
     ) => {
       await expect(deleteCollection(id, email)).rejects.toThrow(errorClass);
@@ -219,6 +221,7 @@ describe("deleteCollection function negative tests", () => {
     }
   );
 });
+
 
 //addBookToCollection positive test cases
 describe("addBookToCollection function positive tests", () => {
