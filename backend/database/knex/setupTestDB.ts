@@ -3,6 +3,7 @@ import Knex from "knex";
 import knexConfig from "../../knexfile";
 import { Model } from "objection";
 import dotenv from "dotenv";
+import sequelize from "../../config/SqlConfig";
 
 dotenv.config();
 // Initialize Knex with initial configuration
@@ -73,6 +74,7 @@ export const teardownTestDB = async () => {
 
   Model.knex(undefined);
 
-  // Destroy the Knex instance
+  await sequelize.close();
+
   await knex.destroy();
 };

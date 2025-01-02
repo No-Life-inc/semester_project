@@ -1,7 +1,6 @@
 import { afterAll, beforeAll, describe, expect, jest, test } from "@jest/globals";
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import { registerUser, loginUser, editUser, editPassword  } from "../../services/userService";
-import User from "../../models/sequelize/User";
 
 jest.setTimeout(30000);
 
