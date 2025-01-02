@@ -114,6 +114,10 @@ export const updateCollection = async (id: number, name: string, email: string) 
  * @throws {UnauthorizedError} - Throws an error if the user is not authorized to delete the collection.
  */
 export const deleteCollection = async (id: number, email: string) => {
+
+  if (id <= 0) {
+    throw new ValidationError("Invalid collection ID");
+  }
   const user = await User.findOne({ where: { email } });
 
   if (!user) {
