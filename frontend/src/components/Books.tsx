@@ -1,47 +1,56 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { fetchBooks } from '../services/apiClient';
-import { Book, Collection } from '../types/type';
 import axios from 'axios';
+import { Book, Collection } from '../types/type';
 import DisplayBooks from './DisplayBooks';
 
 const BookList = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true); // Track if there are more books to load
-  const observerRef = useRef<IntersectionObserver | null>(null);
+  const [page, setPage] = useState(1); // Pagination for standard loading
+  const [hasMore, setHasMore] = useState(true); // Track if more books are available
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>(''); // State for search query
-  const [searchResults, setSearchResults] = useState<Book[]>([]); // Til søgefunktion
-  const [debouncedQuery, setDebouncedQuery] = useState<string>(''); // Debounced søgeværdi
-  
+  const [searchResults, setSearchResults] = useState<Book[]>([]); // For search results
+  const [searchQuery, setSearchQuery] = useState<string>(''); // Search query value
+  const [debouncedQuery, setDebouncedQuery] = useState<string>(''); // Debounced search value
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // Function to load books
+  // Debounce søgefeltets værdi
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery); // Opdater kun efter en pause
+    }, 300); // 300ms debounce-tid
+    return () => {
+      clearTimeout(handler); // Ryd timeout ved næste input
+    };
+  }, [searchQuery]);
+
+  // Funktion til at hente bøger (standardfunktion med pagination)
   const loadBooks = useCallback(async () => {
+    if (debouncedQuery) return; // Undgå at køre, hvis der er en aktiv søgning
+
     setLoading(true);
     try {
-      const data = await fetchBooks(page, 50); // Fetch books for the current page
-      if (data.length > 0) {
-        setBooks((prevBooks) => {
-          const uniqueBooks = [...prevBooks, ...data].filter(
-            (book, index, self) => self.findIndex((b) => b.id === book.id) === index
-          );
-          return uniqueBooks;
-        });
-        setHasMore(data.length === 50); // If less than 50 books, assume no more to load
-      } else {
-        setHasMore(false); // No more books to load
-      }
+      const response = await axios.get('http://localhost:5000/v1/book', {
+        params: { page, limit: 50 },
+      });
+      const fetchedBooks = response.data;
+
+      setBooks((prevBooks: Book[]) => [
+        ...prevBooks,
+        ...fetchedBooks.filter(
+          (book: Book) => !prevBooks.some((prevBook: Book) => prevBook.id === book.id)
+        ),
+      ]);
+      setHasMore(fetchedBooks.length === 50); // Hvis mindre end 50, er der ingen flere bøger
     } catch (error) {
       console.error('Error loading books:', error);
     } finally {
       setLoading(false);
     }
-  }, [page]);
-  
+  }, [page, debouncedQuery]);
 
-  // Function to load collections
+  // Funktion til at hente samlinger (uden ændringer)
   const loadCollections = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
@@ -57,6 +66,7 @@ const BookList = () => {
     }
   }, []);
 
+  // Funktion til at søge bøger
   const searchBooks = useCallback(async () => {
     if (!debouncedQuery.trim()) {
       setSearchResults([]); // Ryd søgeresultater, hvis input er tomt
@@ -76,45 +86,34 @@ const BookList = () => {
     }
   }, [debouncedQuery]);
 
-    // Debounce søgefeltets værdi
-    useEffect(() => {
-      const handler = setTimeout(() => {
-        setDebouncedQuery(searchQuery); // Opdater kun efter en pause
-      }, 300); // 300ms debounce-tid
-      return () => {
-        clearTimeout(handler); // Ryd timeout ved næste input
-      };
-    }, [searchQuery]);
+  // Infinite scroll observer
+  const lastBookRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (loading || debouncedQuery) return; // Undgå at aktivere ved søgning
 
-  useEffect(() => {
-    loadBooks();
-  }, [loadBooks]);
-
-  useEffect(() => {
-    loadCollections();
-  }, [loadCollections]);
-
-  // Observer to detect scrolling to the end
-  interface LastBookRefCallback {
-    (node: HTMLElement | null): void;
-  }
-
-  const lastBookRef: LastBookRefCallback = useCallback(
-    (node) => {
-      if (loading) return;
       if (observerRef.current) observerRef.current.disconnect();
 
       observerRef.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          setPage((prevPage) => prevPage + 1); // Load next page
+          setPage((prevPage) => prevPage + 1); // Hent næste side
         }
       });
 
       if (node) observerRef.current.observe(node);
     },
-    [loading, hasMore]
+    [loading, hasMore, debouncedQuery]
   );
 
+  useEffect(() => {
+    loadCollections();
+  }, [loadCollections]);
+
+  // Standardbøger: Hent flere, når page ændrer sig
+  useEffect(() => {
+    loadBooks();
+  }, [page, loadBooks]);
+
+  // Søgning: Kør, når den debounced query ændrer sig
   useEffect(() => {
     searchBooks();
   }, [searchBooks]);
@@ -122,6 +121,8 @@ const BookList = () => {
   return (
     <div>
       <h1>Book List</h1>
+
+      {/* Søgefelt */}
       <input
         type="text"
         placeholder="Search books by title"
@@ -129,13 +130,17 @@ const BookList = () => {
         onChange={(e) => setSearchQuery(e.target.value)}
         style={{ marginBottom: '20px', padding: '8px', width: '100%' }}
       />
+
       {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
+
+      {/* DisplayBooks viser enten søgeresultater eller normale bøger */}
       <DisplayBooks
-        books={debouncedQuery ? searchResults : books}
+        books={debouncedQuery ? searchResults : books} // Viser søgeresultater, hvis der er en søgning
         collections={collections}
-        lastBookRef={lastBookRef}
+        lastBookRef={debouncedQuery ? undefined : lastBookRef} // Infinite scroll kun aktiv uden søgning
         onBookAdded={(message) => setSuccessMessage(message)}
       />
+
       {loading && <div>Loading...</div>}
     </div>
   );
