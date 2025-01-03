@@ -12,6 +12,9 @@ const BookList = () => {
   const [hasMore, setHasMore] = useState(true); // Track if there are more books to load
   const observerRef = useRef<IntersectionObserver | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>(''); // State for search query
+  const [searchResults, setSearchResults] = useState<Book[]>([]); // Til søgefunktion
+  const [debouncedQuery, setDebouncedQuery] = useState<string>(''); // Debounced søgeværdi
   
 
   // Function to load books
@@ -54,6 +57,35 @@ const BookList = () => {
     }
   }, []);
 
+  const searchBooks = useCallback(async () => {
+    if (!debouncedQuery.trim()) {
+      setSearchResults([]); // Ryd søgeresultater, hvis input er tomt
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.get('http://localhost:5000/v1/book/search', {
+        params: { title: debouncedQuery },
+      });
+      setSearchResults(response.data); // Gem søgeresultater
+    } catch (error) {
+      console.error('Error searching books:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [debouncedQuery]);
+
+    // Debounce søgefeltets værdi
+    useEffect(() => {
+      const handler = setTimeout(() => {
+        setDebouncedQuery(searchQuery); // Opdater kun efter en pause
+      }, 300); // 300ms debounce-tid
+      return () => {
+        clearTimeout(handler); // Ryd timeout ved næste input
+      };
+    }, [searchQuery]);
+
   useEffect(() => {
     loadBooks();
   }, [loadBooks]);
@@ -83,12 +115,23 @@ const BookList = () => {
     [loading, hasMore]
   );
 
+  useEffect(() => {
+    searchBooks();
+  }, [searchBooks]);
+
   return (
     <div>
       <h1>Book List</h1>
+      <input
+        type="text"
+        placeholder="Search books by title"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        style={{ marginBottom: '20px', padding: '8px', width: '100%' }}
+      />
       {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
       <DisplayBooks
-        books={books}
+        books={debouncedQuery ? searchResults : books}
         collections={collections}
         lastBookRef={lastBookRef}
         onBookAdded={(message) => setSuccessMessage(message)}
