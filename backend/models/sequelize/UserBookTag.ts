@@ -31,11 +31,13 @@ UserBookTag.init(
         userBookId: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            field: "user_book_id",
             references: { model: "user_books", key: "id" },
         },
         tagId: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            field: "tag_id",
             references: { model: "tags", key: "id" },
         },
         createdAt: {

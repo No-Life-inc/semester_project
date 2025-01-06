@@ -1,13 +1,7 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../types/authenticatedRequest";
 import * as CollectionService from "../services/collectionService";
-import User from "../models/sequelize/User";
-import Collection from "../models/sequelize/Collection";
-import {
-  NotFoundError,
-  UnauthorizedError,
-  ValidationError,
-} from "../utility/errors";
+import { BadRequestError, ValidationError } from "../utility/errors";
 
 /**
  * Creates a new collection for the authenticated user.
@@ -21,13 +15,23 @@ import {
  *
  * @throws {Error} - Throws an error if the authenticated user is not found in the database.
  */
-export const createCollection = async (req: AuthenticatedRequest, res: Response) => {
+export const createCollection = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   const { name } = req.body;
   const { email } = req.user;
 
   try {
     if (!name) {
       throw new ValidationError("Collection name is required");
+    }
+    if (name.length > 255) {
+      return res
+        .status(422)
+        .json({
+          message: "Collection name must be between 1 and 255 characters",
+        });
     }
 
     const newCollection = await CollectionService.createCollection(name, email);
@@ -48,7 +52,10 @@ export const createCollection = async (req: AuthenticatedRequest, res: Response)
  *
  * @throws {Error} - Throws an error if the authenticated user is not found in the database.
  */
-export const getUserCollections = async (req: AuthenticatedRequest, res: Response) => {
+export const getUserCollections = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   const { email } = req.user;
 
   try {
@@ -73,17 +80,31 @@ export const getUserCollections = async (req: AuthenticatedRequest, res: Respons
  * @throws {Error} - Throws an error if the authenticated user is not found in the database
  *                   or if the user is not authorized to update the specified collection.
  */
-export const updateCollection = async (req: AuthenticatedRequest, res: Response) => {
+export const updateCollection = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   const { id } = req.params;
   const { name } = req.body;
+  const { email } = req.user;
 
   try {
     if (!name) {
       throw new ValidationError("Collection name is required");
     }
 
-    const updatedCollection = await CollectionService.updateCollection(Number(id), name);
-    res.status(200).json({ message: "Collection updated successfully", updatedCollection });
+    if (name.length > 255) {
+      throw new ValidationError("Collection name exceeds the maximum length of 255 characters");
+    }
+
+    const updatedCollection = await CollectionService.updateCollection(
+      Number(id),
+      name,
+      email
+    );
+    res
+      .status(200)
+      .json({ message: "Collection updated successfully", updatedCollection });
   } catch (error) {
     res.status(error.statusCode || 500).json({ message: error.message });
   }
@@ -102,7 +123,10 @@ export const updateCollection = async (req: AuthenticatedRequest, res: Response)
  * @throws {Error} - Throws an error if the authenticated user is not found in the database
  *                   or if the specified collection cannot be deleted.
  */
-export const deleteCollection = async (req: AuthenticatedRequest, res: Response) => {
+export const deleteCollection = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   const { id } = req.params;
   const { email } = req.user;
 
@@ -128,16 +152,27 @@ export const deleteCollection = async (req: AuthenticatedRequest, res: Response)
  * @throws {Error} - Throws an error if the authenticated user is not found in the database,
  *                   if the input IDs are invalid, or if the book cannot be added to the specified collection.
  */
-export const addBookToCollection = async (req: AuthenticatedRequest, res: Response) => {
+export const addBookToCollection = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   const { collectionId, bookId } = req.body;
   const { email } = req.user;
 
   try {
-    if (!collectionId || !bookId) {
-      throw new ValidationError("Collection ID and Book ID are required");
+    if (!collectionId) {
+      throw new BadRequestError("Collection ID is required");
     }
 
-    await CollectionService.addBookToCollection(email, Number(collectionId), Number(bookId));
+    if (!bookId) {
+      throw new BadRequestError("Book ID is required");
+    }
+
+    await CollectionService.addBookToCollection(
+      email,
+      Number(collectionId),
+      Number(bookId)
+    );
     res.status(201).json({ message: "Book added to collection successfully" });
   } catch (error) {
     res.status(error.statusCode || 500).json({ message: error.message });
@@ -158,13 +193,29 @@ export const addBookToCollection = async (req: AuthenticatedRequest, res: Respon
  * @throws {Error} - Throws an error if the authenticated user is not found in the database,
  *                   if the input IDs are invalid, or if the book cannot be removed from the specified collection.
  */
-export const removeBookFromCollection = async (req: AuthenticatedRequest, res: Response) => {
+export const removeBookFromCollection = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   const { collectionId, bookId } = req.body;
   const { email } = req.user;
 
   try {
-    await CollectionService.removeBookFromCollection(email, Number(collectionId), Number(bookId));
-    res.status(200).json({ message: "Book removed from collection successfully" });
+    if (!collectionId) {
+      throw new BadRequestError("Collection ID is required");
+    }
+
+    if (!bookId) {
+      throw new BadRequestError("Book ID is required");
+    }
+    await CollectionService.removeBookFromCollection(
+      email,
+      Number(collectionId),
+      Number(bookId)
+    );
+    res
+      .status(200)
+      .json({ message: "Book removed from collection successfully" });
   } catch (error) {
     res.status(error.statusCode || 500).json({ message: error.message });
   }

@@ -62,13 +62,19 @@ export const loginUserController = async (request: Request, response: Response) 
 export const editUserController = async (request: AuthenticatedRequest, response: Response) => {
     const { name, email: newEmail } = request.body;
     const { email  }  = request.user;
+    let safeEmail;
 
-    if (!name && !email) {
+
+    if (!name && !newEmail) {
         return response.status(400).json({ error: "At least one of 'name' or 'email' must be provided" });
     }
 
+    if (newEmail) {
+        safeEmail = newEmail.toLowerCase();
+    }
+
     try {
-        const result = await editUser(email, name, newEmail.toLowerCase());
+        const result = await editUser(email, name, safeEmail);
         response.json({ message: result });
     } catch (error: any) {
         const errorMessage = error.message || "An error occurred while editing user";

@@ -20,6 +20,8 @@ export const addTagToBook = async (tagId: number, bookId: number) => {
         const tag = await getTagById(tagId);
         const book = await getBookById(bookId);
 
+
+
         if(!tag || !book){
             throw new Error("Tag or book not found");
         }

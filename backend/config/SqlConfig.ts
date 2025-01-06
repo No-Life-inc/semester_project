@@ -10,6 +10,7 @@ export const sequelize = new Sequelize(
     {
         host: process.env.SQL_HOST,
         port: process.env.SQL_PORT ? parseInt(process.env.SQL_PORT, 10) : undefined,
+        logging: false,
         dialect: "mssql",
         dialectOptions: {
             options: {
@@ -17,7 +18,6 @@ export const sequelize = new Sequelize(
                 trustServerCertificate: true,
             },
         },
-        logging: console.log,
     }
 );
 
