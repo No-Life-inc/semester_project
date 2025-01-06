@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import connectToNeo4j from "../../../dbconnections/Neo4jConnection";
 import { v4 as uuidv4 } from "uuid";
 

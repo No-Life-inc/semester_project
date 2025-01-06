@@ -35,14 +35,14 @@ const userSchema = new Schema<IUser>(
         password: { type: String, required: true, select: false },
         books: [
             {
-                book_id: { type: Schema.Types.ObjectId, ref: 'Book', required: true },
+                book_id: { type: Schema.Types.ObjectId, ref: 'Book', required: true, unique: true },
                 tags: [{ type: String }],
             },
         ],
         collections: [
             {
-                name: { type: String, required: true },
-                books: [{ type: Schema.Types.ObjectId, ref: 'Book' }],
+                name: { type: String, required: true, unique: true },
+                books: [{ type: Schema.Types.ObjectId, ref: 'Book' , unique: true}],
             },
         ],
     },

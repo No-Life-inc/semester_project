@@ -1,9 +1,9 @@
-import seedConstraints from './individual seed files/seedConstraints';
-import seedBooks from './individual seed files/seedBooks';
-import seedTags from './individual seed files/seedTags';
-import seedUsers from './individual seed files/seedUsers';
+import seedConstraints from './individual_seed_files/seedConstraints';
+import seedBooks from './individual_seed_files/seedBooks';
+import seedTags from './individual_seed_files/seedTags';
+import seedUsers from './individual_seed_files/seedUsers';
 import connectToNeo4j from '../../dbconnections/Neo4jConnection';
-import seedIndexes from './individual seed files/seedIndexes';
+import seedIndexes from './individual_seed_files/seedIndexes';
 
 export default async function seedNeo4j() {
     const driver = await connectToNeo4j();
@@ -30,6 +30,6 @@ export default async function seedNeo4j() {
             await session.close();
             await driver.close();
         }
-}
+};
 
-seedNeo4j();
+// seedNeo4j();

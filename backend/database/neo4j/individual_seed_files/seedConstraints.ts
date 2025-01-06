@@ -32,6 +32,15 @@ export async function seedConstraints() {
     await session.run(
       `CREATE CONSTRAINT FOR (t:Tag) REQUIRE t.name IS UNIQUE;`
     );
+    await session.run(
+      `CREATE CONSTRAINT FOR (a:Author) REQUIRE a.name IS UNIQUE;`
+    );
+    await session.run(
+      `CREATE CONSTRAINT FOR (p:Publisher) REQUIRE p.name IS UNIQUE;`
+    );
+    await session.run(
+      `CREATE CONSTRAINT FOR (s:Subject) REQUIRE s.name IS UNIQUE;`
+    );
     console.log("Constraints created successfully.");
   } catch (error) {
     console.error("Error creating constraints:", error);

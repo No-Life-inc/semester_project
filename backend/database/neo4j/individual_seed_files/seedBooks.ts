@@ -9,10 +9,10 @@ import { v4 as uuidv4 } from "uuid";
 dotenv.config();
 
 // Path to the JSON file
-const jsonFilePath = path.join("../", "dump", "books.json");
+const booksFilePath = path.resolve(__dirname, "../../dump/books.json");
 
 // Read and parse the JSON file
-const booksData = JSON.parse(fs.readFileSync(jsonFilePath, "utf-8"));
+const booksData = JSON.parse(fs.readFileSync(booksFilePath, "utf-8"));
 
 export async function seedBooks(): Promise<void> {
   // Neo4j connection details

@@ -1,6 +1,4 @@
-import BookSubject from "../models/sequelize/BookSubject";
 import Book from "../models/sequelize/Book"; // Ensure the path is correct
-import { Op } from "sequelize";
 import Subject from "../models/sequelize/Subject"; // Ensure the path is correct
 
 /**
