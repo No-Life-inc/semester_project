@@ -21,7 +21,6 @@ export const sequelize = new Sequelize(
     }
 );
 
-// Forbindelse til resten af applikationen (Books, Collections osv.)
 export const limitedSequelize = new Sequelize(
     process.env.NODE_ENV === 'test' ? process.env.TEST_SQL_NAME : process.env.SQL_NAME,
     process.env.LIMITED_SQL_USER,
@@ -36,7 +35,7 @@ export const limitedSequelize = new Sequelize(
                 trustServerCertificate: true,
             },
         },
-        logging: console.log,
+        logging: false,
     }
 );
 

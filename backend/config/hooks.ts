@@ -1,4 +1,4 @@
-import sequelize from "./SqlConfig";
+import {sequelize} from "./SqlConfig";
 import AuditLog from "../models/sequelize/AuditLog";
 
 export function registerHooks() {

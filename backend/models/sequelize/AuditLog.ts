@@ -1,5 +1,5 @@
 import { Model, DataTypes, Optional } from "sequelize";
-import sequelize from "../../config/SqlConfig";
+import {sequelize} from "../../config/SqlConfig";
 
 interface AuditLogAttributes {
   id: number;
