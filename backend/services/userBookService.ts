@@ -166,3 +166,25 @@ export const removeBookFromUser = async (email: string, bookId: number): Promise
         throw error;
     }
 };
+
+/**
+ * Fetches a user book by its ID.
+ *
+ * @param {number} id - The ID of the user book to fetch.
+ * @returns {Promise<UserBook>} - A promise that resolves to the fetched user book.
+ *
+ * @example
+ * getUserBookById(1)
+ * // This will fetch the user book with ID 1.
+ */
+export const getUserBookById = async (id: number): Promise<UserBook> => {
+    try {
+        const userBook = await UserBook.findByPk(id);
+        if (!userBook) {
+            throw new NotFoundError("UserBook not found");
+        }
+        return userBook;
+    } catch (error) {
+        throw error;
+    }
+};

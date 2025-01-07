@@ -1,6 +1,7 @@
-import {getBookById} from "./bookService";
 import UserBookTag from "../models/sequelize/UserBookTag";
 import {getTagById} from "./tagService";
+import {getUserBookById} from "./userBookService";
+import {BaseError} from "../utility/errors";
 
 
 //Add docstrings to the following functions'
@@ -15,21 +16,24 @@ import {getTagById} from "./tagService";
  * addTagToBook(1, 1)
  * // This will add the tag with ID 1 to the book with ID 1
  */
-export const addTagToBook = async (tagId: number, bookId: number) => {
+export const addTagToBook = async (tagId: number, userBookId: number) => {
     try{
         const tag = await getTagById(tagId);
-        const book = await getBookById(bookId);
+        const userBook = await getUserBookById(userBookId);
 
-
-
-        if(!tag || !book){
+        if(!tag || !userBook){
             throw new Error("Tag or book not found");
         }
 
-        return await UserBookTag.create({tagId: tagId, userBookId: bookId});
+        return await UserBookTag.create({tagId: tagId, userBookId: userBookId});
 
-    } catch (error) {
-        throw new Error("An error occurred while adding tag to book");
+    }catch (error) {
+        if (error instanceof BaseError) {
+            throw error;
+        }
+        else {
+            throw new Error("An error occurred while adding tag to book");
+        }
     }
 }
 

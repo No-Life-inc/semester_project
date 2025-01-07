@@ -22,7 +22,13 @@ export const addTagToBookController = async (request: Request, response: Respons
         const book = await addTagToBook(tag_id, user_book_id);
         response.json(book);
     } catch (error) {
-        response.status(500).json({ error: "An error occurred while adding tag to book" });
+        if (error) {
+            response.status(400).json({ error: error.message });
+        } else if (error) {
+            response.status(404).json({ error: error.message });
+        } else {
+            response.status(500).json({ error: "An unexpected error occurred" });
+        }
     }
 }
 
