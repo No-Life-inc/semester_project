@@ -26,6 +26,8 @@ export const addTagToBookController = async (request: Request, response: Respons
             response.status(400).json({ error: error.message });
         } else if (error) {
             response.status(404).json({ error: error.message });
+        } else if (error) {
+            response.status(409).json({ error: error.message });
         } else {
             response.status(500).json({ error: "An unexpected error occurred" });
         }

@@ -1,9 +1,10 @@
 import express from "express";
 import * as UserBookTagController from "../../controllers/userBookTagController";
+import {authenticate} from "../../utility/authMiddleware";
 
 const router = express.Router();
 
-router.post("/", UserBookTagController.addTagToBookController);
-router.delete("/", UserBookTagController.deleteTagFromBookController);
+router.post("/", authenticate, UserBookTagController.addTagToBookController);
+router.delete("/", authenticate, UserBookTagController.deleteTagFromBookController);
 
 export default router;

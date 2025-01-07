@@ -1,7 +1,7 @@
 import UserBookTag from "../models/sequelize/UserBookTag";
 import {getTagById} from "./tagService";
 import {getUserBookById} from "./userBookService";
-import {BaseError} from "../utility/errors";
+import {BaseError, ConflictError} from "../utility/errors";
 
 
 //Add docstrings to the following functions'
@@ -23,6 +23,17 @@ export const addTagToBook = async (tagId: number, userBookId: number) => {
 
         if(!tag || !userBook){
             throw new Error("Tag or book not found");
+        }
+
+        const existingUserBookTag = await UserBookTag.findOne({
+            where: {
+                tagId: tagId,
+                userBookId: userBookId
+            }
+        });
+
+        if(existingUserBookTag){
+            throw new ConflictError("Tag already exists on the book");
         }
 
         return await UserBookTag.create({tagId: tagId, userBookId: userBookId});

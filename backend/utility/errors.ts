@@ -37,4 +37,10 @@ export class BaseError extends Error {
       super(message, 403);
     }
   }
+
+  export class ConflictError extends BaseError {
+      constructor(message = "Conflict") {
+      super(message, 409);
+      }
+  }
   
