@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize";
-import sequelize from "../../config/SqlConfig";
+import {limitedSequelize} from "../../config/SqlConfig";
 import Book from "./Book"; // Import the Book model
 
 interface PublisherAttributes {
@@ -44,7 +44,7 @@ Publisher.init({
         field: "created_at",
     },
 }, {
-    sequelize,
+    sequelize: limitedSequelize,
     tableName: "publishers",
     timestamps: true,
     createdAt: "created_at",

@@ -1,5 +1,5 @@
 import {DataTypes, Model, Optional} from "sequelize"
-import sequelize from "../../config/SqlConfig"
+import {limitedSequelize} from "../../config/SqlConfig"
 
 interface BookStatsAttributes {
     bookId: number;
@@ -45,7 +45,7 @@ BookStats.init(
         },
     },
     {
-        sequelize,
+        sequelize: limitedSequelize,
         modelName: "BookStats",
         tableName: "book_stats",
         timestamps: true,

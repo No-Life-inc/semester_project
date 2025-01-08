@@ -3,14 +3,14 @@ import Collection from "../models/sequelize/Collection";
 import UserBook from "../models/sequelize/UserBook";
 import Book from "../models/sequelize/Book";
 import UserBookCollection from "../models/sequelize/UserBookCollection";
-import sequelize from "../config/SqlConfig";
 import { Transaction } from "sequelize";
 import {
   NotFoundError,
   ValidationError,
-  UnauthorizedError,
+  UnauthorizedError,ForbiddenError
 } from "../utility/errors";
 import { ValidationError as SequelizeValidationError } from "sequelize";
+import { limitedSequelize } from "../config/SqlConfig";
 /**
  * Creates a new collection for a user.
  *
@@ -23,6 +23,10 @@ import { ValidationError as SequelizeValidationError } from "sequelize";
 export const createCollection = async (name: string, email: string) => {
   if (!name) {
     throw new ValidationError("Collection name is required");
+  }
+
+  if (name.length > 255) {
+    throw new ValidationError("Collection name must be between 1 and 255 characters");
   }
 
   const user = await User.findOne({ where: { email } });
@@ -74,10 +78,19 @@ export const getUserCollections = async (email: string) => {
  * @returns {Promise<Collection>} - A promise that resolves to the updated collection.
  * @throws {NotFoundError} - Throws an error if the collection is not found.
  */
-export const updateCollection = async (id: number, name: string) => {
+export const updateCollection = async (id: number, name: string, email: string) => {
   const collection = await Collection.findByPk(id);
   if (!collection) {
     throw new NotFoundError("Collection not found");
+  }
+
+  const user = await User.findOne({ where: { email } });
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+
+  if (collection.userId !== user.id) {
+    throw new ForbiddenError("You are not authorized to update this collection");
   }
 
   try {
@@ -101,6 +114,10 @@ export const updateCollection = async (id: number, name: string) => {
  * @throws {UnauthorizedError} - Throws an error if the user is not authorized to delete the collection.
  */
 export const deleteCollection = async (id: number, email: string) => {
+
+  if (id <= 0) {
+    throw new ValidationError("Invalid collection ID");
+  }
   const user = await User.findOne({ where: { email } });
 
   if (!user) {
@@ -114,12 +131,10 @@ export const deleteCollection = async (id: number, email: string) => {
   }
 
   if (collection.userId !== user.id) {
-    throw new UnauthorizedError(
-      "You are not authorized to delete this collection"
-    );
+    throw new ForbiddenError("You are not authorized to delete this collection");
   }
 
-  const t = await sequelize.transaction();
+  const t = await limitedSequelize.transaction();
   try {
     await UserBookCollection.destroy({
       where: { collection_id: id },
@@ -149,7 +164,7 @@ export const addBookToCollection = async (
   collectionId: number,
   bookId: number
 ) => {
-  const t = await sequelize.transaction();
+  const t = await limitedSequelize.transaction();
   try {
     const user = await User.findOne({ where: { email }, transaction: t });
 
@@ -161,7 +176,11 @@ export const addBookToCollection = async (
       transaction: t,
     });
 
-    if (!collection || collection.userId !== user.id) {
+    if (!collection) {
+      throw new NotFoundError("Collection not found");
+    }
+    
+    if (collection.userId !== user.id) {
       throw new UnauthorizedError(
         "You are not authorized to add a book to this collection"
       );
@@ -206,6 +225,7 @@ export const addBookToCollection = async (
     await t.rollback();
     throw error;
   }
+
 };
 
 /**
@@ -224,7 +244,7 @@ export const removeBookFromCollection = async (
   collectionId: number,
   bookId: number
 ) => {
-  const t = await sequelize.transaction();
+  const t = await limitedSequelize.transaction();
   try {
     const user = await User.findOne({ where: { email }, transaction: t });
 
@@ -241,7 +261,7 @@ export const removeBookFromCollection = async (
     }
     
     if (collection.userId !== user.id) {
-      throw new UnauthorizedError(
+      throw new ForbiddenError(
         "You are not authorized to remove a book from this collection"
       );
     }

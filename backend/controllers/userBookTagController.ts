@@ -25,10 +25,17 @@ export const addTagToBookController = async (request: Request, response: Respons
         const book = await addTagToBook(tag_id, user_book_id);
         response.json(book);
     } catch (error) {
-        response.status(500).json({ error: "An error occurred while adding tag to book" });
+        if (error) {
+            response.status(400).json({ error: error.message });
+        } else if (error) {
+            response.status(404).json({ error: error.message });
+        } else if (error) {
+            response.status(409).json({ error: error.message });
+        } else {
+            response.status(500).json({ error: "An unexpected error occurred" });
+        }
     }
 }
-
 
 /**
  * Deletes a tag from a book.
@@ -62,24 +69,5 @@ export const deleteTagFromBookController = async (request: Request, response: Re
         response.json({ message: "Tag deleted from book successfully" });
     } catch (error) {
         response.status(500).json({ error: "An error occurred while deleting tag from book" });
-    }
-};
-
-//TODO 1: Implement Get all user tags
-
-
-export const getTagsForBookController = async (req: Request, res: Response) => {
-    const { userBookId } = req.params;
-
-    if (!userBookId) {
-        return res.status(400).json({ error: "userBookId is required" });
-    }
-
-    try {
-        const tags = await getTagsForBook(Number(userBookId));
-        res.status(200).json(tags);
-    } catch (error) {
-        console.error("Error fetching tags for book:", error);
-        res.status(500).json({ error: "An error occurred while fetching tags for the book" });
     }
 };

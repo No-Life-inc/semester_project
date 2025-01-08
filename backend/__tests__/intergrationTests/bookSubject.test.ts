@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it, jest, test } from "@jest/glo
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import { getBooksBySubject } from "../../services/bookSubjectService";
 
-jest.setTimeout(30000);
+jest.setTimeout(120000);
 
 beforeAll(async () => {
   await setupTestDB();

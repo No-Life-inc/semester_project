@@ -1,7 +1,8 @@
-import {getBookById} from "./bookService";
 import UserBookTag from "../models/sequelize/UserBookTag";
 import {getTagById} from "./tagService";
 import Tag from "../models/sequelize/Tag";
+import {getUserBookById} from "./userBookService";
+import {BaseError, ConflictError} from "../utility/errors";
 
 
 //Add docstrings to the following functions'
@@ -18,19 +19,33 @@ import Tag from "../models/sequelize/Tag";
  */
 export const addTagToBook = async (tagId: number, userBookId: number) => {
     try{
-        console.log("Validating tag and book existence:", { tagId, userBookId }); // Log input
-
         const tag = await getTagById(tagId);
-        const userBook = await getBookById(userBookId);
+        const userBook = await getUserBookById(userBookId);
 
         if(!tag || !userBook){
             throw new Error("Tag or book not found");
         }
 
+        const existingUserBookTag = await UserBookTag.findOne({
+            where: {
+                tagId: tagId,
+                userBookId: userBookId
+            }
+        });
+
+        if(existingUserBookTag){
+            throw new ConflictError("Tag already exists on the book");
+        }
+
         return await UserBookTag.create({tagId: tagId, userBookId: userBookId});
 
-    } catch (error) {
-        throw new Error("An error occurred while adding tag to book");
+    }catch (error) {
+        if (error instanceof BaseError) {
+            throw error;
+        }
+        else {
+            throw new Error("An error occurred while adding tag to book");
+        }
     }
 }
 

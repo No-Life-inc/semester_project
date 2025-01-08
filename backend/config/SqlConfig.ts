@@ -3,10 +3,28 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const sequelize = new Sequelize(
+export const sequelize = new Sequelize(
     process.env.NODE_ENV === 'test' ? process.env.TEST_SQL_NAME : process.env.SQL_NAME,
     process.env.SQL_USER,
     process.env.SQL_PASSWORD,
+    {
+        host: process.env.SQL_HOST,
+        port: process.env.SQL_PORT ? parseInt(process.env.SQL_PORT, 10) : undefined,
+        logging: false,
+        dialect: "mssql",
+        dialectOptions: {
+            options: {
+                encrypt: true,
+                trustServerCertificate: true,
+            },
+        },
+    }
+);
+
+export const limitedSequelize = new Sequelize(
+    process.env.NODE_ENV === 'test' ? process.env.TEST_SQL_NAME : process.env.SQL_NAME,
+    process.env.LIMITED_SQL_USER,
+    process.env.LIMITED_SQL_PASSWORD,
     {
         host: process.env.SQL_HOST,
         port: process.env.SQL_PORT ? parseInt(process.env.SQL_PORT, 10) : undefined,
@@ -17,8 +35,8 @@ const sequelize = new Sequelize(
                 trustServerCertificate: true,
             },
         },
-        logging: console.log,
+        logging: false,
     }
 );
 
-export default sequelize;
+

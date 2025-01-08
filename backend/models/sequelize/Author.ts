@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import sequelize from "../../config/SqlConfig";
+import {limitedSequelize} from "../../config/SqlConfig";
 
 // Define the attributes for the Author model
 interface AuthorAttributes {
@@ -51,7 +51,7 @@ Author.init(
         },
     },
     {
-        sequelize,
+        sequelize: limitedSequelize,
         modelName: "Author",
         tableName: "authors",
         timestamps: true, // Disable timestamps if not needed

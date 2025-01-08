@@ -31,4 +31,16 @@ export class BaseError extends Error {
       super(message, 401);
     }
   }
+
+  export class ForbiddenError extends BaseError {
+    constructor(message = "Forbidden") {
+      super(message, 403);
+    }
+  }
+
+  export class ConflictError extends BaseError {
+      constructor(message = "Conflict") {
+      super(message, 409);
+      }
+  }
   

@@ -50,7 +50,9 @@ DB_PASSWORD=YourStrongPassword123
 
 MONGO_URI=mongodb://root:YourStrongPassword123@mongo-db:27017
 
+LIMITED_SQL_USER=LimitedUser
 
+LIMITED_SQL_PASSWORD=StrongPassword123!
 
 ## How To Run
 

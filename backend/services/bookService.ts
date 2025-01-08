@@ -5,8 +5,8 @@ import Author from "../models/sequelize/Author";
 import Publisher from "../models/sequelize/Publisher";
 import { Op, Transaction } from "sequelize";
 import BookAPIData from "../types/bookAPIData";
-import sequelize from "../config/SqlConfig";
 import { BookCreationAttributes } from "../models/sequelize/Book";
+import { limitedSequelize } from "../config/SqlConfig";
 
 /**
  * Fetches all books from the database.
@@ -132,7 +132,7 @@ export const getBooksByTitle = async (title: string): Promise<Book[]> => {
  * // This will add new books to the database.
  */
 export const addBooks = async (booksData: BookAPIData[]): Promise<Book[]> => {
-  const t = await sequelize.transaction();
+  const t = await limitedSequelize.transaction();
 
   try {
     const addedBooks = [];
@@ -227,13 +227,13 @@ const handleSubjects = async (
       subject = await Subject.create({ name: subjectName }, { transaction });
     }
 
-    const existingAssociation = await sequelize.models.book_subjects.findOne({
+    const existingAssociation = await limitedSequelize.models.book_subjects.findOne({
       where: { book_id: bookId, subject_id: subject.id },
       transaction,
     });
 
     if (!existingAssociation) {
-      await sequelize.models.book_subjects.create(
+      await limitedSequelize.models.book_subjects.create(
         { book_id: bookId, subject_id: subject.id },
         { transaction }
       );
@@ -257,13 +257,13 @@ const handleAuthors = async (
       author = await Author.create({ name: authorName }, { transaction });
     }
 
-    const existingAssociation = await sequelize.models.book_authors.findOne({
+    const existingAssociation = await limitedSequelize.models.book_authors.findOne({
       where: { book_id: bookId, author_id: author.id },
       transaction,
     });
 
     if (!existingAssociation) {
-      await sequelize.models.book_authors.create(
+      await limitedSequelize.models.book_authors.create(
         { book_id: bookId, author_id: author.id },
         { transaction }
       );

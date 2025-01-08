@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import sequelize from "../../config/SqlConfig";
+import {limitedSequelize} from "../../config/SqlConfig";
 import User from "./User";
 import Author from "./Author";
 import Publisher from "./Publisher";
@@ -142,7 +142,7 @@ Book.init(
             type: DataTypes.STRING,
             allowNull: true,
             validate: {
-                len: [0, 255], 
+                len: [0, 2147483647], 
             },
         },
         msrp: {
@@ -182,7 +182,7 @@ Book.init(
         },
     },
     {
-        sequelize,
+        sequelize: limitedSequelize,
         modelName: "Book",
         tableName: "books",
         createdAt: "created_at",

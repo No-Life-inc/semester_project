@@ -7,6 +7,6 @@ const router = express.Router();
 router.use(authenticate);
 router.get("/", getUserBooksController);
 router.post("/", addBookToUserController);
-router.delete("/:userBookId", removeBookFromUserController);
+router.delete("/:bookId", removeBookFromUserController);
 
 export default router;

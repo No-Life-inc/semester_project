@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import sequelize from "../../config/SqlConfig";
+import {limitedSequelize} from "../../config/SqlConfig";
 import Collection from "./Collection"; // Import the Collection model
 import Book from "./Book"; // Import the Book model
 import bcrypt from "bcryptjs";
@@ -51,7 +51,7 @@ User.init(
         },
     },
     {
-        sequelize,
+        sequelize: limitedSequelize,
         modelName: "User",
         tableName: "users",
         timestamps: true,
@@ -62,6 +62,8 @@ User.init(
         },
     }
 );
+
+
 
 User.beforeCreate(async (user) => {
     user.password = await bcrypt.hash(user.password, 10);
