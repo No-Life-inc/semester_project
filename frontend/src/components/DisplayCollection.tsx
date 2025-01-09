@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Collection, Tag } from "../types/type";
 
 interface DisplayCollectionsProps {
@@ -8,8 +8,10 @@ interface DisplayCollectionsProps {
     onRemoveBook: (collectionId: number, bookId: number) => void;
     onFetchTags: (userBookId: number) => void;
     tagsForBooks: { [key: number]: Tag[] };
-    onAddTag: (userBookId: number, tagId: number) => void; // Opdater onAddTag til at tage tagId
-    availableTags: Tag[]; // Liste over tilgængelige tags
+    onAddTag: (userBookId: number, tagId: number) => void;
+    availableTags: Tag[];
+    fetchMoreTags: () => void;
+    hasMoreTags: boolean;
 }
 
 const DisplayCollection: React.FC<DisplayCollectionsProps> = ({
@@ -21,25 +23,56 @@ const DisplayCollection: React.FC<DisplayCollectionsProps> = ({
     tagsForBooks,
     onAddTag,
     availableTags,
+    fetchMoreTags,
+    hasMoreTags,
 }) => {
     const [selectedTagIds, setSelectedTagIds] = useState<{ [key: number]: number | null }>({});
+    const observerRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const [entry] = entries;
+                if (entry.isIntersecting && hasMoreTags) {
+                    fetchMoreTags();
+                }
+            },
+            { threshold: 1.0 }
+        );
+
+        if (observerRef.current) observer.observe(observerRef.current);
+        return () => {
+            if (observerRef.current) observer.unobserve(observerRef.current);
+        };
+    }, [hasMoreTags, fetchMoreTags]);
 
     return (
-        <div>
-            <h3>Your Collections:</h3>
+        <div data-testid="collections-container">
+            <h3 id="your-collections-header">Your Collections:</h3>
             {collections.length > 0 ? (
                 <ul>
                     {collections.map((collection) => (
-                        <li key={collection.id}>
-                            <strong>{collection.name}</strong>
-                            <button onClick={() => onEdit(collection)}>Edit Collection</button>
-                            <button onClick={() => onDelete(collection.id)}>Delete Collection</button>
+                        <li key={collection.id} data-testid={`collection-${collection.id}`}>
+                            <strong data-testid={`collection-name-${collection.id}`}>{collection.name}</strong>
+                            <button
+                                data-testid={`edit-collection-${collection.id}`}
+                                onClick={() => onEdit(collection)}
+                            >
+                                Edit Collection
+                            </button>
+                            <button
+                                data-testid={`delete-collection-${collection.id}`}
+                                onClick={() => onDelete(collection.id)}
+                            >
+                                Delete Collection
+                            </button>
                             {collection.user_books && collection.user_books.length > 0 ? (
                                 <ul>
                                     {collection.user_books.map((userBook) => (
-                                        <li key={userBook.id}>
+                                        <li key={userBook.id} data-testid={`book-${userBook.id}`}>
                                             {userBook.book.title}
                                             <button
+                                                data-testid={`remove-book-${userBook.id}`}
                                                 onClick={() =>
                                                     userBook.book.id !== undefined &&
                                                     onRemoveBook(collection.id, userBook.book.id)
@@ -47,21 +80,33 @@ const DisplayCollection: React.FC<DisplayCollectionsProps> = ({
                                             >
                                                 Remove Book
                                             </button>
-
-                                            <button onClick={() => onFetchTags(userBook.id)}>Show Tags</button>
+    
+                                            <button
+                                                data-testid={`show-tags-${userBook.id}`}
+                                                onClick={() => onFetchTags(userBook.id)}
+                                            >
+                                                Show Tags
+                                            </button>
                                             {tagsForBooks[userBook.id] && (
                                                 <ul>
                                                     {tagsForBooks[userBook.id].map((userBookTag: any) => {
                                                         if (userBookTag.tag) {
-                                                            return <li key={userBookTag.tag.id}>{userBookTag.tag.name}</li>;
+                                                            return (
+                                                                <li
+                                                                    key={userBookTag.tag.id}
+                                                                    data-testid={`tag-${userBookTag.tag.id}`}
+                                                                >
+                                                                    {userBookTag.tag.name}
+                                                                </li>
+                                                            );
                                                         }
                                                         return null;
                                                     })}
                                                 </ul>
                                             )}
-
-                                            {/* Dropdown for Tag Selection */}
+    
                                             <select
+                                                data-testid={`tag-selector-${userBook.id}`}
                                                 value={selectedTagIds[userBook.id] || ""}
                                                 onChange={(e) =>
                                                     setSelectedTagIds((prev) => ({
@@ -71,15 +116,19 @@ const DisplayCollection: React.FC<DisplayCollectionsProps> = ({
                                                 }
                                             >
                                                 <option value="">Select a tag</option>
-                                                {availableTags.map((tag) => (
-                                                    <option key={tag.id} value={tag.id}>
+                                                {availableTags.map((tag, index) => (
+                                                    <option
+                                                        key={`available-tag-${tag.id}-${index}`}
+                                                        value={tag.id}
+                                                    >
                                                         {tag.name}
                                                     </option>
                                                 ))}
                                             </select>
-
-                                            {/* Button for Adding Tag */}
+                                            <div ref={observerRef} style={{ height: "1px" }} />
+    
                                             <button
+                                                data-testid={`add-tag-${userBook.id}`}
                                                 onClick={() => {
                                                     const tagId = selectedTagIds[userBook.id];
                                                     if (tagId) {
@@ -97,16 +146,17 @@ const DisplayCollection: React.FC<DisplayCollectionsProps> = ({
                                     ))}
                                 </ul>
                             ) : (
-                                <p>No books in this collection.</p>
+                                <p data-testid={`no-books-${collection.id}`}>No books in this collection.</p>
                             )}
                         </li>
                     ))}
                 </ul>
             ) : (
-                <p>No collections found.</p>
+                <p data-testid="no-collections">No collections found.</p>
             )}
         </div>
     );
+    
 };
 
 export default DisplayCollection;

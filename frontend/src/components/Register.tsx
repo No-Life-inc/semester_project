@@ -23,38 +23,42 @@ const Register = () => {
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={formData.name}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleInputChange}
-          required
-        />
-        <button type="submit">Register</button>
-      </form>
-      {message && <p>{message}</p>}
+    <div data-testid="register-container">
+        <h2 data-testid="register-header">Register</h2>
+        <form onSubmit={handleSubmit} data-testid="register-form">
+            <input
+                type="text"
+                name="name"
+                placeholder="Name"
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+                data-testid="register-name-input"
+            />
+            <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                data-testid="register-email-input"
+            />
+            <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+                data-testid="register-password-input"
+            />
+            <button type="submit" data-testid="register-submit-button">Register</button>
+        </form>
+        {message && <p data-testid="register-message">{message}</p>}
     </div>
-  );
+);
+
 };
 
 export default Register;

@@ -71,3 +71,19 @@ export const deleteTagFromBookController = async (request: Request, response: Re
         response.status(500).json({ error: "An error occurred while deleting tag from book" });
     }
 };
+
+export const getTagsForBookController = async (req: Request, res: Response) => {
+    const { userBookId } = req.params;
+
+    if (!userBookId) {
+        return res.status(400).json({ error: "userBookId is required" });
+    }
+
+    try {
+        const tags = await getTagsForBook(Number(userBookId));
+        res.status(200).json(tags);
+    } catch (error) {
+        console.error("Error fetching tags for book:", error);
+        res.status(500).json({ error: "An error occurred while fetching tags for the book" });
+    }
+};

@@ -1,4 +1,3 @@
-// CreateCollection.tsx
 import React, { useState, FormEvent, useEffect } from "react";
 import axios from "axios";
 import { Collection } from "../types/type";
@@ -16,18 +15,39 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
     const [error, setError] = useState<string | null>(null);
     const [editingCollection, setEditingCollection] = useState<Collection | null>(null);
     const [tagsForBooks, setTagsForBooks] = useState<{ [key: number]: Tag[] }>({});
-    const [availableTags, setAvailableTags] = useState([]);
+    const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [hasMoreTags, setHasMoreTags] = useState(true);
 
     useEffect(() => {
         fetchCollections();
     }, []);
 
-    useEffect(() => {
-        const fetchTags = async () => {
-            const response = await axios.get("http://localhost:5000/v1/tag");
-            setAvailableTags(response.data);
-        };
+    const fetchTags = async () => {
+        if (loading || !hasMoreTags) return;
 
+        setLoading(true);
+        try {
+            const response = await axios.get("http://localhost:5000/v1/tag", {
+                params: { page, limit: 10 },
+            });
+            const fetchedTags = response.data;
+
+            if (fetchedTags.length === 0) {
+                setHasMoreTags(false);
+            } else {
+                setAvailableTags((prevTags) => [...prevTags, ...fetchedTags]);
+                setPage((prevPage) => prevPage + 1);
+            }
+        } catch (error) {
+            console.error("Error fetching tags:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchTags();
     }, []);
 
@@ -111,8 +131,13 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
     // Fetch tags for a specific book
     const fetchTagsForBook = async (userBookId: number) => {
         try {
-            const response = await axios.get(`http://localhost:5000/v1/userBookTag/${userBookId}`);
-            setTagsForBooks((prev) => ({ ...prev, [userBookId]: response.data }));
+            const token = localStorage.getItem("token");
+            const response = await axios.get(`http://localhost:5000/v1/userBookTag/${userBookId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setTagsForBooks((prev) => ({ ...prev, [userBookId]: response.data as Tag[] }));
         } catch (error) {
             console.error("Error fetching tags for book:", error);
         }
@@ -122,11 +147,20 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
     const handleAddTag = async (userBookId: number, tagId: number) => {
         console.log("Adding tag:", { userBookId, tagId });
         try {
-            await axios.post("http://localhost:5000/v1/userBookTag", {
-                user_book_id: userBookId,
-                tag_id: tagId,
-            });
-            await fetchTagsForBook(userBookId); // Opdater tags
+            const token = localStorage.getItem("token"); 
+            await axios.post(
+                "http://localhost:5000/v1/userBookTag",
+                {
+                    user_book_id: userBookId,
+                    tag_id: tagId,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            await fetchTagsForBook(userBookId);
         } catch (error) {
             console.error("Error adding tag to book:", error);
         }
@@ -139,8 +173,8 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
     };
 
     const handleUpdate = () => {
-        fetchCollections(); // Refresh collections
-        setEditingCollection(null); // Luk redigeringsvisningen
+        fetchCollections();
+        setEditingCollection(null);
     };
     
 
@@ -164,41 +198,46 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
         }
     };
     
+return (
+    <div data-testid="create-collection-container">
+        <h3 id="create-collection-header" data-testid="create-collection-header">Create a Collection</h3>
+        <form onSubmit={handleCreateCollection} data-testid="create-collection-form">
+            <input
+                type="text"
+                placeholder="Collection Name"
+                value={collectionName}
+                onChange={(e) => setCollectionName(e.target.value)}
+                data-testid="collection-name-input"
+            />
+            <button type="submit" data-testid="create-collection-button">Create</button>
+        </form>
+        {error && <p style={{ color: "red" }} data-testid="create-collection-error">{error}</p>}
 
-    return (
-        <div>
-            <h3>Create a Collection</h3>
-            <form onSubmit={handleCreateCollection}>
-                <input
-                    type="text"
-                    placeholder="Collection Name"
-                    value={collectionName}
-                    onChange={(e) => setCollectionName(e.target.value)}
-                />
-                <button type="submit">Create</button>
-            </form>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+        {editingCollection ? (
+            <EditCollection
+                collection={editingCollection}
+                onUpdate={handleUpdate}
+                onCancel={() => setEditingCollection(null)}
+                data-testid="edit-collection-component"
+            />
+        ) : (
+            <DisplayCollection
+                collections={collections}
+                onEdit={handleEdit}
+                onDelete={handleDeleteCollection}
+                onRemoveBook={handleRemoveBook}
+                onFetchTags={fetchTagsForBook}
+                tagsForBooks={tagsForBooks}
+                onAddTag={handleAddTag}
+                availableTags={availableTags}
+                fetchMoreTags={fetchTags}
+                hasMoreTags={hasMoreTags}
+                data-testid="display-collection-component"
+            />
+        )}
+    </div>
+);
 
-            {editingCollection ? (
-                <EditCollection
-                    collection={editingCollection}
-                    onUpdate={handleUpdate}
-                    onCancel={() => setEditingCollection(null)}
-                />
-            ) : (
-                <DisplayCollection
-                    collections={collections}
-                    onEdit={handleEdit}
-                    onDelete={handleDeleteCollection}
-                    onRemoveBook={handleRemoveBook}
-                    onFetchTags={fetchTagsForBook}
-                    tagsForBooks={tagsForBooks}
-                    onAddTag={handleAddTag}
-                    availableTags={availableTags}
-                />
-            )}
-        </div>
-    );
 };
 
 export default CreateCollection;

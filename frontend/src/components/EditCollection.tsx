@@ -42,23 +42,25 @@ const EditCollection: React.FC<EditCollectionProps> = ({ collection, onUpdate, o
     };
 
     return (
-        <div>
-            <h3>Edit Collection</h3>
-            <form onSubmit={handleEditCollection}>
+        <div data-testid="edit-collection-container">
+            <h3 id="edit-collection-header" data-testid="edit-collection-header">Edit Collection</h3>
+            <form onSubmit={handleEditCollection} data-testid="edit-collection-form">
                 <input
                     type="text"
                     placeholder="Collection Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    data-testid="edit-collection-input"
                 />
-                <button type="submit">Save</button>
-                <button type="button" onClick={onCancel}>
+                <button type="submit" data-testid="save-collection-button">Save</button>
+                <button type="button" onClick={onCancel} data-testid="cancel-edit-button">
                     Cancel
                 </button>
             </form>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            {error && <p style={{ color: "red" }} data-testid="edit-collection-error">{error}</p>}
         </div>
     );
+    
 };
 
 export default EditCollection;

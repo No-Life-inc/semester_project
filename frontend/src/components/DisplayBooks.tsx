@@ -45,47 +45,70 @@ const DisplayBooks: React.FC<DisplayBooksProps> = ({ books, collections, lastBoo
   };
 
   return (
-    <div className="book-list">
-      {books.map((book, index) => (
-        <div
-          key={book.id}
-          className="card"
-          ref={index === books.length - 1 ? lastBookRef : null}
-        >
-          <div className="card-image-container">
-            {book.image && <img src={book.image} alt={`${book.title} cover`} className="card-image" />}
-          </div>
-          <div className="card-title" title={book.title}>
-            {truncateTitle(book.title)}
-          </div>
-          <div className="card-content">
-            {book.authors && <p>By: {book.authors.map((author) => author.name).join(', ')}</p>}
-            {book.edition && <p>Edition: {book.edition}</p>}
-            {book.isbn && <p>ISBN: {book.isbn}</p>}
-            {book.language && <p>Language: {book.language}</p>}
-            {book.publicationDate && <p>Publication Date: {new Date(book.publicationDate).toLocaleDateString()}</p>}
-          </div>
-          <div className="add-to-collection">
-            <select
-              onChange={(e) => setSelectedCollection(Number(e.target.value))}
-              defaultValue=""
+    <div className="book-list" data-testid="book-list">
+        {books.map((book, index) => (
+            <div
+                key={book.id}
+                className="card"
+                ref={index === books.length - 1 ? lastBookRef : null}
+                data-testid={`book-card-${book.id}`}
             >
-              <option value="" disabled>
-                Select Collection
-              </option>
-              {collections.map((collection) => (
-                <option key={collection.id} value={collection.id}>
-                  {collection.name}
-                </option>
-              ))}
-            </select>
-            <button onClick={() => book.id !== undefined && handleAddToCollection(book.id)}>Add to Collection</button>
-          </div>
-        </div>
-      ))}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+                <div className="card-image-container" data-testid={`book-image-container-${book.id}`}>
+                    {book.image && (
+                        <img
+                            src={book.image}
+                            alt={`${book.title} cover`}
+                            className="card-image"
+                            data-testid={`book-image-${book.id}`}
+                        />
+                    )}
+                </div>
+                <div className="card-title" title={book.title} data-testid={`book-title-${book.id}`}>
+                    {truncateTitle(book.title)}
+                </div>
+                <div className="card-content" data-testid={`book-content-${book.id}`}>
+                    {book.authors && (
+                        <p data-testid={`book-authors-${book.id}`}>
+                            By: {book.authors.map((author) => author.name).join(', ')}
+                        </p>
+                    )}
+                    {book.edition && <p data-testid={`book-edition-${book.id}`}>Edition: {book.edition}</p>}
+                    {book.isbn && <p data-testid={`book-isbn-${book.id}`}>ISBN: {book.isbn}</p>}
+                    {book.language && <p data-testid={`book-language-${book.id}`}>Language: {book.language}</p>}
+                    {book.publicationDate && (
+                        <p data-testid={`book-publication-date-${book.id}`}>
+                            Publication Date: {new Date(book.publicationDate).toLocaleDateString()}
+                        </p>
+                    )}
+                </div>
+                <div className="add-to-collection" data-testid={`add-to-collection-${book.id}`}>
+                    <select
+                        onChange={(e) => setSelectedCollection(Number(e.target.value))}
+                        defaultValue=""
+                        data-testid={`collection-selector-${book.id}`}
+                    >
+                        <option value="" disabled>
+                            Select Collection
+                        </option>
+                        {collections.map((collection) => (
+                            <option key={collection.id} value={collection.id} data-testid={`collection-option-${collection.id}`}>
+                                {collection.name}
+                            </option>
+                        ))}
+                    </select>
+                    <button
+                        onClick={() => book.id !== undefined && handleAddToCollection(book.id)}
+                        data-testid={`add-to-collection-button-${book.id}`}
+                    >
+                        Add to Collection
+                    </button>
+                </div>
+            </div>
+        ))}
+        {error && <p style={{ color: 'red' }} data-testid="error-message">{error}</p>}
     </div>
-  );
+);
+
 };
 
 export default DisplayBooks;

@@ -43,37 +43,41 @@ const EditUser: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Edit Profile</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Name:
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Email:
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
-        <button type="submit">Save Changes</button>
-      </form>
+    <div data-testid="edit-profile-container">
+        <h2 id="edit-profile-header" data-testid="edit-profile-header">Edit Profile</h2>
+        <form onSubmit={handleSubmit} data-testid="edit-profile-form">
+            <label>
+                Name:
+                <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    data-testid="edit-profile-name-input"
+                />
+            </label>
+            <label>
+                Email:
+                <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    data-testid="edit-profile-email-input"
+                />
+            </label>
+            <button type="submit" data-testid="save-profile-changes-button">Save Changes</button>
+        </form>
 
-      {/* Display success or error messages */}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
+        {error && <p style={{ color: "red" }} data-testid="edit-profile-error">{error}</p>}
+        {success && <p style={{ color: "green" }} data-testid="edit-profile-success">{success}</p>}
 
-      <button onClick={() => navigate("/profile")}>Return to Profile</button>
+        <button onClick={() => navigate("/profile")} data-testid="return-to-profile-button">
+            Return to Profile
+        </button>
     </div>
-  );
+);
+
 };
 
 export default EditUser;

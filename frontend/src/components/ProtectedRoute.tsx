@@ -7,14 +7,21 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user } = useContext(UserContext) || {};
+  const { user, setUser } = useContext(UserContext) || {};
 
-  // If the user is not authenticated, redirect to the login page
-  if (!user) {
+  const token = localStorage.getItem('token');
+
+  if (!user && token && setUser) {
+    const savedUser = JSON.parse(localStorage.getItem('user') || 'null');
+    if (savedUser) {
+      setUser(savedUser); 
+    }
+  }
+
+  if (!user && !token) {
     return <Navigate to="/login" />;
   }
 
-  // Otherwise, render the protected page
   return <>{children}</>;
 };
 

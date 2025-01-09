@@ -13,7 +13,7 @@ const Logout: React.FC = () => {
     navigate('/'); // Redirect to the home or login page
   }, [setUser, navigate]);
 
-  return <p>Logging out...</p>; // Provide a brief message to the user
+  return <p data-testid="log-out-message">Logging out...</p>;
 };
 
 export default Logout;

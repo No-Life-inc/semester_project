@@ -37,9 +37,9 @@ const EditPassword: React.FC = () => {
     };
 
     return (
-        <div>
-            <h2>Change Password</h2>
-            <form onSubmit={handleSubmit}>
+        <div data-testid="change-password-container">
+            <h2 id="change-password-header" data-testid="change-password-header">Change Password</h2>
+            <form onSubmit={handleSubmit} data-testid="change-password-form">
                 <label>
                     Old Password:
                     <input
@@ -47,6 +47,7 @@ const EditPassword: React.FC = () => {
                         value={oldPassword}
                         onChange={(e) => setOldPassword(e.target.value)}
                         required
+                        data-testid="old-password-input"
                     />
                 </label>
                 <label>
@@ -56,18 +57,21 @@ const EditPassword: React.FC = () => {
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         required
+                        data-testid="new-password-input"
                     />
                 </label>
-                <button type="submit">Save Changes</button>
+                <button type="submit" data-testid="save-changes-button">Save Changes</button>
             </form>
-
-            {/* Display error or success messages */}
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            {success && <p style={{ color: "green" }}>{success}</p>}
-
-            <button onClick={() => navigate("/profile")}>Return to Profile</button>
+    
+            {error && <p style={{ color: "red" }} data-testid="change-password-error">{error}</p>}
+            {success && <p style={{ color: "green" }} data-testid="change-password-success">{success}</p>}
+    
+            <button onClick={() => navigate("/profile")} data-testid="return-to-profile-button">
+                Return to Profile
+            </button>
         </div>
     );
+    
 };
 
 export default EditPassword;

@@ -27,10 +27,13 @@ export const fetchBookById = async (id: number): Promise<Book> => {
   }
 };
 
-export const getAllTags = async () => {
-  const response = await axios.get(`${API_BASE_URL}/tag/`);
+export const getAllTags = async (page: number = 1, limit: number = 10) => {
+  const response = await axios.get(`${API_BASE_URL}/tag/`, {
+    params: { page, limit },
+  });
   return response.data;
 };
+
 
 export const getTagById = async (id: number) => {
   const response = await axios.get(`${API_BASE_URL}/tag/${id}`);

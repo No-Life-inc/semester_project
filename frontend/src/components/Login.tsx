@@ -45,32 +45,35 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleInputChange}
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-      {message && <p>{message}</p>}
+    <div data-testid="login-container">
+        <h2 id="login-header" data-testid="login-header">Login</h2>
+        <form onSubmit={handleSubmit} data-testid="login-form">
+            <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                data-testid="login-email-input"
+            />
+            <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+                data-testid="login-password-input"
+            />
+            <button type="submit" disabled={loading} data-testid="login-submit-button">
+                {loading ? 'Logging in...' : 'Login'}
+            </button>
+        </form>
+        {message && <p data-testid="login-message">{message}</p>}
     </div>
-  );
+);
+
 };
 
 export default Login;

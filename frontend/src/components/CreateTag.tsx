@@ -25,18 +25,22 @@ const CreateTag: React.FC<CreateTagProps> = ({ onTagCreated }) => {
   };
 
   return (
-    <div>
-      <h2>Create a New Tag</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <input
-        type="text"
-        placeholder="Enter tag name"
-        value={tagName}
-        onChange={(e) => setTagName(e.target.value)}
-      />
-      <button onClick={handleCreateTag}>Create Tag</button>
+    <div data-testid="create-tag-container">
+        <h2 id="create-tag-header" data-testid="create-tag-header">Create a New Tag</h2>
+        {error && <p style={{ color: "red" }} data-testid="create-tag-error">{error}</p>}
+        <input
+            type="text"
+            placeholder="Enter tag name"
+            value={tagName}
+            onChange={(e) => setTagName(e.target.value)}
+            data-testid="tag-name-input"
+        />
+        <button onClick={handleCreateTag} data-testid="create-tag-button">
+            Create Tag
+        </button>
     </div>
-  );
+);
+
 };
 
 export default CreateTag;

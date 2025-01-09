@@ -6,7 +6,7 @@ import { User } from "../types/type";
 import DisplayTag from "./DisplayTag";
 import CreateTag from "./CreateTag";
 import { Tag } from "../types/type";
-import { getAllTags, deleteTagById } from "../services/apiClient";
+import { getAllTags } from "../services/apiClient";
 
 
 interface UserContextValue {
@@ -41,30 +41,44 @@ const Profile: React.FC = () => {
     }
   };
 
-  const handleDeleteTag = async (id: number) => {
-    try {
-      await deleteTagById(id);
-      setTags((prevTags) => prevTags.filter((tag) => tag.id !== id));
-    } catch (err) {
-      console.error("Error deleting tag:", err);
-    }
-  };
-
   return (
-    <div>
-      <h2>Profile</h2>
-      <p>Name: {user?.name}</p>
-      <p>Email: {user?.email}</p>
-      <button onClick={() => navigate("/edit-user")}>Edit Profile</button>
-      <button onClick={() => navigate("/edit-password")}>Change Password</button>
-      <hr />
-      <CreateCollection onSuccess={(message) => setSuccessMessage(message)} />
-      {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-
-      <CreateTag onTagCreated={handleTagCreated} />
-      <DisplayTag tags={tags} onDeleteTag={handleDeleteTag} />
+    <div data-testid="profile-container">
+        <h2 data-testid="profile-header">Profile</h2>
+        <p data-testid="profile-name">Name: {user?.name}</p>
+        <p data-testid="profile-email">Email: {user?.email}</p>
+        <button
+            onClick={() => navigate("/edit-user")}
+            data-testid="edit-profile-button"
+        >
+            Edit Profile
+        </button>
+        <button
+            onClick={() => navigate("/edit-password")}
+            data-testid="change-password-button"
+        >
+            Change Password
+        </button>
+        <hr />
+        <CreateCollection
+            onSuccess={(message) => setSuccessMessage(message)}
+            data-testid="create-collection-component"
+        />
+        {successMessage && (
+            <p style={{ color: "green" }} data-testid="success-message">
+                {successMessage}
+            </p>
+        )}
+        <CreateTag
+            onTagCreated={handleTagCreated}
+            data-testid="create-tag-component"
+        />
+        <DisplayTag
+            tags={tags}
+            data-testid="display-tag-component"
+        />
     </div>
-  );
+);
+
 };
 
 export default Profile;

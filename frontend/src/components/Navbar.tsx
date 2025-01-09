@@ -12,39 +12,44 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="navbar">
-      <h1>CollectionAPP 5000</h1>
-      <ul>
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        {user ? (
-          <>
-            <li>
-              <Link to="/books">Books</Link>
+    <nav className="navbar" data-testid="navbar">
+        <h1 data-testid="navbar-header">CollectionAPP 5000</h1>
+        <ul data-testid="navbar-links">
+            <li data-testid="navbar-home-link">
+                <Link to="/">Home</Link>
             </li>
-            <li>
-              <Link to="/profile">Profile</Link>
-            </li>
-            <li>
-              <button onClick={handleLogout} className="logout-button">
-                Logout
-              </button>
-            </li>
-          </>
-        ) : (
-          <>
-            <li>
-              <Link to="/register">Register</Link>
-            </li>
-            <li>
-              <Link to="/login">Login</Link>
-            </li>
-          </>
-        )}
-      </ul>
+            {user ? (
+                <>
+                    <li data-testid="navbar-books-link">
+                        <Link to="/books">Books</Link>
+                    </li>
+                    <li data-testid="navbar-profile-link">
+                        <Link to="/profile">Profile</Link>
+                    </li>
+                    <li>
+                        <button
+                            onClick={handleLogout}
+                            className="logout-button"
+                            data-testid="navbar-logout-button"
+                        >
+                            Logout
+                        </button>
+                    </li>
+                </>
+            ) : (
+                <>
+                    <li data-testid="navbar-register-link">
+                        <Link to="/register">Register</Link>
+                    </li>
+                    <li data-testid="navbar-login-link">
+                        <Link to="/login">Login</Link>
+                    </li>
+                </>
+            )}
+        </ul>
     </nav>
-  );
+);
+
 };
 
 export default Navbar;
