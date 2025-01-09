@@ -31,7 +31,6 @@ const EditUser: React.FC = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Update context with the new user data
       if (user && setUser) {
         setUser({ ...user, name, email });
         localStorage.setItem('user', JSON.stringify({ ...user, name, email }));

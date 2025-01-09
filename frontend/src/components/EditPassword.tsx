@@ -27,10 +27,9 @@ const EditPassword: React.FC = () => {
             );
 
             setSuccess(response.data.message || "Password updated successfully!");
-            setError(null); // Clear any error messages
-            setTimeout(() => navigate("/profile"), 2000); // Redirect after 2 seconds
+            setError(null); 
+            setTimeout(() => navigate("/profile"), 2000); 
         } catch (error: any) {
-            // Handle backend error messages
             setError(error.response?.data?.error || "An error occurred while updating the password.");
         }
     };

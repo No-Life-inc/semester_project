@@ -1,12 +1,11 @@
-// EditCollection.tsx
 import React, { FormEvent, useState } from "react";
 import axios from "axios";
 import { Collection } from "../types/type";
 
 interface EditCollectionProps {
     collection: Collection;
-    onUpdate: () => void; // Callback to refresh the collections after editing
-    onCancel: () => void; // Callback to cancel editing
+    onUpdate: () => void;
+    onCancel: () => void; 
 }
 
 const EditCollection: React.FC<EditCollectionProps> = ({ collection, onUpdate, onCancel }) => {
@@ -35,7 +34,7 @@ const EditCollection: React.FC<EditCollectionProps> = ({ collection, onUpdate, o
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
-            onUpdate(); // Send opdateret collection til CreateCollection
+            onUpdate();
         } catch (error: any) {
             setError(error.response?.data?.error || "An error occurred while editing the collection.");
         }

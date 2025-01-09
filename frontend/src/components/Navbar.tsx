@@ -4,11 +4,11 @@ import '../styles/Navbar.css';
 import { UserContext } from '../context/UserContext';
 
 const Navbar: React.FC = () => {
-  const { user, setUser } = useContext(UserContext) || {}; // Access UserContext
+  const { user, setUser } = useContext(UserContext) || {};
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove token from localStorage
-    setUser?.(null); // Update context state to null
+    localStorage.removeItem('token');
+    setUser?.(null);
   };
 
   return (
