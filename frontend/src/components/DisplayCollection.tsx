@@ -71,6 +71,7 @@ const DisplayCollection: React.FC<DisplayCollectionsProps> = ({
                                     {collection.user_books.map((userBook) => (
                                         <li key={userBook.id} data-testid={`book-${userBook.id}`}>
                                             {userBook.book.title}
+                                            {userBook.book.id}
                                             <button
                                                 data-testid={`remove-book-${userBook.id}`}
                                                 onClick={() =>

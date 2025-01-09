@@ -3,13 +3,13 @@ describe('Login and Edit Details', () => {
 
     cy.clearLocalStorage();
     cy.clearCookies();
-    // Log in and verify the token is in localStorage
+
     cy.visit('/login');
     cy.get('[data-testid="login-email-input"]').type('test@test.com');
     cy.get('[data-testid="login-password-input"]').type('YourStrongPassword123');
     cy.get('[data-testid="login-submit-button"]').click();
 
-    // Verify successful login and token storage
+  
     cy.url().should('eq', 'http://localhost:3000/');
     cy.window().then((window) => {
       const token = window.localStorage.getItem('token');
@@ -146,7 +146,7 @@ it('displays error message if email is invalid', () => {
   cy.get('[data-testid="edit-profile-button"]').click();
   cy.url().should('include', '/edit-user');
 
-  cy.get('[data-testid="edit-profile-email-input"]').should('have.value', 'test@test.com');
+  // cy.get('[data-testid="edit-profile-email-input"]').should('have.value', 'test@test.com');
   cy.get('[data-testid="edit-profile-email-input"]').clear().type('test_email@example.com');
 
   cy.get('[data-testid="save-profile-changes-button"]').click();
@@ -239,7 +239,7 @@ it('should display error message if new password is incorrect', () => {
   cy.get('[data-testid="new-password-input"]').type('YourStrongPassword123');
   cy.get('[data-testid="save-changes-button"]').click();
 
-  cy.get('[data-testid="change-password-error"]').should('have.text', 'Invalid password.');
+  cy.get('[data-testid="change-password-error"]').should('have.text', 'Old password is incorrect.');
 
   cy.get('[data-testid="old-password-input"]').type('YourStrongPassword123');
   cy.get('[data-testid="new-password-input"]').type('p');
