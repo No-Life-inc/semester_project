@@ -42,7 +42,7 @@ describe('Register Page', () => {
 
   });
 
-  it('should show an error message on failed registration', () => {
+  it('should show an error message if invalid characters in name', () => {
   
     cy.get('[data-testid="register-name-input"]').type('Betül');
     cy.get('[data-testid="register-email-input"]').type('h@h.com');

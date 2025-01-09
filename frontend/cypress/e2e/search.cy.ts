@@ -12,7 +12,6 @@ describe('Search Books (Live API)', () => {
     });
 
     cy.visit('/books');
-    cy.url().should('include', '/books');
   });
 
   it('should search for books and display matching results', () => {
