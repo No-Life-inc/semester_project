@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import User from "../models/sequelize/User";
 import {validateEmail, validateName, validatePassword} from "./validatorService";
 import {generateToken, verifyToken, DecodedToken} from "./jwtService";
+import {BadRequestError, ConflictError, NotFoundError, UnauthorizedError} from "../utility/errors";
 
 /**
  * Registers a new user.
@@ -23,7 +24,7 @@ export const registerUser = async (name: string, email: string, password: string
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-        throw new Error("Email is already in use.");
+        throw new ConflictError("Email is already in use.");
     }
 
     // Create and return the new user
@@ -53,13 +54,13 @@ export const loginUser = async (email: string, password: string) => {
         attributes: { include: ["password"] },
     });
     if (!user) {
-        throw new Error("Invalid email or password.");
+        throw new UnauthorizedError("Invalid email or password.");
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-        throw new Error("Invalid email or password.");
+        throw new UnauthorizedError("Invalid email or password.");
     }
 
 
@@ -97,7 +98,7 @@ export const editUser = async (email: string, name: string, newEmail: string) =>
     const user = await User.findOne({ where: { email: email } });
 
     if (!user) {
-        throw new Error("User not found.");
+        throw new NotFoundError("User not found.");
     }
 
     if (newEmail) {
@@ -136,12 +137,12 @@ export const editPassword = async (email: string, oldPassword: string, password:
     });
 
     if (!user) {
-        throw new Error("User not found.");
+        throw new NotFoundError("User not found.");
     }
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
-        throw new Error("Invalid password.");
+        throw new UnauthorizedError("Old password is incorrect.");
     }
 
     user.password = password;
