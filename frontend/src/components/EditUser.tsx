@@ -11,27 +11,26 @@ interface UserContextValue {
 }
 
 const EditUser: React.FC = () => {
-  const { user, setUser } = useContext(UserContext) as UserContextValue; // Explicitly type the context value
+  const { user, setUser } = useContext(UserContext) as UserContextValue;
   const [name, setName] = useState<string>(user?.name || "");
   const [email, setEmail] = useState<string>(user?.email || "");
-  const [error, setError] = useState<string | null>(null); // State for error messages
-  const [success, setSuccess] = useState<string | null>(null); // State for success messages
+  const [error, setError] = useState<string | null>(null); 
+  const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError(null); // Clear previous errors
-    setSuccess(null); // Clear previous success messages
+    setError(null); 
+    setSuccess(null); 
 
     try {
-      const token = localStorage.getItem("token"); // Assume JWT token stored in localStorage.
+      const token = localStorage.getItem("token");
       const response = await axios.patch(
         "http://localhost:5000/v1/user/editUser",
         { name, email },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Update context with the new user data
       if (user && setUser) {
         setUser({ ...user, name, email });
       }

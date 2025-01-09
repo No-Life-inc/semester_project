@@ -18,10 +18,8 @@ const Register = () => {
       console.log(response.data);
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.error) {
-        // Display the error message from the API response
         setMessage(error.response.data.error);
       } else {
-        // Fallback for other errors or missing response data
         setMessage('An error occurred during registration. Please try again.');
       }
       console.error('Registration error:', error);

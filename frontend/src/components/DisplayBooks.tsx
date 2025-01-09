@@ -42,7 +42,6 @@ const DisplayBooks: React.FC<DisplayBooksProps> = ({ books, collections, lastBoo
       if (onBookAdded) onBookAdded(response.data.message || 'Book added successfully.');
     } catch (error: any) {
         if (error.response && error.response.data && error.response.data.error) {
-            // Show the error message from the API response
             setMessage(error.response.data.error);
           } else {
             setMessage('An error occurred while adding book to collection. Please try again.');

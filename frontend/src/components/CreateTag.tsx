@@ -22,7 +22,6 @@ const CreateTag: React.FC<CreateTagProps> = ({ onTagCreated }) => {
       onTagCreated();
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.error) {
-        // Show the error message from the API response
         setMessage(error.response.data.error);
       } else {
         setMessage('An error occurred while creating tag. Please try again.');
