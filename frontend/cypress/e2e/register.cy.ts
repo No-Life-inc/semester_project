@@ -1,3 +1,5 @@
+import { defineConfig } from "cypress";
+
 describe('Register Page', () => {
   beforeEach(() => {
     // Start by visiting the register page
@@ -10,7 +12,7 @@ describe('Register Page', () => {
 
     // Fill out the form
     cy.get('[data-testid="register-name-input"]').type('Hans');
-    cy.get('[data-testid="register-email-input"]').type('h@h.com');
+    cy.get('[data-testid="register-email-input"]').type('ha@ha.com');
     cy.get('[data-testid="register-password-input"]').type('Password123');
 
     // Submit the form
@@ -21,7 +23,7 @@ describe('Register Page', () => {
       expect(interception.response?.statusCode).to.equal(200);
       expect(interception.request.body).to.deep.equal({
         name: 'Hans',
-        email: 'h@h.com',
+        email: 'ha@ha.com',
         password: 'Password123',
       });
     });
@@ -39,7 +41,7 @@ describe('Register Page', () => {
 
     // Fill out the form
     cy.get('[data-testid="register-name-input"]').type('Hans');
-    cy.get('[data-testid="register-email-input"]').type('h@h.com');
+    cy.get('[data-testid="register-email-input"]').type('ha@ha.com');
     cy.get('[data-testid="register-password-input"]').type('Password123');
 
     // Submit the form
@@ -49,6 +51,6 @@ describe('Register Page', () => {
     cy.wait('@registerRequest');
 
     // Check that the error message is displayed
-    cy.get('[data-testid="register-message"]').should('contain', 'An error occurred during registration');
+    cy.get('[data-testid="register-message"]').should('contain', 'Registration failed');
   });
 });
