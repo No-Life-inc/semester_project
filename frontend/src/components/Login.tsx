@@ -26,14 +26,16 @@ const Login = () => {
       const response = await axios.post('http://localhost:5000/v1/user/login', formData);
       const { token, user } = response.data; 
   
-
+      
       localStorage.setItem('token', token);
-      setUser(user);
+      setUser(user); 
+      localStorage.setItem('user', JSON.stringify(user));
   
       setMessage('Login successful!');
       navigate('/'); 
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.error) {
+        
         setMessage(error.response.data.error);
       } else {
         setMessage('An error occurred during login. Please try again.');

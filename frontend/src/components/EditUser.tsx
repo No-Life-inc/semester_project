@@ -11,11 +11,11 @@ interface UserContextValue {
 }
 
 const EditUser: React.FC = () => {
-  const { user, setUser } = useContext(UserContext) as UserContextValue;
+  const { user, setUser } = useContext(UserContext) as UserContextValue; 
   const [name, setName] = useState<string>(user?.name || "");
   const [email, setEmail] = useState<string>(user?.email || "");
   const [error, setError] = useState<string | null>(null); 
-  const [success, setSuccess] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -24,7 +24,7 @@ const EditUser: React.FC = () => {
     setSuccess(null); 
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token"); 
       const response = await axios.patch(
         "http://localhost:5000/v1/user/editUser",
         { name, email },
@@ -33,6 +33,7 @@ const EditUser: React.FC = () => {
 
       if (user && setUser) {
         setUser({ ...user, name, email });
+        localStorage.setItem('user', JSON.stringify({ ...user, name, email }));
       }
 
       setSuccess("User details updated successfully!");
