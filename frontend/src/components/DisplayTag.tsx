@@ -14,18 +14,23 @@ const DisplayTag: React.FC<DisplayTagProps> = ({ tags: initialTags }) => {
   const [page, setPage] = useState(1);
   const [isFetching, setIsFetching] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [message, setMessage] = useState<string | null>(null);
 
   const handleGetTagById = async () => {
     setError(null);
-    if (!tagId) {
-      setError("Please enter a valid ID");
-      return;
-    }
     try {
       const tag = await getTagById(Number(tagId));
+      if (!tag) {
+        setMessage("Tag not found. Please check the ID and try again.");
+        return;
+      }      
       setTagById(tag);
-    } catch (err) {
-      setError("Error fetching tag by ID");
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.error) {
+        setMessage(error.response.data.error);
+      } else {
+        setMessage('An error occurred while getting tag by id. Please try again.');
+      }
     }
   };
 
@@ -38,7 +43,7 @@ const DisplayTag: React.FC<DisplayTagProps> = ({ tags: initialTags }) => {
       if (newTags.length === 0) setHasMore(false);
       setTags((prevTags) => [...prevTags, ...newTags]);
       setPage(nextPage);
-    } catch (err) {
+    } catch (error: any) {
       setError("Error fetching more tags");
     } finally {
       setIsFetching(false);
@@ -68,7 +73,9 @@ const DisplayTag: React.FC<DisplayTagProps> = ({ tags: initialTags }) => {
   return (
     <div data-testid="tags-container">
         <h1 id="tags-header" data-testid="tags-header">Tags</h1>
+        {message && <p style={{ color: "red" }} data-testid="message">{message}</p>}
         <h2 id="all-tags-header" data-testid="all-tags-header">All Tags</h2>
+        {message && <p style={{ color: "red" }} data-testid="message">{message}</p>}
         {error && <p style={{ color: "red" }} data-testid="tags-error">{error}</p>}
         {tags.length > 0 ? (
             <ul data-testid="tags-list">
@@ -104,8 +111,11 @@ const DisplayTag: React.FC<DisplayTagProps> = ({ tags: initialTags }) => {
             data-testid="tag-id-input"
         />
         <button onClick={handleGetTagById} data-testid="get-tag-button">Get Tag</button>
+        
+        {message && <p style={{ color: "red" }} data-testid="message">{message}</p>}
 
         {tagById && (
+          
             <div data-testid="tag-details-container">
                 <h3 id="tag-details-header" data-testid="tag-details-header">Tag Details</h3>
                 <p data-testid="tag-details-id">ID: {tagById.id}</p>

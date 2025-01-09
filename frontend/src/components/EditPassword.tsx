@@ -5,14 +5,14 @@ import axios from "axios";
 const EditPassword: React.FC = () => {
     const [oldPassword, setOldPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
-    const [error, setError] = useState<string | null>(null); // Error state for error messages
-    const [success, setSuccess] = useState<string | null>(null); // Success state for success messages
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setError(null); // Clear previous errors
-        setSuccess(null); // Clear previous success messages
+        setError(null); 
+        setSuccess(null); 
 
         try {
             const token = localStorage.getItem("token");
@@ -28,11 +28,10 @@ const EditPassword: React.FC = () => {
             );
 
             setSuccess(response.data.message || "Password updated successfully!");
-            setError(null); // Clear any error messages
-            setTimeout(() => navigate("/profile"), 2000); // Redirect after 2 seconds
+            setError(null); 
+            setTimeout(() => navigate("/profile"), 2000); 
         } catch (error: any) {
-            // Handle backend error messages
-            setError(error.response?.data?.message || "An error occurred while updating the password.");
+            setError(error.response?.data?.error || "An error occurred while updating the password.");
         }
     };
 

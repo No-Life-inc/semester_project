@@ -24,25 +24,25 @@ const Login = () => {
     setMessage('');
     try {
       const response = await axios.post('http://localhost:5000/v1/user/login', formData);
-      const { token, user } = response.data; // Extract token and user data from response
+      const { token, user } = response.data; 
+  
 
-      // Save token to localStorage and update UserContext
       localStorage.setItem('token', token);
-      setUser(user); // Set user in the UserContext
-
+      setUser(user);
+  
       setMessage('Login successful!');
-      navigate('/'); // Redirect to the home page or dashboard
+      navigate('/'); 
     } catch (error: any) {
-      if (error.response && error.response.status === 401) {
-        setMessage('Invalid email or password.');
+      if (error.response && error.response.data && error.response.data.error) {
+        setMessage(error.response.data.error);
       } else {
         setMessage('An error occurred during login. Please try again.');
       }
-      console.error('Login error:', error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div data-testid="login-container">

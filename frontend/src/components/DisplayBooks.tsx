@@ -17,6 +17,7 @@ const truncateTitle = (title: string, maxLength: number = 30) => {
 const DisplayBooks: React.FC<DisplayBooksProps> = ({ books, collections, lastBookRef, onBookAdded }) => {
   const [selectedCollection, setSelectedCollection] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const handleAddToCollection = async (bookId: number) => {
     setError(null);
@@ -40,7 +41,11 @@ const DisplayBooks: React.FC<DisplayBooksProps> = ({ books, collections, lastBoo
       );
       if (onBookAdded) onBookAdded(response.data.message || 'Book added successfully.');
     } catch (error: any) {
-      setError(error.response?.data?.message || 'An error occurred while adding the book to the collection.');
+        if (error.response && error.response.data && error.response.data.error) {
+            setMessage(error.response.data.error);
+          } else {
+            setMessage('An error occurred while adding book to collection. Please try again.');
+          }
     }
   };
 

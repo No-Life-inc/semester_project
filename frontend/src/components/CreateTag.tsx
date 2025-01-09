@@ -8,6 +8,7 @@ interface CreateTagProps {
 const CreateTag: React.FC<CreateTagProps> = ({ onTagCreated }) => {
   const [tagName, setTagName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const handleCreateTag = async () => {
     setError(null);
@@ -19,8 +20,12 @@ const CreateTag: React.FC<CreateTagProps> = ({ onTagCreated }) => {
       await createTag(tagName);
       setTagName("");
       onTagCreated();
-    } catch (err) {
-      setError("Error creating tag.");
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.error) {
+        setMessage(error.response.data.error);
+      } else {
+        setMessage('An error occurred while creating tag. Please try again.');
+      }
     }
   };
 
