@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import {limitedSequelize} from "../../config/SqlConfig";
+import {sequelize} from "../../config/SqlConfig";
 
 // Define the attributes for the UserBookTag model
 interface UserBookTagAttributes {
@@ -48,7 +48,7 @@ UserBookTag.init(
         },
     },
     {
-        sequelize: limitedSequelize,
+        sequelize: sequelize,
         modelName: "UserBookTag",
         tableName: "user_book_tags",
         timestamps: true,

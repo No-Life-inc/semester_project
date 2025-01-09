@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import {limitedSequelize} from "../../config/SqlConfig";
+import {sequelize} from "../../config/SqlConfig";
 import Collection from "./Collection"; // Import the Collection model
 import Book from "./Book"; // Import the Book model
 import bcrypt from "bcryptjs";
@@ -51,7 +51,7 @@ User.init(
         },
     },
     {
-        sequelize: limitedSequelize,
+        sequelize: sequelize,
         modelName: "User",
         tableName: "users",
         timestamps: true,

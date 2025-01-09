@@ -13,6 +13,10 @@ export const validatePassword = (password: string): void => {
         throw new ValidationError("Password must be at least 8 characters long.");
     }
 
+    if (password.length > 128) {
+        throw new ValidationError("Password cannot exceed 128 characters.");
+    }
+
     if (!/[a-z]/.test(password)) {
         throw new ValidationError("Password must contain at least one lowercase letter.");
     }
@@ -24,6 +28,7 @@ export const validatePassword = (password: string): void => {
     if (!/[0-9]/.test(password)) {
         throw new ValidationError("Password must contain at least one digit.");
     }
+
 };
 
 export const validateEmail = (email: string): void => {

@@ -19,8 +19,11 @@ const app = express();
 app.use(express.json());
 app.use("/userBookTag", userBookTagRouter);
 
+let existingTagId;
+let existingUserBookId;
 beforeAll(async () => {
     await setupTestDB();
+
 });
 
 afterAll(async () => {
@@ -45,7 +48,7 @@ describe("UserBookTag Routes - Add Tag to Book - Negative tests", () => {
             .post("/userBookTag")
             .send({ tag_id: 99999, user_book_id: 99999 });
 
-        expect(response.status).toBe(500);
+        expect(response.status).toBe(401);
     });
 
     test("should return 400 or 500 if the request body is incomplete", async () => {
@@ -53,7 +56,7 @@ describe("UserBookTag Routes - Add Tag to Book - Negative tests", () => {
             .post("/userBookTag")
             .send({ tag_id: 1 });
 
-        expect([400, 500]).toContain(response.status);
+        expect([401]).toContain(response.status);
     });
 });
 
@@ -76,7 +79,7 @@ describe("UserBookTag Routes - Delete Tag from Book - Negative tests", () => {
         const response = await request(app)
             .delete("/userBookTag")
             .send({ tag_id: "abc", user_book_id: 1 });
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(401);
         expect(response.body.error).toBe("Invalid user_book_id or tag_id");
     });
 

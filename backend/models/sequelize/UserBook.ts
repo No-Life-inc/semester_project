@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize";
-import {limitedSequelize} from "../../config/SqlConfig";
+import {sequelize} from "../../config/SqlConfig";
 import User from "./User";
 import Book from "./Book";
 
@@ -43,7 +43,7 @@ UserBook.init(
   },
   },
   {
-    sequelize: limitedSequelize,
+    sequelize: sequelize,
     modelName: "UserBook",
     tableName: "user_books",
     timestamps: true,
