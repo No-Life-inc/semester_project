@@ -1,8 +1,8 @@
-import { sequelize, limitedSequelize } from "./SqlConfig";
+import { sequelize } from "./SqlConfig";
 import AuditLog from "../models/sequelize/AuditLog";
 
 export function registerHooks() {
-  const instances = [sequelize, limitedSequelize];
+  const instances = [sequelize];
 
   instances.forEach((sequelizeInstance) => {
     sequelizeInstance.addHook("afterCreate", async (instance, options) => {

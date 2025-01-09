@@ -49,6 +49,12 @@ describe("validatePassword function - Negative Tests", () => {
         expect(act).toThrow("Password must contain at least one digit.");
     });
 
+    test("should throw an error if password exceeds 128 characters", () => {
+        const longPassword = "a".repeat(129);
+        const act = () => validatePassword(longPassword);
+        expect(act).toThrow("Password cannot exceed 128 characters.");
+    });
+
     test.each([
         ["Pass1"],
         ["Pass12"],

@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import {limitedSequelize} from "../../config/SqlConfig";
+import {sequelize} from "../../config/SqlConfig";
 
 interface SubjectAttributes {
     id: number;
@@ -32,7 +32,7 @@ Subject.init({
         field: "created_at",
     },
 }, {
-    sequelize: limitedSequelize,
+    sequelize: sequelize,
     tableName: "subjects", // Update the table name if necessary
     timestamps: true,
     createdAt: "created_at",

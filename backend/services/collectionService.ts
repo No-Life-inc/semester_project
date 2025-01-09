@@ -10,7 +10,7 @@ import {
   UnauthorizedError,ForbiddenError
 } from "../utility/errors";
 import { ValidationError as SequelizeValidationError } from "sequelize";
-import { limitedSequelize } from "../config/SqlConfig";
+import { sequelize } from "../config/SqlConfig";
 /**
  * Creates a new collection for a user.
  *
@@ -134,7 +134,7 @@ export const deleteCollection = async (id: number, email: string) => {
     throw new ForbiddenError("You are not authorized to delete this collection");
   }
 
-  const t = await limitedSequelize.transaction();
+  const t = await sequelize.transaction();
   try {
     await UserBookCollection.destroy({
       where: { collection_id: id },
@@ -164,7 +164,7 @@ export const addBookToCollection = async (
   collectionId: number,
   bookId: number
 ) => {
-  const t = await limitedSequelize.transaction();
+  const t = await sequelize.transaction();
   try {
     const user = await User.findOne({ where: { email }, transaction: t });
 
@@ -244,7 +244,7 @@ export const removeBookFromCollection = async (
   collectionId: number,
   bookId: number
 ) => {
-  const t = await limitedSequelize.transaction();
+  const t = await sequelize.transaction();
   try {
     const user = await User.findOne({ where: { email }, transaction: t });
 

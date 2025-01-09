@@ -161,7 +161,7 @@ describe("editPassword function tests", () => {
 
     test("should throw an error for incorrect old password", async () => {
         await expect(editPassword("test_password@example.com", "WrongOldPassword", "NewPassword123")).rejects.toThrow(
-            "Invalid password."
+            "Old password is incorrect."
         );
     });
 

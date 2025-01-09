@@ -2,6 +2,7 @@ import {Request, Response} from "express";
 import {registerUser, loginUser, editUser, editPassword} from "../services/userService";
 import {verifyToken} from "../services/jwtService";
 import {AuthenticatedRequest} from "../types/authenticatedRequest";
+import {BadRequestError, BaseError, ValidationError} from "../utility/errors";
 
 /**
  * Registers a new user.
@@ -19,11 +20,18 @@ export const registerUserController = async (request: Request, response: Respons
     const { name, email, password } = request.body;
 
     try {
+        if (!name || !email || !password) {
+            throw new BadRequestError("Name, email, and password are required");
+        }
+
         const user = await registerUser(name, email.toLowerCase(), password);
         response.json(user);
     } catch (error: any) {
-        const errorMessage = error.message || "An error occurred while registering user";
-        response.status(500).json({ error: errorMessage });
+        if (error instanceof BaseError) {
+            response.status(error.statusCode).json({ error: error.message });
+        } else {
+            response.status(500).json({ error: "An unexpected error occurred" });
+        }
     }
 };
 
@@ -38,11 +46,19 @@ export const loginUserController = async (request: Request, response: Response) 
     const { email, password } = request.body;
 
     try {
+        if (!email || !password) {
+            throw new BadRequestError("Email and password are required");
+        }
+
         const user = await loginUser(email.toLowerCase(), password);
+
         response.json(user);
     } catch (error: any) {
-        const errorMessage = error.message || "An error occurred while logging in user";
-        response.status(500).json({ error: errorMessage });
+        if (error instanceof BaseError) {
+            response.status(error.statusCode).json({ error: error.message });
+        } else {
+            response.status(500).json({ error: "An unexpected error occurred" });
+        }
     }
 };
 
@@ -65,20 +81,19 @@ export const editUserController = async (request: AuthenticatedRequest, response
     let safeEmail;
 
 
-    if (!name && !newEmail) {
-        return response.status(400).json({ error: "At least one of 'name' or 'email' must be provided" });
-    }
-
-    if (newEmail) {
-        safeEmail = newEmail.toLowerCase();
-    }
-
     try {
-        const result = await editUser(email, name, safeEmail);
+        if (!name && !newEmail) {
+            throw new BadRequestError("At least one of 'name' or 'email' must be provided");
+        }
+
+        const result = await editUser(email, name, newEmail?.toLowerCase());
         response.json({ message: result });
     } catch (error: any) {
-        const errorMessage = error.message || "An error occurred while editing user";
-        response.status(500).json({ error: errorMessage });
+        if (error instanceof BaseError) {
+            response.status(error.statusCode).json({ error: error.message });
+        } else {
+            response.status(500).json({ error: "An unexpected error occurred" });
+        }
     }
 };
 
@@ -98,18 +113,24 @@ export const editPasswordController = async (request: AuthenticatedRequest, resp
     const { password, oldPassword} = request.body;
     const { email } = request.user;
 
-    if (!oldPassword || !password) {
-        return response.status(400).json({ error: "Both 'oldPassword' and 'password' must be provided" });
-    } else if (oldPassword === password) {
-        return response.status(400).json({ error: "New password must be different from old password" });
-    }
-
     try {
+        // Validate input
+        if (!oldPassword || !password) {
+            throw new BadRequestError("Both 'oldPassword' and 'password' must be provided");
+        }
+
+        if (oldPassword === password) {
+            throw new ValidationError("New password must be different from old password");
+        }
+
         const result = await editPassword(email, oldPassword, password);
         response.json({ message: result });
     } catch (error: any) {
-        const errorMessage = error.message || "An error occurred while editing user password";
-        response.status(500).json({ error: errorMessage });
+        if (error instanceof BaseError) {
+            response.status(error.statusCode).json({ error: error.message });
+        } else {
+            response.status(500).json({ error: "An unexpected error occurred" });
+        }
     }
 };
 

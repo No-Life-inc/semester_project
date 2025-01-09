@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import {limitedSequelize} from "../../config/SqlConfig";
+import {sequelize} from "../../config/SqlConfig";
 import User from "./User";
 import Author from "./Author";
 import Publisher from "./Publisher";
@@ -182,7 +182,7 @@ Book.init(
         },
     },
     {
-        sequelize: limitedSequelize,
+        sequelize: sequelize,
         modelName: "Book",
         tableName: "books",
         createdAt: "created_at",

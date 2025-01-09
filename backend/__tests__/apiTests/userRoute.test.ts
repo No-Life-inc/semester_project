@@ -48,7 +48,7 @@ describe("User Routes - Register - Positive tests", () => {
 });
 
 describe("User Routes - Register - Negative tests", () => {
-    test("should return 500 if email is already in use", async () => {
+    test("should return 409 if email is already in use", async () => {
         const response = await request(app)
             .post("/user/register")
             .send({
@@ -57,11 +57,11 @@ describe("User Routes - Register - Negative tests", () => {
                 password: "SomePass123",
             });
 
-        expect(response.status).toBe(500);
+        expect(response.status).toBe(409);
         expect(response.body.error).toBe("Email is already in use.");
     });
 
-    test("should return 500 if invalid email is provided", async () => {
+    test("should return 422 if invalid email is provided", async () => {
         const response = await request(app)
             .post("/user/register")
             .send({
@@ -70,11 +70,11 @@ describe("User Routes - Register - Negative tests", () => {
                 password: "Password123",
             });
 
-        expect(response.status).toBe(500);
+        expect(response.status).toBe(422);
         expect(response.body.error).toBeDefined();
     });
 
-    test("should return 500 if no password is provided", async () => {
+    test("should return 400 if no password is provided", async () => {
         const response = await request(app)
             .post("/user/register")
             .send({
@@ -82,7 +82,7 @@ describe("User Routes - Register - Negative tests", () => {
                 email: "nopassword@example.com",
             });
 
-        expect(response.status).toBe(500);
+        expect(response.status).toBe(400);
         expect(response.body.error).toBeDefined();
     });
 });
@@ -103,7 +103,7 @@ describe("User Routes - Login - Positive tests", () => {
 });
 
 describe("User Routes - Login - Negative tests", () => {
-    test("should return 500 if email is invalid", async () => {
+    test("should return 401 if email is invalid", async () => {
         const response = await request(app)
             .post("/user/login")
             .send({
@@ -111,11 +111,11 @@ describe("User Routes - Login - Negative tests", () => {
                 password: process.env.DEFAULT_PASSWORD
             });
 
-        expect(response.status).toBe(500);
+        expect(response.status).toBe(401);
         expect(response.body.error).toBe("Invalid email or password.");
     });
 
-    test("should return 500 if password is incorrect", async () => {
+    test("should return 401 if password is incorrect", async () => {
         const response = await request(app)
             .post("/user/login")
             .send({
@@ -123,7 +123,7 @@ describe("User Routes - Login - Negative tests", () => {
                 password: "WrongPassword",
             });
 
-        expect(response.status).toBe(500);
+        expect(response.status).toBe(401);
         expect(response.body.error).toBe("Invalid email or password.");
     });
 });
@@ -198,7 +198,7 @@ describe("User Routes - Edit Password - Negative tests", () => {
         expect(response.body.error).toBe("Both 'oldPassword' and 'password' must be provided");
     });
 
-    test("should return 400 if oldPassword and new password are the same", async () => {
+    test("should return 422 if oldPassword and new password are the same", async () => {
         const token = getUserToken(0);
 
         const response = await request(app)
@@ -209,11 +209,11 @@ describe("User Routes - Edit Password - Negative tests", () => {
                 password: process.env.DEFAULT_PASSWORD,
             });
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(422);
         expect(response.body.error).toBe("New password must be different from old password");
     });
 
-    test("should return 500 if oldPassword is incorrect", async () => {
+    test("should return 401 if oldPassword is incorrect", async () => {
         const token = getUserToken(0);
         const response = await request(app)
             .patch("/user/editPassword")
@@ -223,7 +223,7 @@ describe("User Routes - Edit Password - Negative tests", () => {
                 password: "NewPass456",
             });
 
-        expect(response.status).toBe(500);
-        expect(response.body.error).toBe("Invalid password.");
+        expect(response.status).toBe(401);
+        expect(response.body.error).toBe("Old password is incorrect.");
     });
 });
