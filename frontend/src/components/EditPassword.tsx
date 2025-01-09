@@ -32,7 +32,7 @@ const EditPassword: React.FC = () => {
             setTimeout(() => navigate("/profile"), 2000); // Redirect after 2 seconds
         } catch (error: any) {
             // Handle backend error messages
-            setError(error.response?.data?.message || "An error occurred while updating the password.");
+            setError(error.response?.data?.error || "An error occurred while updating the password.");
         }
     };
 

@@ -37,7 +37,7 @@ const EditCollection: React.FC<EditCollectionProps> = ({ collection, onUpdate, o
     
             onUpdate(); // Send opdateret collection til CreateCollection
         } catch (error: any) {
-            setError(error.response?.data?.message || "An error occurred while editing the collection.");
+            setError(error.response?.data?.error || "An error occurred while editing the collection.");
         }
     };
 

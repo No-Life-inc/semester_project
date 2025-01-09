@@ -19,6 +19,8 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMoreTags, setHasMoreTags] = useState(true);
+    const [message, setMessage] = useState('');
+    
 
     useEffect(() => {
         fetchCollections();
@@ -40,8 +42,13 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
                 setAvailableTags((prevTags) => [...prevTags, ...fetchedTags]);
                 setPage((prevPage) => prevPage + 1);
             }
-        } catch (error) {
-            console.error("Error fetching tags:", error);
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.error) {
+                // Show the error message from the API response
+                setMessage(error.response.data.error);
+              } else {
+                setMessage('An error occurred while fething tags. Please try again.');
+              }
         } finally {
             setLoading(false);
         }
@@ -74,10 +81,10 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
             );
 
             setCollectionName("");
-            fetchCollections(); // Refresh collections
+            fetchCollections(); 
             onSuccess("Collection created successfully!");
         } catch (error: any) {
-            setError(error.response?.data?.message || "An error occurred while creating the collection.");
+            setError(error.response?.data?.error);
         }
     };
 
@@ -96,7 +103,7 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
             });
             setCollections(response.data);
         } catch (error: any) {
-            setError(error.response?.data?.message || "An error occurred while fetching collections.");
+            setError(error.response?.data?.error);
         }
     };
 
@@ -120,11 +127,13 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
                 : collection
             )
           );
-        } catch (error) {
-          console.error("Error removing book from collection:", error);
-          if (axios.isAxiosError(error) && error.response) {
-            console.error("Server response:", error.response.data); // Log serverens svar
-        }
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.error) {
+                // Show the error message from the API response
+                setMessage(error.response.data.error);
+              } else {
+                setMessage('An error occurred while removing book. Please try again.');
+              }
         }
       };
 
@@ -138,8 +147,13 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
                 },
             });
             setTagsForBooks((prev) => ({ ...prev, [userBookId]: response.data as Tag[] }));
-        } catch (error) {
-            console.error("Error fetching tags for book:", error);
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.error) {
+                // Show the error message from the API response
+                setMessage(error.response.data.error);
+              } else {
+                setMessage('An error occurred while fetching tags for books. Please try again.');
+              }
         }
     };
 
@@ -161,8 +175,13 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
                 }
             );
             await fetchTagsForBook(userBookId);
-        } catch (error) {
-            console.error("Error adding tag to book:", error);
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.error) {
+                // Show the error message from the API response
+                setMessage(error.response.data.error);
+              } else {
+                setMessage('An error occurred while adding tag to book. Please try again.');
+              }
         }
     };
     
@@ -194,7 +213,7 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
     
             fetchCollections(); // Opdater listen efter sletning
         } catch (error: any) {
-            setError(error.response?.data?.message || "An error occurred while deleting the collection.");
+            setError(error.response?.data?.error || "An error occurred while deleting the collection.");
         }
     };
     
@@ -212,6 +231,8 @@ return (
             <button type="submit" data-testid="create-collection-button">Create</button>
         </form>
         {error && <p style={{ color: "red" }} data-testid="create-collection-error">{error}</p>}
+
+        {message && <p data-testid="search-error">{message}</p>}
 
         {editingCollection ? (
             <EditCollection

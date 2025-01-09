@@ -38,7 +38,7 @@ const EditUser: React.FC = () => {
 
       setSuccess("User details updated successfully!");
     } catch (error: any) {
-      setError(error.response?.data?.message || "An error occurred while updating details.");
+      setError(error.response?.data?.error || "An error occurred while updating details.");
     }
   };
 

@@ -19,6 +19,7 @@ const Profile: React.FC = () => {
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -36,8 +37,13 @@ const Profile: React.FC = () => {
     try {
       const allTags = await getAllTags();
       setTags(allTags);
-    } catch (err) {
-      console.error("Error updating tags:", err);
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.error) {
+        // Show the error message from the API response
+        setMessage(error.response.data.error);
+      } else {
+        setMessage('An error occurred while fething tags. Please try again.');
+      }
     }
   };
 

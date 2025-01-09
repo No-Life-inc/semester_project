@@ -16,11 +16,19 @@ const Register = () => {
       const response = await axios.post('http://localhost:5000/v1/user/register', formData);
       setMessage('Registration successful');
       console.log(response.data);
-    } catch (error) {
-      setMessage('An error occurred during registration');
-      console.error(error);
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.error) {
+        // Display the error message from the API response
+        setMessage(error.response.data.error);
+      } else {
+        // Fallback for other errors or missing response data
+        setMessage('An error occurred during registration. Please try again.');
+      }
+      console.error('Registration error:', error);
     }
   };
+  
+  
 
   return (
     <div data-testid="register-container">
