@@ -5,15 +5,14 @@ import axios from "axios";
 const EditPassword: React.FC = () => {
     const [oldPassword, setOldPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
-    const [error, setError] = useState<string | null>(null); // Error state for error messages
-    const [success, setSuccess] = useState<string | null>(null); // Success state for success messages
+    const [error, setError] = useState<string | null>(null); 
+    const [success, setSuccess] = useState<string | null>(null); 
     const navigate = useNavigate();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setError(null); // Clear previous errors
-        setSuccess(null); // Clear previous success messages
-
+        setError(null); 
+        setSuccess(null); 
         try {
             const token = localStorage.getItem("token");
             if (!token) {

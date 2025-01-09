@@ -15,7 +15,9 @@ interface UserContextValue {
 }
 
 const Profile: React.FC = () => {
-  const { user } = useContext(UserContext) as UserContextValue;
+  const storedUser = localStorage.getItem("user");
+  const userFromStorage: User = storedUser ? JSON.parse(storedUser) : null;
+  const user  = userFromStorage
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
