@@ -14,6 +14,8 @@ export const getBooksBySubject = async (
     page: number = 1,
     limit: number = 50
 ): Promise<Book[]> => {
+    page = page || 1;
+    limit = limit || 50;
     if (isNaN(subjectId) || subjectId < 1) {
         throw new Error("Invalid subject ID. Subject ID must be a number greater than or equal to 1.");
     }
@@ -39,9 +41,9 @@ export const getBooksBySubject = async (
             include: [
                 {
                     model: Subject,
-                    as: "subjects", // Use the alias defined in the association
+                    as: "subjects",
                     where: { id: subjectId },
-                    required: true, // Ensures only books associated with this subject are returned
+                    required: true,
                 },
             ],
         });
