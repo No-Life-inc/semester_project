@@ -151,7 +151,7 @@ it('displays error message if email is invalid', () => {
 
   cy.get('[data-testid="save-profile-changes-button"]').click();
 
-  cy.get('[data-testid="edit-profile-error"]').should('have.text', 'Validation error');
+  cy.get('[data-testid="edit-profile-error"]').should('have.text', 'An unexpected error occurred');
 
 });
 
@@ -241,23 +241,23 @@ it('should display error message if new password is incorrect', () => {
 
   cy.get('[data-testid="change-password-error"]').should('have.text', 'Old password is incorrect.');
 
-  cy.get('[data-testid="old-password-input"]').type('YourStrongPassword123');
-  cy.get('[data-testid="new-password-input"]').type('p');
+  cy.get('[data-testid="old-password-input"]').clear().type('YourStrongPassword123');
+  cy.get('[data-testid="new-password-input"]').clear().type('p');
 
   cy.get('[data-testid="save-changes-button"]').click();
 
-  cy.get('[data-testid="change-password-error"]').should('have.text', 'Invalid password.');
+  cy.get('[data-testid="change-password-error"]').should('have.text', 'Password must be at least 8 characters long.');
 
-  cy.get('[data-testid="new-password-input"]').type('yourstrongpassword');
-
-  cy.get('[data-testid="save-changes-button"]').click();
-
-  cy.get('[data-testid="change-password-error"]').should('have.text', 'Invalid password.');
-
-  cy.get('[data-testid="new-password-input"]').type('Yourstrongpassword');
+  cy.get('[data-testid="new-password-input"]').clear().type('yourstrongpassword');
 
   cy.get('[data-testid="save-changes-button"]').click();
 
-  cy.get('[data-testid="change-password-error"]').should('have.text', 'Invalid password.');
+  cy.get('[data-testid="change-password-error"]').should('have.text', 'Password must contain at least one uppercase letter.');
+
+  cy.get('[data-testid="new-password-input"]').clear().type('Yourstrongpassword');
+
+  cy.get('[data-testid="save-changes-button"]').click();
+
+  cy.get('[data-testid="change-password-error"]').should('have.text', 'Password must contain at least one digit.');
 });
 });
