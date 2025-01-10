@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, jest, test } from "@jest/globals";
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import { getAllSubjects, getSubjectById } from "../../services/subjectService";
+import  Subject  from "../../models/sequelize/Subject";
 
 jest.setTimeout(120000);
 
@@ -79,4 +80,73 @@ test.each(negativeTestCases)(
         await expect(getSubjectById(subjectId)).rejects.toThrow(errorMessage);
     }
 );
+});
+
+
+describe("Subject field boundary positive tests", () => {
+  const cases = [
+    { name: "A", description: "should accept minimal valid name (1 char)" },
+    { name: "Subject Name", description: "should accept typical valid name" },
+    { name: "a".repeat(255), description: "should accept maximal valid name (255 chars)" },
+  ];
+
+  test.each(cases)(
+    "$description",
+    async ({ name }) => {
+      const result = await Subject.create({ name });
+      expect(result).toBeDefined();
+      expect(result.name).toBe(name);
+      expect(result.createdAt).toBeDefined();
+    }
+  );
+});
+
+
+describe("Subject field boundary negative tests", () => {
+  const cases = [
+    { name: "", errorMessage: "Validation error: name cannot be empty" },
+    { name: null, errorMessage: "Validation error: name cannot be null" },
+    { name: "a".repeat(256), errorMessage: "Validation error: name cannot exceed 255 characters" },
+  ];
+
+  test.each(cases)(
+    "should throw an error when name is invalid: $name",
+    async ({ name, errorMessage }) => {
+      await expect(Subject.create({ name })).rejects.toThrow(errorMessage);
+    }
+  );
+});
+
+
+describe("Subject createdAt field positive tests", () => {
+  const cases = [
+    { createdAt: new Date("2023-01-01"), description: "should accept a valid date" },
+    { createdAt: undefined, description: "should use default value for createdAt" },
+  ];
+
+  test.each(cases)(
+    "$description",
+    async ({ createdAt }) => {
+      const subjectData = { name: "Test Subject", createdAt };
+      const result = await Subject.create(subjectData);
+      expect(result).toBeDefined();
+      expect(result.createdAt).toBeDefined();
+    }
+  );
+});
+
+
+describe("Subject createdAt field negative tests", () => {
+  const cases = [
+    { createdAt: new Date("invalid-date"), errorMessage: "Validation error: invalid date" },
+    { createdAt: new Date("9999-12-31T00:00:00Z"), errorMessage: "Validation error: date out of range" },
+  ];
+
+  test.each(cases)(
+    "should throw an error when createdAt is invalid",
+    async ({ createdAt, errorMessage }) => {
+      const subjectData = { name: "Test Subject", createdAt };
+      await expect(Subject.create(subjectData)).rejects.toThrow(errorMessage);
+    }
+  );
 });
