@@ -131,7 +131,8 @@ describe('Book Routes - Search Books Positive tests', () => {
  
   test.each([
     ["should get 1 book by title", "/book/search?title=Resting Scrooge Face: A Short Story", 200, Array.isArray, 1],
-    ["should get 1 book by title", "/book/search?title=The", 200, Array.isArray, 43],
+    ["should get 43 book by title", "/book/search?title=The", 200, Array.isArray, 43],
+
   ])( 
     "%s",
     async (description, route, expectedStatus, expectedBodyType, expectedLength) => {
@@ -148,3 +149,19 @@ describe('Book Routes - Search Books Positive tests', () => {
     }
   );
 });
+
+describe('Book Routes - Search Books Negative tests', () => {
+  
+  test.each([
+    ["should get 0 books by title", "/book/search?title=", 400],
+  ])( 
+    "%s",
+    async (description, route, expectedStatus) => {
+      const response = await request(app).get(route);
+
+      
+      expect(response.status).toBe(expectedStatus);
+    }
+  );
+}
+);

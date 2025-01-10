@@ -79,7 +79,7 @@ export const getBooksByTitleController = async (req: Request, res: Response) => 
     const titleQuery = req.query.title as string;
 
     if (!titleQuery) {
-        res.status(400).json({ message: "Title query parameter is required" });
+        return res.status(400).json({ message: "Title query parameter is required" });
     }
 
     try {
