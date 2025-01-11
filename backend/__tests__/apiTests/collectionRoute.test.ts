@@ -609,7 +609,7 @@ describe("Collection Routes - DELETE /collections/:id Positive Tests", () => {
   test.each([
     [
       "should delete a valid collection for User 1",
-      1, // Collection ID
+      1,
       () => getUserToken(0),
       200,
       { message: "Collection deleted successfully" },
