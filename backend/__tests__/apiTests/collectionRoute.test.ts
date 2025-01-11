@@ -261,6 +261,41 @@ describe("Collection Routes - POST /addBook Negative Tests", () => {
       401,
       { message: "Invalid or expired token" },
     ],
+    [
+      "should return 400 for missing collectionId",
+      { bookId: 3 },
+      () => getUserToken(0),
+      400,
+      { error: "Collection ID is required" },
+    ],
+    [
+      "should return 400 for missing bookId",
+      { collectionId: 1 },
+      () => getUserToken(0),
+      400,
+      { error: "Book ID is required" },
+    ],
+    [
+      "should return 400 for invalid bookId (0)",
+      { collectionId: 1, bookId: 0 },
+      () => getUserToken(0),
+      400,
+      { error: "Book ID is required" },
+    ],
+    [
+      "should return 422 for invalid bookId",
+      { collectionId: 1, bookId: -1 },
+      () => getUserToken(0),
+      422,
+      { error: "Invalid book ID" },
+    ],
+    [
+      "should return 400 for invalid bookId",
+      { collectionId: 1, bookId: NaN },
+      () => getUserToken(0),
+      400,
+      { error: "Book ID is required" },
+    ],
   ])(
     "%s",
     async (description, payload, getTokenFn, expectedStatus, expectedBody) => {
@@ -276,6 +311,22 @@ describe("Collection Routes - POST /addBook Negative Tests", () => {
       }
     }
   );
+
+  test("should return 500 for unexpected error", async () => {
+    jest.spyOn(CollectionService, "addBookToCollection").mockImplementation(() => {
+      throw new Error("Unexpected error");
+    });
+
+    const response = await request(app)
+      .post("/collections/addBook")
+      .set("Authorization", `Bearer ${getUserToken(0)}`)
+      .send({ collectionId: 1, bookId: 3 });
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({ error: "An error occurred" });
+
+    jest.restoreAllMocks();
+  });
 });
 
 // Positive Tests for DELETE /removeBook
