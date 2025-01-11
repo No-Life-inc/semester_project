@@ -1,7 +1,9 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import { getBooks, getBookById, getBooksByTitle, addBooks } from "../services/bookService";
 import { fetchBooksFromExternalAPI } from "../services/externalAPIService";
 import Book from "../models/sequelize/Book";
+
+import { BaseError } from "../utility/errors";
 
 /**
  * Fetches books from the database.
@@ -22,9 +24,13 @@ export const getBooksController = async (request: Request, response: Response) =
     try {
         const books = await getBooks(Number(page), Number(limit));
         response.json(books);
-    } catch (error) {
-        response.status(400).json({ error: "An error occurred while fetching books" });
-    }
+    } 
+    catch (error) {
+        if (error instanceof BaseError)
+            response.status(error.statusCode).json({ error: error.message });
+        else
+            response.status(500).json({ error: "An error occurred" });
+        }
 };
 
 /**
@@ -43,7 +49,7 @@ export const getBooksController = async (request: Request, response: Response) =
 export const getBookByIdController = async (request: Request, response: Response) => {
     const { id } = request.params;
 
-    // Validate ID: Check for null, empty string, whitespace, non-numeric, or invalid numbers
+    
     const bookId = parseInt(id, 10);
     if (!id || id.trim() === "" || isNaN(bookId) || bookId < 1) {
         return response.status(400).json({ error: "ID parameter must be a valid positive number" });
@@ -52,14 +58,14 @@ export const getBookByIdController = async (request: Request, response: Response
     try {
         const book = await getBookById(bookId);
 
-        if (!book) {
-            return response.status(404).json({ error: "Book not found" });
-        }
-
         response.json(book);
+
     } catch (error) {
-        response.status(404).json({ error: "Book not found" });
-    }
+        if (error instanceof BaseError)
+            response.status(error.statusCode).json({ error: error.message });
+        else
+            response.status(500).json({ error: "An error occurred" });
+        }
 };
 
 
@@ -79,17 +85,16 @@ export const getBooksByTitleController = async (req: Request, res: Response) => 
     const titleQuery = req.query.title as string;
 
     if (!titleQuery) {
-        return res.status(400).json({ message: "Title query parameter is required" });
+        return res.status(422).json({ message: "Title query parameter is required" });
     }
 
     try {
         let books = await getBooksByTitle(titleQuery);
 
         if (books.length === 0) {
-            // Fetch data from external API
+            
             const apiBooks = await fetchBooksFromExternalAPI(titleQuery);
 
-            // Add the new books to the database
             if (apiBooks.length > 0) {
                 const addedBooks: Book[] = await addBooks(apiBooks);
                 books = addedBooks;
@@ -98,6 +103,9 @@ export const getBooksByTitleController = async (req: Request, res: Response) => 
 
         res.status(200).json(books);
     } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+        if (error instanceof BaseError)
+            res.status(error.statusCode).json({ error: error.message });
+        else
+            res.status(500).json({ error: "An error occurred" });
+        }
 };

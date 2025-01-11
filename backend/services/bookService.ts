@@ -7,6 +7,7 @@ import { Op, Transaction } from "sequelize";
 import BookAPIData from "../types/bookAPIData";
 import { BookCreationAttributes } from "../models/sequelize/Book";
 import { sequelize } from "../config/SqlConfig";
+import { NotFoundError, BadRequestError, ValidationError } from "../utility/errors";
 
 /**
  * Fetches all books from the database.
@@ -28,21 +29,21 @@ export const getBooks = async (page: number = 1, limit: number = 50) => {
     limit = 50;
   }
 
-  // Validate page and limit
+ 
   if (isNaN(page) || page < 1) {
-    throw new Error(
+    throw new ValidationError(
       "Invalid page number. Page must be a number greater than or equal to 1."
     );
   }
 
   if (isNaN(limit) || limit < 1) {
-    throw new Error(
+    throw new ValidationError(
       "Invalid limit. Limit must be a number greater than or equal to 1."
     );
   }
 
   if (limit > 100) {
-    throw new Error(
+    throw new ValidationError(
       "Invalid limit. Limit must be a number less than or equal to 100."
     );
   }
@@ -73,7 +74,7 @@ export const getBooks = async (page: number = 1, limit: number = 50) => {
 export const getBookById = async (id: number) => {
   try {
     if (typeof id !== "number" || isNaN(id) || id < 1) {
-      throw new Error(
+      throw new ValidationError(
         "Invalid book id. Book id must be a number greater than or equal to 1."
       );
     }
@@ -81,7 +82,7 @@ export const getBookById = async (id: number) => {
     const book = await Book.findByPk(id);
 
     if (!book) {
-      throw new Error("Book not found");
+      throw new NotFoundError("Book not found");
     }
 
     return book;
@@ -103,7 +104,7 @@ export const getBookById = async (id: number) => {
 export const getBooksByTitle = async (title: string): Promise<Book[]> => {
   try {
     if (!title) {
-      throw new Error("Invalid title. Title must be a non-empty string.");
+      throw new ValidationError("Invalid title. Title must be a non-empty string.");
     }
 
     const books = await Book.findAll({

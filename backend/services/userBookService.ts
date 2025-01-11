@@ -49,7 +49,7 @@ export const getUserBooks = async (email: string, page: number = 1, limit: numbe
             include: [
                 {
                     model: Book,
-                    as: 'book', // Ensure this matches the alias used in your association
+                    as: 'book', 
                 },
             ],
         });
@@ -155,13 +155,14 @@ export const removeBookFromUser = async (email: string, bookId: number): Promise
             throw new NotFoundError("UserBook not found");
         }
 
-        if (userBook.userId !== user.id) {
+        if (userBook.userId === user.id) {
+            await userBook.destroy();
+            return true;
+        }
+        else{
             throw new UnauthorizedError("UserBook does not belong to the user");
         }
-
-        await userBook.destroy();
-
-        return true;
+        
     } catch (error) {
         throw error;
     }
@@ -179,6 +180,10 @@ export const removeBookFromUser = async (email: string, bookId: number): Promise
  */
 export const getUserBookById = async (id: number): Promise<UserBook> => {
     try {
+        if (isNaN(id) || id < 1) {
+            throw new ValidationError("Invalid Book id. Book id must be a number greater than or equal to 1.");
+        }
+
         const userBook = await UserBook.findByPk(id);
         if (!userBook) {
             throw new NotFoundError("UserBook not found");

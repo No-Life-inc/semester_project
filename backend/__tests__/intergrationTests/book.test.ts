@@ -11,18 +11,16 @@ import {
 jest.setTimeout(120000);
 
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
-import knex from "knex";
-import knexConfig from "../../knexfile";
 import {
   getBooks,
   getBookById,
   addBooks,
   getBooksByTitle,
 } from "../../services/bookService";
-import Publisher from "../../models/sequelize/Publisher";
-import Subject from "../../models/sequelize/Subject";
 import BookAPIData from "../../types/bookAPIData";
 import Book from "../../models/sequelize/Book";
+
+import { NotFoundError, ValidationError } from "../../utility/errors";
 
 beforeAll(async () => {
   await setupTestDB();
@@ -39,7 +37,7 @@ describe("getBooks function positive tests", () => {
     [1, 100, 100],
     [1, 99, 99],
     [1, 50, 50],
-    [undefined, undefined, 50], // No parameters should fetch books with page 1, limit 50
+    [undefined, undefined, 50], 
   ];
 
   test.each(positiveTestCases)(
@@ -57,45 +55,65 @@ describe("getBooks function negative tests", () => {
       -1,
       10,
       "Invalid page number. Page must be a number greater than or equal to 1.",
+      ValidationError,
+    ],
+    [
+      -2,
+      10,
+      "Invalid page number. Page must be a number greater than or equal to 1.",
+      ValidationError,
     ],
     [
       NaN,
       10,
       "Invalid page number. Page must be a number greater than or equal to 1.",
+      ValidationError,
     ],
     [
       0,
       10,
       "Invalid page number. Page must be a number greater than or equal to 1.",
+      ValidationError,
     ],
     [
       1,
       -10,
       "Invalid limit. Limit must be a number greater than or equal to 1.",
+      ValidationError,
     ],
     [
       1,
       NaN,
       "Invalid limit. Limit must be a number greater than or equal to 1.",
+      ValidationError,
     ],
     [
       1,
       101,
       "Invalid limit. Limit must be a number less than or equal to 100.",
+      ValidationError,
+    ],
+    [
+      1,
+      102,
+      "Invalid limit. Limit must be a number less than or equal to 100.",
+      ValidationError,
     ],
     [
       1,
       0,
       "Invalid limit. Limit must be a number greater than or equal to 1.",
+      ValidationError,
     ],
   ];
 
   test.each(negativeTestCases)(
     "should throw an error (page: %i, limit: %i, errorMessage: %s)",
-    async (page, limit, errorMessage) => {
+    async (page, limit, errorMessage, err) => {
       await expect(getBooks(Number(page), Number(limit))).rejects.toThrow(
         errorMessage
       );
+      await expect(getBooks(Number(page), Number(limit))).rejects.toThrow(err);
     }
   );
 });
@@ -114,30 +132,54 @@ describe("getBookById function positive tests", () => {
 });
 
 describe("getBookById function negative tests", () => {
-  const negativeTestCases: [number, string][] = [
+  const negativeTestCases = [
     [
       -1,
       "Invalid book id. Book id must be a number greater than or equal to 1.",
+      ValidationError,
+    ],
+    [
+      -2,
+      "Invalid book id. Book id must be a number greater than or equal to 1.",
+      ValidationError,
     ],
     [
       NaN,
       "Invalid book id. Book id must be a number greater than or equal to 1.",
+      ValidationError,
     ],
-    [5000, "Book not found"],
+    [
+      null,
+      "Invalid book id. Book id must be a number greater than or equal to 1.",
+      ValidationError,
+    ],
+    [
+      undefined,
+      "Invalid book id. Book id must be a number greater than or equal to 1.",
+      ValidationError,
+    ],
+    [
+      5000, 
+      "Book not found",
+      NotFoundError
+    ],
     [
       0,
       "Invalid book id. Book id must be a number greater than or equal to 1.",
+      ValidationError,
     ],
     [
       "1" as any,
       "Invalid book id. Book id must be a number greater than or equal to 1.",
+      ValidationError,
     ],
   ];
 
   test.each(negativeTestCases)(
     "should throw an error (bookId: %i, errorMessage: %s)",
-    async (bookId: any, errorMessage: string) => {
+    async (bookId: any, errorMessage: string, err: ValidationError | NotFoundError) => {
       await expect(getBookById(bookId)).rejects.toThrow(errorMessage);
+      await expect(getBookById(bookId)).rejects.toThrow(err);
     }
   );
 });
@@ -250,18 +292,18 @@ describe("BookData field boundary positive tests", () => {
   test.each(cases)(
     "%s",
     async (fieldData, fieldToCheck, expectedValue, description) => {
-      // Prepare the data array
+      
       const validDataArray: BookAPIData[] = [{...minimalBookData, ...fieldData }];
     ;
 
-      // Perform the test
+     
       const result = await addBooks(validDataArray);
 
-      // Validate results
+     
       expect(result).toBeDefined();
       expect(result.length).toBe(validDataArray.length);
 
-      // Check the specific field
+      
       result.forEach((book) => {
         expect(book[fieldToCheck]).toEqual(expectedValue);
         expect(book.id).toBeDefined();
@@ -272,11 +314,11 @@ describe("BookData field boundary positive tests", () => {
 });
 
 describe("BookData field boundary negative tests", () => {
-  const overMaxText = "A".repeat(256); // 256 characters
-  const invalidDate = "10000-01-01"; // Beyond valid date range
-  const invalidISBN10 = "12345678901"; // 11 characters for a 10-character field
-  const invalidISBN13 = "12345678901234"; // 14 characters for a 13-character field
-  const overMaxMSRP = 100000000.0; // Exceeds valid max value
+  const overMaxText = "A".repeat(256); 
+  const invalidDate = "10000-01-01"; 
+  const invalidISBN10 = "12345678901"; 
+  const invalidISBN13 = "12345678901234"; 
+  const overMaxMSRP = 100000000.0; 
   const underMaxMSRP = -100000000.0;
   const maxInt = 2147483647;
   const negativeMaxInt = -2147483648;
@@ -324,7 +366,7 @@ describe("BookData field boundary negative tests", () => {
     [{ msrp: -10000 }, "should reject msrp below valid min value"],
     [{ msrp: NaN }, "should reject Nan msrp"],
 
-    // Other field tests
+    
     [{ binding: overMaxText }, "should reject binding exceeding 255 characters"],
     [{ dimensions: overMaxText }, "should reject dimensions exceeding 255 characters"],
     [{ synopsis: overMaxText }, "should reject synopsis exceeding 255 characters"],
@@ -332,12 +374,12 @@ describe("BookData field boundary negative tests", () => {
   ];
 
   test.each(cases)("%s", async (fieldData, description) => {
-    // Prepare the data array
+    
     const invalidDataArray: BookAPIData[] = [{...minimalBookData, ...fieldData }];
 
-    // Perform the test
+   
     await expect(addBooks(invalidDataArray)).rejects.toThrow(
-      /validation error|invalid/i // Customize the error message expected
+      /validation error|invalid/i 
     );
   });
 });
@@ -374,9 +416,7 @@ describe("BookData field associations - Authors", () => {
           expectedValue.forEach((authorName) => {
             expect(bookWithAuthors.authors.map((author) => author.name)).toContain(authorName);
           });
-        } else {
-          throw new Error(`Book with ID ${book.id} not found`);
-        }
+        } 
       }));
     }
   );
@@ -403,9 +443,8 @@ describe("BookData field associations - Authors (Negative Tests)", () => {
     async (fieldData, description) => {
       const invalidDataArray: BookAPIData[] = [{ ...minimalBookData, ...fieldData }];
 
-      // Perform the test
     await expect(addBooks(invalidDataArray)).rejects.toThrow(
-      /validation error|invalid/i // Customize the error message expected
+      /validation error|invalid/i 
     );
   });
     });
@@ -441,9 +480,7 @@ describe("BookData field associations - Subjects", () => {
           expectedValue.forEach((subjectName) => {
             expect(bookWithSubjects.subjects.map((subject) => subject.name)).toContain(subjectName);
           });
-        } else {
-          throw new Error(`Book with ID ${book.id} not found`);
-        }
+        } 
       }));
     }
   );
@@ -478,16 +515,14 @@ describe("BookData field associations - Publisher", () => {
 
         if (bookWithPublisher) {
           expect(bookWithPublisher.publisher.name).toBe(expectedValue);
-        } else {
-          throw new Error(`Book with ID ${book.id} not found`);
-        }
+        } 
       }));
     }
   );
 });
 
 
-describe("getBooksByTitle function", () => {
+describe("getBooksByTitle Positive Tests", () => {
   const positiveTestCases = [
     ["Scrooge", "Scrooge"],
     [
@@ -507,9 +542,13 @@ describe("getBooksByTitle function", () => {
     }
   );
 
-  const negativeTestCases: [string | null, string][] = [
+});
+
+describe("getBooksByTitle Negative Tests", () => {
+  const negativeTestCases: [string | null | undefined, string][] = [
     ["", "Invalid title. Title must be a non-empty string."],
     [null, "Invalid title. Title must be a non-empty string."],
+    [undefined, "Invalid title. Title must be a non-empty string."],
   ];
 
   test.each(negativeTestCases)(

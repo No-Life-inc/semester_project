@@ -13,7 +13,6 @@ import UserBook from "../../models/sequelize/UserBook";
 import User from "../../models/sequelize/User";
 import UserBookCollection from "../../models/sequelize/UserBookCollection";
 import Collection from "../../models/sequelize/Collection";
-
 const testKnex = knex(knexConfig.test);
 
 beforeAll(async ()=>{
