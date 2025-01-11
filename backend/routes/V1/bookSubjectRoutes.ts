@@ -4,6 +4,6 @@ import { getBooksBySubjectController } from "../../controllers/bookSubjectContro
 const router = express.Router();
 
 // Route to get books associated with a specific subject
-router.get("/subjectbooks/:subjectId", getBooksBySubjectController);
+router.get("/:subjectId", getBooksBySubjectController);
 
 export default router;

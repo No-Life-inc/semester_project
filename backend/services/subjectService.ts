@@ -25,7 +25,6 @@ export const getAllSubjects = async (page: number = 1, limit: number = 50) => {
         limit = 50;
     }
 
-    // Validate page and limit
     if (isNaN(page) || page < 1) {
         throw new Error("Invalid page number. Page must be a number greater than or equal to 1.");
     }

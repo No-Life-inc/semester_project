@@ -62,7 +62,7 @@ describe('Login Page', () => {
   
       cy.wait('@loginRequest');
   
-      cy.get('[data-testid="login-message"]').should('contain', 'An error occurred during login. Please try again.');
+      cy.get('[data-testid="login-message"]').should('contain', 'Internal server error');
     });
   });
   

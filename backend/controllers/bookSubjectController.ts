@@ -10,12 +10,12 @@ import { getBooksBySubject } from "../services/bookSubjectService";
  */
 export const getBooksBySubjectController = async (req: Request, res: Response): Promise<void> => {
     const { subjectId } = req.params;
-    const { page, limit } = req.query;
+    const { page = 1, limit = 50 } = req.query;
 
     try {
         const books = await getBooksBySubject(Number(subjectId), Number(page), Number(limit));
         res.status(200).json(books);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(error.statusCode || 400).json({ message: error.message });
     }
 };

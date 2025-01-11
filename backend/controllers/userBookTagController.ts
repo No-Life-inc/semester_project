@@ -1,5 +1,8 @@
 import {Request, Response} from "express";
 import {addTagToBook, deleteTagFromBook, getTagsForBook } from "../services/userBookTagService";
+import {BaseError} from "../utility/errors";
+import {getUserIdByEmail} from "../services/userService";
+import {AuthenticatedRequest} from "../types/authenticatedRequest";
 
 /**
  * Adds a tag to a book.
@@ -15,22 +18,20 @@ import {addTagToBook, deleteTagFromBook, getTagsForBook } from "../services/user
  *
  * This will add the tag with ID 1 to the book with ID 1
  */
-export const addTagToBookController = async (request: Request, response: Response) => {
+export const addTagToBookController = async (request: AuthenticatedRequest, response: Response) => {
     const { tag_id, user_book_id } = request.body;
+    const userId = await getUserIdByEmail(request.user.email);
 
-    console.log("Received data in controller:", { tag_id, user_book_id }); // Log input
-
+    if (!tag_id || !user_book_id || isNaN(Number(tag_id)) || isNaN(Number(user_book_id))) {
+        return response.status(400).json({ error: "Invalid tag_id or user_book_id" });
+    }
 
     try {
-        const book = await addTagToBook(tag_id, user_book_id);
+        const book = await addTagToBook(tag_id, user_book_id, userId);
         response.json(book);
     } catch (error) {
-        if (error) {
-            response.status(400).json({ error: error.message });
-        } else if (error) {
-            response.status(404).json({ error: error.message });
-        } else if (error) {
-            response.status(409).json({ error: error.message });
+        if (error instanceof BaseError) {
+            response.status(error.statusCode).json({ error: error.message });
         } else {
             response.status(500).json({ error: "An unexpected error occurred" });
         }
@@ -51,39 +52,49 @@ export const addTagToBookController = async (request: Request, response: Respons
  *
  * This will delete the tag with ID 1 from the book with ID 1
  */
-export const deleteTagFromBookController = async (request: Request, response: Response) => {
+export const deleteTagFromBookController = async (request: AuthenticatedRequest, response: Response) => {
     const { tag_id, user_book_id } = request.body;
+    const userId = await getUserIdByEmail(request.user.email);
 
     const tagId = Number(tag_id);
     const bookId = Number(user_book_id);
 
-    if (isNaN(bookId) || isNaN(tagId)) {
-        return response.status(400).json({ error: "Invalid user_book_id or tag_id" });
+    if (!tag_id || !user_book_id || isNaN(Number(tag_id)) || isNaN(Number(user_book_id))) {
+        return response.status(400).json({ error: "Invalid tag_id or user_book_id" });
     }
 
     try {
-        const rowsDeleted = await deleteTagFromBook(tagId, bookId);
+        const rowsDeleted = await deleteTagFromBook(tagId, bookId, userId);
         if (rowsDeleted === 0) {
             return response.status(404).json({ error: "Tag or association not found" });
         }
         response.json({ message: "Tag deleted from book successfully" });
     } catch (error) {
-        response.status(500).json({ error: "An error occurred while deleting tag from book" });
+        if (error instanceof BaseError) {
+            response.status(error.statusCode).json({ error: error.message });
+        } else {
+            response.status(500).json({ error: "An unexpected error occurred" });
+        }
     }
 };
 
-export const getTagsForBookController = async (req: Request, res: Response) => {
-    const { userBookId } = req.params;
+export const getTagsForBookController = async (request: AuthenticatedRequest, response: Response) => {
+    const { userBookId } = request.params;
+    const userId = await getUserIdByEmail(request.user.email);
 
-    if (!userBookId) {
-        return res.status(400).json({ error: "userBookId is required" });
+
+    if (!userBookId|| isNaN(Number(userBookId))) {
+        return response.status(400).json({ error: "userBookId is required" });
     }
 
     try {
-        const tags = await getTagsForBook(Number(userBookId));
-        res.status(200).json(tags);
+        const tags = await getTagsForBook(Number(userBookId), userId);
+        response.status(200).json(tags);
     } catch (error) {
-        console.error("Error fetching tags for book:", error);
-        res.status(500).json({ error: "An error occurred while fetching tags for the book" });
+        if (error instanceof BaseError) {
+            response.status(error.statusCode).json({ error: error.message });
+        } else {
+            response.status(500).json({ error: "An unexpected error occurred" });
+        }
     }
 };
