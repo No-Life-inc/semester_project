@@ -20,9 +20,13 @@ afterAll(async () => {
 
 describe('Book Subject Routes - Get Books By Subject Positive Tests', () => {
   test.each([
+    ["should get books for subject with ID 1", "/bookSubject/1", 200, Array.isArray, 38],
+    ["should get books for subject with ID 1", "/bookSubject/1?limit=1", 200, Array.isArray, 1],
+    ["should get books for subject with ID 50", "/bookSubject/50?limit=2", 200, Array.isArray, 2],
     ["should get books for subject with ID 1", "/bookSubject/1?page=1&limit=10", 200, Array.isArray, 10],
     ["should get books for subject with ID 2", "/bookSubject/2?page=1&limit=5", 200, Array.isArray, 5],
-    ["should get default 9 books for subject with Subject ID 10", "/bookSubject/10", 200, Array.isArray, 9],
+    ["should get books for subject with ID 50", "/bookSubject/50?page=1&limit=2", 200, Array.isArray, 2],
+
   ])(
     "%s",
     async (description, route, expectedStatus, expectedBodyType, expectedLength) => {

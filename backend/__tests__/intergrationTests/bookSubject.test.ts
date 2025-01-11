@@ -14,10 +14,12 @@ afterAll(async () => {
 
 describe("getBooksBySubject function positive tests", () => {
   const positiveTestCases = [
-    [1, 1, 10], 
+    [1, 1, 1], 
+    [1, 1, 2],
     [1, 1, 50],
+    [1, 1, 99],
     [1, 1, 100],
-    [1, 2, 10],
+    [2, 2, 1]
   ];
 
   test.each(positiveTestCases)(
@@ -34,11 +36,14 @@ describe("getBooksBySubject function negative tests", () => {
   const negativeTestCases: [number, number, number, string][] = [
       [-1, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
       [NaN, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
+      [0, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
       [1, -1, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
       [1, NaN, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
+      [1, 0, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
       [1, 1, -1, "Invalid limit. Limit must be a number greater than or equal to 1."],
       [1, 1, NaN, "Invalid limit. Limit must be a number greater than or equal to 1."],
       [1, 1, 101, "Invalid limit. Limit must be a number less than or equal to 100."],
+      [1, 1, 0, "Invalid limit. Limit must be a number greater than or equal to 1."]
   ];
 
   test.each(negativeTestCases)(

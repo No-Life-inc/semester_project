@@ -16,9 +16,11 @@ describe("getAllSubjects function positive tests", () => {
 const positiveTestCases = [
     [1, 1, 1],
     [1, 2, 2],
-    [1, 100, 100],
-    [1, 99, 99],
     [1, 50, 50],
+    [1, 99, 99],
+    [1, 100, 100],
+    [undefined, undefined, 50],
+    [2, 1, 1]
 ];
 
 test.each(positiveTestCases)(
@@ -37,6 +39,7 @@ describe("getAllSubjects function negative tests", () => {
       [1, -10, "Invalid limit. Limit must be a number greater than or equal to 1."],
       [1, NaN, "Invalid limit. Limit must be a number greater than or equal to 1."],
       [1, 101, "Invalid limit. Limit must be a number less than or equal to 100."],
+      [1, 0, "Invalid limit. Limit must be a number greater than or equal to 1."],
     ];
   
     test.each(negativeTestCases)(
@@ -51,9 +54,9 @@ describe("getSubjectById function positive tests", () => {
 const positiveTestCases = [
     [1],
     [2],
+    [50],
     [99],
     [100],
-    [50],
 ];
 
 test.each(positiveTestCases)(
@@ -71,6 +74,7 @@ const negativeTestCases: [number, string][] = [
     [-1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
     [NaN, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
     [9999, "Subject not found"],
+    [0, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
 ];
 
 test.each(negativeTestCases)(
@@ -81,3 +85,5 @@ test.each(negativeTestCases)(
 );
 });
  
+
+//TODO: boundary tests

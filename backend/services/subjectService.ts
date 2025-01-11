@@ -16,6 +16,8 @@ import Subject from "../models/sequelize/Subject";
  * // Fetch the second page of subjects with a limit of 20 records per page
  * const subjects = await getAllSubjects(2, 20);
  */
+
+//TODO: change error codes
 export const getAllSubjects = async (page: number = 1, limit: number = 50) => {
     if (page === undefined) {
         page = 1;

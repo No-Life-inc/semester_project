@@ -19,8 +19,6 @@ import {
   addBooks,
   getBooksByTitle,
 } from "../../services/bookService";
-import Publisher from "../../models/sequelize/Publisher";
-import Subject from "../../models/sequelize/Subject";
 import BookAPIData from "../../types/bookAPIData";
 import Book from "../../models/sequelize/Book";
 
