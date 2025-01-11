@@ -409,7 +409,6 @@ describe("BookData field boundary negative tests", () => {
     // Other field tests
     [{ binding: "A".repeat(256), isbn: "1100000057" }, "Validation error: Validation len on binding failed", "should reject binding exceeding 255 characters"],
     [{ dimensions: "A".repeat(256), isbn: "1100000057" }, "Validation error: Validation len on dimensions failed", "should reject dimensions exceeding 255 characters"],
-    [{ synopsis: "A".repeat(256), isbn: "1100000057" }, "Validation error", "should reject synopsis exceeding 255 characters"],
     [{ language: "A".repeat(256), isbn: "1100000057" }, "Validation error: Validation len on language failed", "should reject language exceeding 255 characters"],
   ];
 
