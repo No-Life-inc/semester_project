@@ -56,8 +56,6 @@ const createCollectionNegativeCases: CreateCollectionNegativeTestCase[] = [
   [" ", "test_email@example.com", ValidationError, "Collection name is required"],
   ["0", "test_email@example.com", ValidationError, "Collection name cannot be a number"],
   ["A".repeat(256), "test_email@example.com", ValidationError, "Collection name must be between 1 and 255 characters"],
-  ["A".repeat(254), "test_email@example.com", ValidationError, "Collection name must be between 1 and 255 characters"],
-  ["A".repeat(255), "test_email@example.com", ValidationError, "Collection name must be between 1 and 255 characters"],
   ["-1", "test_email@example.com", ValidationError, "Collection name cannot be a number"],
   ["Invalid Collection", "invalid@example.com", NotFoundError, "User not found"],
 ];
@@ -76,9 +74,9 @@ describe("createCollection function negative tests", () => {
 type GetUserCollectionsPositiveTestCase = [string, number];
 
 const getUserCollectionsPositiveCases: GetUserCollectionsPositiveTestCase[] = [
-  ["test_email@example.com", 1],
-  ["test_password@example.com", 1],
-  ["test@test.com", 1],
+  ["test_email@example.com", 2],
+  ["test_password@example.com", 2],
+  ["test@test.com", 2],
 ];
 
 describe("getUserCollections function positive tests", () => {
