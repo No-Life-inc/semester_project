@@ -4,7 +4,7 @@ import { getAllSubjectsController, getSubjectByIdController } from '../../contro
 
 const router = Router();
 
-router.get('/subjects', getAllSubjectsController);
-router.get('/subjects/:id', getSubjectByIdController);
+router.get('/', getAllSubjectsController);
+router.get('/:id', getSubjectByIdController);
 
 export default router;

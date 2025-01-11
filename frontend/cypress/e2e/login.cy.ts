@@ -6,7 +6,7 @@ describe('Login Page', () => {
     });
   
     it('should redirect to home page after successful login', () => {
-      // Intercept API call to verify the request is sent correctly
+     
       cy.intercept('POST', 'http://localhost:5000/v1/user/login').as('loginRequest');
   
       cy.get('[data-testid="login-email-input"]').type('test_email@example.com');
@@ -14,7 +14,7 @@ describe('Login Page', () => {
   
       cy.get('[data-testid="login-submit-button"]').click();
   
-      // Wait for the API request to complete and verify the response
+      
       cy.wait('@loginRequest').then((interception) => {
         expect(interception.response?.statusCode).to.equal(200);
         expect(interception.request.body).to.deep.equal({
@@ -22,7 +22,7 @@ describe('Login Page', () => {
           password: 'YourStrongPassword123',
         });
   
-        // Check that token is stored in localStorage
+      
         const responseBody = interception.response?.body;
         expect(responseBody).to.have.property('token');
         expect(responseBody).to.have.property('user');

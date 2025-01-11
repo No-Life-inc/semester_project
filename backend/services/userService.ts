@@ -149,3 +149,18 @@ export const editPassword = async (email: string, oldPassword: string, password:
     await user.save();
     return "Your password has been updated successfully."
 }
+
+/**
+ * Get user details.
+ *
+ * @param {string} email - The email of the user
+ * @returns {Promise<User>} - The user details
+ *
+ * */
+export const getUserIdByEmail = async (email: string) => {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+        throw new NotFoundError("User not found.");
+    }
+    return user.id;
+}

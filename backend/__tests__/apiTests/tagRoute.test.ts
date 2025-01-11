@@ -72,7 +72,7 @@ describe("Tag Routes - POST Tag - Positive tests", () => {
             .post("/tag")
             .send(newTag);
 
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(201);
         expect(response.body).toHaveProperty("id");
         expect(response.body).toHaveProperty("name", "Fantasy");
     });
@@ -97,12 +97,12 @@ describe("Tag Routes - DELETE Tag - Positive tests", () => {
         });
 
 
-    test("should return 409 if the tag name already exists", async () => {
+    test("should return 400 if the tag name already exists", async () => {
         const response = await request(app)
             .post("/tag")
             .send({ name: "Classic" });
 
-        expect([409, 500]).toContain(response.status);
+        expect(response.status).toBe(400);
         expect(response.body.error).toBe("Tag name already exists");
     });
 });

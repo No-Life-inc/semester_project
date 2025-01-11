@@ -25,7 +25,7 @@ const EditPassword: React.FC = () => {
                 { oldPassword, password: newPassword },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-
+            
             setSuccess(response.data.message || "Password updated successfully!");
             setError(null); 
         } catch (error: any) {

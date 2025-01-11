@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getUserBooks, addBookToUser, removeBookFromUser } from "../services/userBookService";
 import { AuthenticatedRequest } from "../types/authenticatedRequest";
+import { BaseError } from "../utility/errors";
 
 /**
  * Fetches user books and their associated book details.
@@ -26,8 +27,11 @@ export const getUserBooksController = async (req: AuthenticatedRequest, res: Res
         const result = await getUserBooks(email, pageNumber, limitNumber);
         res.status(200).json(result);
     } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+        if (error instanceof BaseError)
+            res.status(error.statusCode).json({ error: error.message });
+        else
+            res.status(500).json({ error: "An error occurred" });
+        }
 };
 
 
@@ -52,8 +56,11 @@ export const addBookToUserController = async (req: AuthenticatedRequest, res: Re
         const userBook = await addBookToUser(email, Number(bookId));
         res.status(201).json(userBook);
     } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+        if (error instanceof BaseError)
+            res.status(error.statusCode).json({ error: error.message });
+        else
+            res.status(500).json({ error: "An error occurred" });
+        }
 };
 
 /**
@@ -76,10 +83,11 @@ export const removeBookFromUserController = async (req: AuthenticatedRequest, re
         const success = await removeBookFromUser(email, Number(bookId));
         if (success) {
             res.status(200).json({ message: "Book removed from user successfully" });
-        } else {
-            res.status(404).json({ message: "UserBook not found" });
         }
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        if (error instanceof BaseError)
+            res.status(error.statusCode).json({ error: error.message });
+        else
+            res.status(500).json({ error: "An error occurred" });
     }
 };
