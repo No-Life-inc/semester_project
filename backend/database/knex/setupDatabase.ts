@@ -36,18 +36,18 @@ export async function initializeDatabase(): Promise<void> {
         // Seed the Neo4j database if needed
         // query the database to check if the data exists
 
-        const driver = await connectToNeo4j();
-        const session = driver.session();
+        // const driver = await connectToNeo4j();
+        // const session = driver.session();
 
-        const result = await session.run(`MATCH (b:Book) RETURN count(b) as book LIMIT 1`);
+        // const result = await session.run(`MATCH (b:Book) RETURN count(b) as book LIMIT 1`);
 
-        if (result.records[0].get("book").low > 0) {
-            console.log("Data already exists in the Neo4j database. Skipping seeding.");
-        } else {
-            console.log("Seeding Neo4j database...");
-            await seedNeo4j();
-            console.log("Neo4j database seeded successfully.");
-        }
+        // if (result.records[0].get("book").low > 0) {
+        //     console.log("Data already exists in the Neo4j database. Skipping seeding.");
+        // } else {
+        //     console.log("Seeding Neo4j database...");
+        //     await seedNeo4j();
+        //     console.log("Neo4j database seeded successfully.");
+        // }
         
     } catch (error) {
         console.error("Database initialization failed:", error);
