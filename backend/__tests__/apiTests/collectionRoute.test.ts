@@ -92,6 +92,18 @@ describe("Collection Routes - POST /collections Positive Tests", () => {
       () => getUserToken(0),
       201,
     ],
+    [
+      "should create a collection with exactly 255 characters",
+      { name: "a".repeat(255) },
+      () => getUserToken(0),
+      201,
+    ],
+    [
+      "should create a collection with 1 character",
+      { name: "a" },
+      () => getUserToken(0),
+      201,
+    ]
   ])("%s", async (description, payload, getTokenFn, expectedStatus) => {
     const token = getTokenFn();
     const response = await request(app)
@@ -121,6 +133,34 @@ describe("Collection Routes - POST /collections Negative Tests", () => {
       () => "invalidToken",
       401,
       { message: "Invalid or expired token" },
+    ],
+    [
+      "should return 422 for missing name field",
+      {},
+      () => getUserToken(0),
+      422,
+      { message: "Collection name is required" },
+    ],
+    [
+      "should return 422 for null name",
+      { name: null },
+      () => getUserToken(0),
+      422,
+      { message: "Collection name is required" },
+    ],
+    [
+      "should return 422 for empty string name",
+      { name: "" },
+      () => getUserToken(0),
+      422,
+      { message: "Collection name is required" },
+    ],
+    [
+      "should return 422 for name exceeding 255 characters",
+      { name: "A".repeat(256) },
+      () => getUserToken(0),
+      422,
+      { message: "Collection name must be between 1 and 255 characters" },
     ],
   ])(
     "%s",
@@ -259,7 +299,9 @@ describe("Collection Routes - DELETE /removeBook Negative Tests", () => {
       { collectionId: 1, bookId: 1 },
       () => getUserToken(2),
       403,
-      { message: "You are not authorized to remove a book from this collection" },
+      {
+        message: "You are not authorized to remove a book from this collection",
+      },
     ],
   ])(
     "%s",
