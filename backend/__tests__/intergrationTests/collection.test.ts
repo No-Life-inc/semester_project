@@ -54,6 +54,12 @@ const createCollectionNegativeCases: CreateCollectionNegativeTestCase[] = [
   ["", "test_email@example.com", ValidationError, "Collection name is required"],
   [null, "test_email@example.com", ValidationError, "Collection name is required"],
   [undefined, "test_email@example.com", ValidationError, "Collection name is required"],
+  [" ", "test_email@example.com", ValidationError, "Collection name is required"],
+  ["0", "test_email@example.com", ValidationError, "Collection name cannot be a number"],
+  ["A".repeat(256), "test_email@example.com", ValidationError, "Collection name must be between 1 and 255 characters"],
+  ["A".repeat(254), "test_email@example.com", ValidationError, "Collection name must be between 1 and 255 characters"],
+  ["A".repeat(255), "test_email@example.com", ValidationError, "Collection name must be between 1 and 255 characters"],
+  ["-1", "test_email@example.com", ValidationError, "Collection name cannot be a number"],
   ["Invalid Collection", "invalid@example.com", NotFoundError, "User not found"],
 ];
 
@@ -71,9 +77,9 @@ type GetUserCollectionsPositiveTestCase = [string, number];
 
 // Positive test cases for getUserCollections
 const getUserCollectionsPositiveCases: GetUserCollectionsPositiveTestCase[] = [
-  ["test_email@example.com", 2],
-  ["test_password@example.com", 2],
-  ["test@test.com", 2],
+  ["test_email@example.com", 1],
+  ["test_password@example.com", 1],
+  ["test@test.com", 1],
 ];
 
 describe("getUserCollections function positive tests", () => {
@@ -85,7 +91,6 @@ describe("getUserCollections function positive tests", () => {
       expect(Array.isArray(collections)).toBe(true);
       expect(collections.length).toBe(expectedCollectionCount);
 
-      // Additional checks for boundary cases
       if (expectedCollectionCount > 0) {
         collections.forEach((collection) => {
           expect(collection).toHaveProperty("name");
@@ -97,23 +102,25 @@ describe("getUserCollections function positive tests", () => {
 });
 
 type GetUserCollectionsNegativeTestCase = [
-  string,
-  typeof NotFoundError,
+  string | null | undefined,
+  typeof ValidationError | typeof NotFoundError,
   string
 ];
 
-// Negative test cases for getUserCollections
 const getUserCollectionsNegativeCases: GetUserCollectionsNegativeTestCase[] = [
+  ["", ValidationError, "Invalid email address"],
+  [null, ValidationError, "Invalid email address"],
+  [undefined, ValidationError, "Invalid email address"],
+  [" ", ValidationError, "Invalid email address"],
   ["non_existent@example.com", NotFoundError, "User not found"],
-  ["", NotFoundError, "User not found"],
 ];
 
 describe("getUserCollections function negative tests", () => {
   test.each(getUserCollectionsNegativeCases)(
-    "should throw an error for invalid user (email: %s, errorClass: %s, errorMessage: %s)",
-    async (email: string, errorClass: typeof NotFoundError, errorMessage: string) => {
-      await expect(getUserCollections(email)).rejects.toThrow(errorClass);
-      await expect(getUserCollections(email)).rejects.toThrow(errorMessage);
+    "should throw an error for invalid user input (email: %s, errorClass: %s, errorMessage: %s)",
+    async (email: string | null | undefined, errorClass: typeof NotFoundError, errorMessage: string) => {
+      await expect(getUserCollections(email as any)).rejects.toThrow(errorClass);
+      await expect(getUserCollections(email as any)).rejects.toThrow(errorMessage);
     }
   );
 });

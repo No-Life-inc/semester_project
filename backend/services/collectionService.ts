@@ -21,12 +21,22 @@ import { sequelize } from "../config/SqlConfig";
  * @throws {NotFoundError} - Throws an error if the user is not found.
  */
 export const createCollection = async (name: string, email: string) => {
-  if (!name) {
+  if (!name || name.trim() === "") {
     throw new ValidationError("Collection name is required");
   }
 
   if (name.length > 255) {
     throw new ValidationError("Collection name must be between 1 and 255 characters");
+  }
+
+  const isNumeric = !isNaN(Number(name));
+  if (isNumeric) {
+    throw new ValidationError("Collection name cannot be a number");
+  }
+
+  const containsOnlySpaces = name.trim().length === 0;
+  if (containsOnlySpaces) {
+    throw new ValidationError("Collection name cannot be empty or whitespace");
   }
 
   const user = await User.findOne({ where: { email } });
@@ -46,6 +56,10 @@ export const createCollection = async (name: string, email: string) => {
  * @throws {NotFoundError} - Throws an error if the user is not found.
  */
 export const getUserCollections = async (email: string) => {
+  if (!email || typeof email !== "string" || !email.trim()) {
+    throw new ValidationError("Invalid email address");
+  }
+
   const user = await User.findOne({
     where: { email },
     include: [
