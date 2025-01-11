@@ -1,4 +1,5 @@
 import Tag from '../models/sequelize/Tag';
+import {BadRequestError, ConflictError, InternalServerError, NotFoundError} from "../utility/errors";
 
 /**
  * Fetches all tags from the database.
@@ -12,6 +13,13 @@ import Tag from '../models/sequelize/Tag';
  * // This will fetch the first 10 tags
  */
 export const getAllTags = async (page: number, limit: number) => {
+    const totalTags = await Tag.count();
+    const maxPage = Math.ceil(totalTags / limit);
+
+    if (page > maxPage) {
+        throw new BadRequestError(`Page ${page} exceeds the maximum page number ${maxPage}.`);
+    }
+
     const offset = (page - 1) * limit;
     return await Tag.findAll({
         offset,
@@ -32,12 +40,12 @@ export const getAllTags = async (page: number, limit: number) => {
 export const getTagById = async (id: number) => {
 
     if (isNaN(id) || id < 1) {
-        throw new Error("Invalid tag id. Tag id must be a number greater than or equal to 1.");
+        throw new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.");
     }
 
     const tag = await Tag.findByPk(id);
     if (!tag) {
-        throw new Error("Tag not found");
+        throw new NotFoundError("Tag not found");
     }
     return tag;
 };
@@ -54,19 +62,19 @@ export const getTagById = async (id: number) => {
  */
 export const addTag = async (name: string) => {
     if (!name) {
-        throw new Error("Tag name is required");
+        throw new BadRequestError("Tag name is required");
     }
     // check if tag name already exists
     const tag = await Tag.findOne({ where: { name } });
     if (tag) {
-        throw new Error("Tag name already exists");
+        throw new BadRequestError("Tag name already exists");
     }
     if (name.length > 255) {
-        throw new Error("Tag name cannot exceed 255 characters.");
+        throw new ConflictError("Tag name cannot exceed 255 characters.");
     }
     const addTag = await Tag.create({ name });
     if (!addTag) {
-        throw new Error("Tag not created");
+        throw new InternalServerError("Tag not created");
     }
     return addTag;
 };
@@ -84,19 +92,13 @@ export const addTag = async (name: string) => {
  */
 export const deleteTagById = async (id: number) => {
     if (isNaN(id) || id < 1) {
-        throw new Error("Invalid tag id. Tag id must be a number greater than or equal to 1.");
+        throw new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.");
     }
 
-    try {
-        const deletedCount = await Tag.destroy({ where: { id } });
-        if (deletedCount === 0) {
-            throw new Error("Tag not found");
-        }
-        return deletedCount;
-    } catch (error) {
-        if (error.message === "Tag not found") {
-            throw error;
-        }
-        throw new Error("An error occurred while deleting tag");
+    const deletedCount = await Tag.destroy({ where: { id } });
+    if (deletedCount === 0) {
+        throw new NotFoundError("Tag not found");
     }
+
+    return deletedCount;
 };
