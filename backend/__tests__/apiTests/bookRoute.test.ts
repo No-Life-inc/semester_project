@@ -109,12 +109,12 @@ describe('Book Routes - Get Book By ID Positive tests', () => {
 describe('Book Routes - Get Book By ID Negative tests', () => {
   
   test.each([
-    ["should get 400 for invalid ID", "/book/id/0", 400],
-    ["should get 400 for invalid ID", "/book/id/-1", 400],
-    ["should get 400 for invalid ID", "/book/id/-2", 400],
+    ["should get 400 for invalid ID", "/book/id/0", 422],
+    ["should get 400 for invalid ID", "/book/id/-1", 422],
+    ["should get 400 for invalid ID", "/book/id/-2", 422],
     ["should get 404 for invalid ID", "/book/id/101", 404],
     ["should get 404 for invalid ID", "/book/id/102", 404],
-    ["should get 400 for invalid ID", "/book/id/a", 400],
+    ["should get 400 for invalid ID", "/book/id/a", 422],
     ["should get 404 for invalid ID", "/book/id/ ", 404],
     ["should get 404 for invalid ID", "/book/id/", 404],
   ])( 

@@ -52,7 +52,7 @@ export const getBookByIdController = async (request: Request, response: Response
     
     const bookId = parseInt(id, 10);
     if (!id || id.trim() === "" || isNaN(bookId) || bookId < 1) {
-        return response.status(400).json({ error: "ID parameter must be a valid positive number" });
+        return response.status(422).json({ error: "ID parameter must be a valid positive number" });
     }
 
     try {
