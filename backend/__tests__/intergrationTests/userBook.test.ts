@@ -3,8 +3,6 @@ import { afterAll, beforeAll, describe, expect, it, jest, test } from "@jest/glo
 jest.setTimeout(120000);
 
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
-import knex from "knex";
-import knexConfig from "../../knexfile";
 import { getUserBooks, addBookToUser, removeBookFromUser } from "../../services/userBookService";
 
 beforeAll(async () => {

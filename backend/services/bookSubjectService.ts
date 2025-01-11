@@ -14,8 +14,14 @@ export const getBooksBySubject = async (
     page: number = 1,
     limit: number = 50
 ): Promise<Book[]> => {
-    page = page || 1;
-    limit = limit || 50;
+    if (page === undefined) {
+        page = 1;
+    }
+
+    if (limit === undefined) {
+        limit = 50;
+    }
+    
     if (isNaN(subjectId) || subjectId < 1) {
         throw new Error("Invalid subject ID. Subject ID must be a number greater than or equal to 1.");
     }
