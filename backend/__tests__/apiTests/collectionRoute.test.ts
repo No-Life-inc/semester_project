@@ -384,8 +384,36 @@ describe("Collection Routes - DELETE /removeBook Negative Tests", () => {
       () => getUserToken(2),
       403,
       {
-        message: "You are not authorized to remove a book from this collection",
+        error: "You are not authorized to remove a book from this collection",
       },
+    ],
+    [
+      "should return 400 for 0 bookId ",
+      { collectionId: 1, bookId: 0 },
+      () => getUserToken(0),
+      400,
+      { error: "Book ID is required" },
+    ],
+    [
+      "should return 422 for negative bookId",
+      { collectionId: 1, bookId: -1 },
+      () => getUserToken(0),
+      422,
+      { error: "Invalid book ID" },
+    ],
+    [
+      "should return 400 for bookId = NaN",
+      { collectionId: 1, bookId: NaN },
+      () => getUserToken(0),
+      400,
+      { error: "Book ID is required" },
+    ],
+    [
+      "should return 404 for non-existent bookId",
+      { collectionId: 1, bookId: 999 },
+      () => getUserToken(0),
+      404,
+      { error: "UserBook entry not found" },
     ],
   ])(
     "%s",
@@ -402,6 +430,22 @@ describe("Collection Routes - DELETE /removeBook Negative Tests", () => {
       }
     }
   );
+
+  test("should return 500 for unexpected error", async () => {
+    jest.spyOn(CollectionService, "removeBookFromCollection").mockImplementation(() => {
+      throw new Error("Unexpected error");
+    });
+
+    const response = await request(app)
+      .delete("/collections/removeBook")
+      .set("Authorization", `Bearer ${getUserToken(0)}`)
+      .send({ collectionId: 1, bookId: 3 });
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({ error: "An error occurred" });
+
+    jest.restoreAllMocks();
+  });
 });
 
 // Positive Tests for PUT /collections/:id
