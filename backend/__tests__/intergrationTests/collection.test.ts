@@ -24,7 +24,7 @@ afterAll(async ()=>{
   await teardownTestDB();
 });
 
-//Positive test cases for createCollection
+// Create Collection Positive Tests
 const createCollectionPositiveCases = [
   ["Collection 1", "test_email@example.com"],
   ["Collection 2", "test_password@example.com"],
@@ -42,6 +42,7 @@ describe("createCollection function positive tests", () => {
   );
 });
 
+// Create Collection Negative Tests
 type CreateCollectionNegativeTestCase = [
   string | null | undefined,
   string,
@@ -49,7 +50,6 @@ type CreateCollectionNegativeTestCase = [
   string
 ];
 
-// Negative test cases for createCollection
 const createCollectionNegativeCases: CreateCollectionNegativeTestCase[] = [
   ["", "test_email@example.com", ValidationError, "Collection name is required"],
   [null, "test_email@example.com", ValidationError, "Collection name is required"],
@@ -73,9 +73,9 @@ describe("createCollection function negative tests", () => {
   );
 });
 
+// Get User Collection Positive Tests
 type GetUserCollectionsPositiveTestCase = [string, number];
 
-// Positive test cases for getUserCollections
 const getUserCollectionsPositiveCases: GetUserCollectionsPositiveTestCase[] = [
   ["test_email@example.com", 1],
   ["test_password@example.com", 1],
@@ -101,6 +101,7 @@ describe("getUserCollections function positive tests", () => {
   );
 });
 
+// Get User Collection Negative Tests
 type GetUserCollectionsNegativeTestCase = [
   string | null | undefined,
   typeof ValidationError | typeof NotFoundError,
@@ -125,9 +126,9 @@ describe("getUserCollections function negative tests", () => {
   );
 });
 
+// Update Collection Positive Tests
 type UpdateCollectionPositiveTestCase = [number, string, string];
 
-// Positive test cases for updateCollection
 const updateCollectionPositiveCases: UpdateCollectionPositiveTestCase[] = [
   [1, "Updated Collection Name", "test_email@example.com"],
   [2, "Another Valid Name", "test_password@example.com"],
@@ -144,19 +145,23 @@ describe("updateCollection function positive tests", () => {
   );
 });
 
+// Update Collection Negative Tests
 type UpdateCollectionNegativeTestCase = [
   number,
-  string | null,
-  typeof NotFoundError | typeof ValidationError,
+  string | null | undefined,
+  typeof NotFoundError | typeof ValidationError | typeof ForbiddenError,
   string,
   string
 ];
 
-// Negative test cases for updateCollection
 const updateCollectionNegativeCases: UpdateCollectionNegativeTestCase[] = [
   [999, "Non-existent Collection", NotFoundError, "Collection not found", "test_email@example.com"],
-  [1, "", ValidationError, "Validation notEmpty on name failed","test_email@example.com"],
-  [1, null, ValidationError, "Name cannot be null", "test_email@example.com"],
+  [1, "", ValidationError, "Collection name cannot be empty or whitespace", "test_email@example.com"],
+  [1, null, ValidationError, "Collection name cannot be empty or whitespace", "test_email@example.com"],
+  [1, undefined, ValidationError, "Collection name cannot be empty or whitespace", "test_email@example.com"],
+  [1, " ".repeat(10), ValidationError, "Collection name cannot be empty or whitespace", "test_email@example.com"],
+  [1, "A".repeat(256), ValidationError, "Collection name must be between 1 and 255 characters", "test_email@example.com"],
+  [1, "12345", ValidationError, "Collection name cannot be a number", "test_email@example.com"],
   [1, "Updated Name", ForbiddenError, "You are not authorized to update this collection", "test@test.com"],
 ];
 
@@ -165,8 +170,8 @@ describe("updateCollection function negative tests", () => {
     "should throw an error for invalid update (id: %d, name: %s, errorClass: %s, errorMessage: %s)",
     async (
       id: number,
-      name: string | null,
-      errorClass: typeof NotFoundError | typeof ValidationError,
+      name: string | null | undefined,
+      errorClass: typeof NotFoundError | typeof ValidationError | typeof ForbiddenError,
       errorMessage: string,
       email: string
     ) => {
@@ -176,9 +181,9 @@ describe("updateCollection function negative tests", () => {
   );
 });
 
+// Delete Collection Positive Tests
 type DeleteCollectionPositiveTestCase = [number, string];
 
-// Positive test cases for deleteCollection
 const deleteCollectionPositiveCases: DeleteCollectionPositiveTestCase[] = [
   [1, "test_email@example.com"],
   [2, "test_password@example.com"],
@@ -197,14 +202,14 @@ describe("deleteCollection function positive tests", () => {
   );
 });
 
+// Delete Collection Negative Tests
 type DeleteCollectionNegativeTestCase = [
-  number,
-  string,
-  typeof NotFoundError | typeof UnauthorizedError | typeof ValidationError,
+  number | null | undefined | string,
+  string | null | undefined,
+  typeof NotFoundError | typeof ForbiddenError | typeof ValidationError,
   string
 ];
 
-// Negative test cases for deleteCollection
 const deleteCollectionNegativeCases: DeleteCollectionNegativeTestCase[] = [
   [999, "test_email@example.com", NotFoundError, "Collection not found"],
   [1, "non_existent_user@example.com", NotFoundError, "User not found"],
@@ -212,19 +217,26 @@ const deleteCollectionNegativeCases: DeleteCollectionNegativeTestCase[] = [
   [0, "test_email@example.com", ValidationError, "Invalid collection ID"],
   [-1, "test_email@example.com", ValidationError, "Invalid collection ID"],
   [-999, "test_email@example.com", ValidationError, "Invalid collection ID"],
+  [NaN, "test_email@example.com", ValidationError, "Invalid collection ID"],
+  [null, "test_email@example.com", ValidationError, "Invalid collection ID"],
+  [undefined, "test_email@example.com", ValidationError, "Invalid collection ID"],
+  [1, "", ValidationError, "Invalid email address"],
+  [1, null, ValidationError, "Invalid email address"],
+  [1, undefined, ValidationError, "Invalid email address"],
+  [1, "  ", ValidationError, "Invalid email address"],
 ];
 
 describe("deleteCollection function negative tests", () => {
   test.each(deleteCollectionNegativeCases)(
-    "should throw an error for invalid delete (id: %d, email: %s, errorClass: %s, errorMessage: %s)",
+    "should throw an error for invalid delete (id: %s, email: %s, errorClass: %s, errorMessage: %s)",
     async (
-      id: number,
-      email: string,
-      errorClass: typeof NotFoundError | typeof UnauthorizedError | typeof ValidationError,
+      id: number | null | undefined | string,
+      email: string | null | undefined,
+      errorClass: typeof NotFoundError | typeof ForbiddenError | typeof ValidationError,
       errorMessage: string
     ) => {
-      await expect(deleteCollection(id, email)).rejects.toThrow(errorClass);
-      await expect(deleteCollection(id, email)).rejects.toThrow(errorMessage);
+      await expect(deleteCollection(id as number, email as string)).rejects.toThrow(errorClass);
+      await expect(deleteCollection(id as number, email as string)).rejects.toThrow(errorMessage);
     }
   );
 });

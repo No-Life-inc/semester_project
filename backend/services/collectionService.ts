@@ -93,6 +93,19 @@ export const getUserCollections = async (email: string) => {
  * @throws {NotFoundError} - Throws an error if the collection is not found.
  */
 export const updateCollection = async (id: number, name: string, email: string) => {
+  if (!name || name.trim() === "") {
+    throw new ValidationError("Collection name cannot be empty or whitespace");
+  }
+
+  if (name.length > 255) {
+    throw new ValidationError("Collection name must be between 1 and 255 characters");
+  }
+
+  const isNumeric = !isNaN(Number(name));
+  if (isNumeric) {
+    throw new ValidationError("Collection name cannot be a number");
+  }
+
   const collection = await Collection.findByPk(id);
   if (!collection) {
     throw new NotFoundError("Collection not found");
@@ -128,10 +141,14 @@ export const updateCollection = async (id: number, name: string, email: string) 
  * @throws {UnauthorizedError} - Throws an error if the user is not authorized to delete the collection.
  */
 export const deleteCollection = async (id: number, email: string) => {
-
-  if (id <= 0) {
+  if (!id || typeof id !== "number" || id <= 0 || isNaN(id)) {
     throw new ValidationError("Invalid collection ID");
   }
+
+  if (!email || typeof email !== "string" || !email.trim()) {
+    throw new ValidationError("Invalid email address");
+  }
+
   const user = await User.findOne({ where: { email } });
 
   if (!user) {
