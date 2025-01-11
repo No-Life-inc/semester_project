@@ -186,13 +186,6 @@ describe("getBookById function negative tests", () => {
 
 
 describe("BookData field boundary positive tests", () => {
-  const maxText =
-    "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst.";
-  const maxTextMinusOne =
-    "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst";
-  
-  const maxInt = 2147483647;
-  const maxMSRP = 99999999.98;
 
   const minimalBookData: BookAPIData = { title: " " };
 
@@ -200,8 +193,8 @@ describe("BookData field boundary positive tests", () => {
     [{ isbn: "1234567889" }, "title", " ", "should accept minimal valid title"],
     [{ title: "A", isbn: "1234567890" }, "title", "A", "should accept minimal valid title"],
     [{ title: "Default Title", isbn: "1234567888" }, "title", "Default Title", "should accept a middle valid title"],
-    [{ title: maxText, isbn: "1234567891" }, "title", maxText, "should accept maximal title (255 chars)"],
-    [{ title: maxTextMinusOne, isbn: "1234567892" }, "title", maxTextMinusOne, "should accept title one character below limit"],
+    [{ title: "A".repeat(255), isbn: "1234567891" }, "title", "A".repeat(255), "should accept maximal title (255 chars)"],
+    [{ title: "A".repeat(254), isbn: "1234567892" }, "title", "A".repeat(254), "should accept title one character below limit"],
 
     // Image field tests
     [{ image: "", isbn: "1234567893" }, "image", "", "should accept minimal image URL"],
@@ -214,8 +207,8 @@ describe("BookData field boundary positive tests", () => {
     [{ title_long: "", isbn: "0000000001" }, "titleLong", "", "should accept minimal title_long"],
     [{ title_long: "a", isbn: "0000000002" }, "titleLong", "a", "should accept close to minimal title_long"],
     [{ title_long: "Default Title", isbn: "0000000005" }, "titleLong", "Default Title", "should accept a middle title_long"],
-    [{ title_long: maxText, isbn: "0000000003" }, "titleLong", maxText, "should accept maximal title_long (255 chars)"],
-    [{ title_long: maxTextMinusOne, isbn: "0000000004" }, "titleLong", maxTextMinusOne, "should accept maximal title_long (255 chars)"],
+    [{ title_long: "A".repeat(255), isbn: "0000000003" }, "titleLong", "A".repeat(255), "should accept maximal title_long (255 chars)"],
+    [{ title_long: "A".repeat(254), isbn: "0000000004" }, "titleLong", "A".repeat(254), "should accept maximal title_long (255 chars)"],
 
     // Date_published field tests
     [{ date_published: '0001-01-01', isbn: "0000000007" }, "publicationDate", '0001-01-01', "should accept minimal date_published"],
@@ -227,8 +220,8 @@ describe("BookData field boundary positive tests", () => {
     //Synopsis field tests
     [{ synopsis: "", isbn: "0000000014" }, "synopsis", "", "should accept minimal synopsis"],
     [{ synopsis: " ", isbn: "0000000015" }, "synopsis", " ", "should accept close to minimal synopsis"],
-    [{ synopsis: maxText, isbn: "0000000013" }, "synopsis", maxText, "should accept maximal synopsis (255 chars)"],
-    [{ synopsis: maxTextMinusOne, isbn: "0000000016" }, "synopsis", maxTextMinusOne, "should accept maximal synopsis (255 chars)"],
+    [{ synopsis: "A".repeat(255), isbn: "0000000013" }, "synopsis", "A".repeat(255), "should accept maximal synopsis (255 chars)"],
+    [{ synopsis: "A".repeat(254), isbn: "0000000016" }, "synopsis", "A".repeat(254), "should accept maximal synopsis (255 chars)"],
     [{ synopsis: "Test synopsis", isbn: "0000000017" }, "synopsis", "Test synopsis", "should accept a middle synopsis"],
 
     //isbn13 field tests
@@ -241,29 +234,29 @@ describe("BookData field boundary positive tests", () => {
     //edition field tests
     [{ edition: "", isbn: "0000000023" }, "edition", "", "should accept minimal edition"],
     [{ edition: "a", isbn: "0000000024" }, "edition", "a", "should accept close to minimal edition"],
-    [{ edition: maxText, isbn: "0000000025" }, "edition", maxText, "should accept maximal edition (255 chars)"],
-    [{ edition: maxTextMinusOne, isbn: "0000000026" }, "edition", maxTextMinusOne, "should accept maximal edition (255 chars)"],
+    [{ edition: "A".repeat(255), isbn: "0000000025" }, "edition", "A".repeat(255), "should accept maximal edition (255 chars)"],
+    [{ edition: "A".repeat(254), isbn: "0000000026" }, "edition", "A".repeat(254), "should accept maximal edition (255 chars)"],
     [{ edition: "Default Edition", isbn: "0000000027" }, "edition", "Default Edition", "should accept a middle edition"],
 
     //binding field tests
     [{ binding: "", isbn: "0000000028" }, "binding", "", "should accept minimal binding"],
     [{ binding: "a", isbn: "0000000029" }, "binding", "a", "should accept close to minimal binding"],
-    [{ binding: maxText, isbn: "0000000030" }, "binding", maxText, "should accept maximal binding (255 chars)"],
-    [{ binding: maxTextMinusOne, isbn: "0000000031" }, "binding", maxTextMinusOne, "should accept maximal binding (255 chars)"],
+    [{ binding: "A".repeat(255), isbn: "0000000030" }, "binding", "A".repeat(255), "should accept maximal binding (255 chars)"],
+    [{ binding: "A".repeat(254), isbn: "0000000031" }, "binding", "A".repeat(254), "should accept maximal binding (255 chars)"],
     [{ binding: "Default Binding", isbn: "0000000032" }, "binding", "Default Binding", "should accept a middle binding"],
 
     //language field tests
     [{ language: "", isbn: "0000000033" }, "language", "", "should accept minimal language"],
     [{ language: "a", isbn: "0000000034" }, "language", "a", "should accept close to minimal language"],
-    [{ language: maxText, isbn: "0000000035" }, "language", maxText, "should accept maximal language (255 chars)"],
-    [{ language: maxTextMinusOne, isbn: "0000000036" }, "language", maxTextMinusOne, "should accept language binding (255 chars)"],
+    [{ language: "A".repeat(255), isbn: "0000000035" }, "language", "A".repeat(255), "should accept maximal language (255 chars)"],
+    [{ language: "A".repeat(254), isbn: "0000000036" }, "language", "A".repeat(254), "should accept language binding (255 chars)"],
     [{ language: "Default language", isbn: "0000000037" }, "language", "Default language", "should accept a middle language"],
 
     //dimensions field tests
     [{ dimensions: "", isbn: "0000000038" }, "dimensions", "", "should accept minimal dimensions"],
     [{ dimensions: "a", isbn: "0000000039" }, "dimensions", "a", "should accept close to minimal dimensions"],
-    [{ dimensions: maxText, isbn: "0000000040" }, "dimensions", maxText, "should accept maximal dimensions (255 chars)"],
-    [{ dimensions: maxTextMinusOne, isbn: "0000000041" }, "dimensions", maxTextMinusOne, "should accept maximal dimensions (255 chars)"],
+    [{ dimensions: "A".repeat(255), isbn: "0000000040" }, "dimensions", "A".repeat(255), "should accept maximal dimensions (255 chars)"],
+    [{ dimensions: "A".repeat(254), isbn: "0000000041" }, "dimensions", "A".repeat(254), "should accept maximal dimensions (255 chars)"],
     [{ dimensions: "Default dimensions", isbn: "0000000042" }, "dimensions", "Default dimensions", "should accept a middle dimensions"],
 
     //isbn10 field tests
@@ -278,14 +271,13 @@ describe("BookData field boundary positive tests", () => {
     [{ pages: 1, isbn: "0000000049" }, "pages", 1, "should accept close to minimal pages"],
     [{ pages: 100, isbn: "0000000050" }, "pages", 100, "should accept middle pages"],
     [{ pages: 9999, isbn: "0000000051" }, "pages", 9999, "should accept some large page number"],
-    [{ pages: maxInt, isbn: "0000000052" }, "pages", maxInt, "should accept maximal pages (INT_MAX)"],
+    [{ pages: 2147483647, isbn: "0000000052" }, "pages", 2147483647, "should accept maximal pages (INT_MAX)"],
 
     [{ msrp: 0, isbn: "0000000053" }, "msrp", 0, "should accept minimal msrp"],
     [{ msrp: 1, isbn: "0000000054" }, "msrp", 1, "should accept close to minimal msrp"],
     [{ msrp: 100, isbn: "0000000055" }, "msrp", 100, "should accept middle msrp value"],
     [{ msrp: 9999, isbn: "0000000056" }, "msrp", 9999, "should accept a large msrp value"],
-    [{ msrp: maxMSRP, isbn: "0000000057" }, "msrp", maxMSRP, "should accept maximal msrp (INT_MAX)"],
-  
+    [{ msrp: 99999999.98, isbn: "0000000057" }, "msrp", 99999999.98, "should accept maximal msrp (INT_MAX)"],
 
   ];
 
@@ -314,63 +306,55 @@ describe("BookData field boundary positive tests", () => {
 });
 
 describe("BookData field boundary negative tests", () => {
-  const overMaxText = "A".repeat(256); 
-  const invalidDate = "10000-01-01"; 
-  const invalidISBN10 = "12345678901"; 
-  const invalidISBN13 = "12345678901234"; 
-  const overMaxMSRP = 100000000.0; 
-  const underMaxMSRP = -100000000.0;
-  const maxInt = 2147483647;
-  const negativeMaxInt = -2147483648;
 
   const minimalBookData: BookAPIData = { title: " " };
 
   const cases: [Partial<BookAPIData>, string][] = [
     // Title field tests
-    [{ title: overMaxText }, "should reject title exceeding 255 characters"],
+    [{ title: "A".repeat(256) }, "should reject title exceeding 255 characters"],
     [{ title: undefined }, "should reject undefined title"],
     [{ title: "" }, "should reject empty title"],
     [{ title: null }, "should reject null title"],
 
     // Image field tests
-    [{ image: overMaxText }, "should reject image URL exceeding 255 characters"],
+    [{ image: "A".repeat(256) }, "should reject image URL exceeding 255 characters"],
 
     // Title_long field tests
-    [{ title_long: overMaxText }, "should reject title_long exceeding 255 characters"],
+    [{ title_long: "A".repeat(256) }, "should reject title_long exceeding 255 characters"],
 
     // Date_published field tests
-    [{ date_published: invalidDate }, "should reject invalid date_published beyond 9999-12-31"],
+    [{ date_published: "10000-01-01" }, "should reject invalid date_published beyond 9999-12-31"],
     [{ date_published: "0000-00-00" }, "should reject invalid date_published of 0001-01-00"],
     [{ date_published: "9999-12-31" }, "should reject invalid date_published of 9999-12-31"],
     [{ date_published: "9999-12-32" }, "should reject invalid date_published of 9999-12-32"],
 
     // ISBN fields
-    [{ isbn10: invalidISBN10 }, "should reject isbn10 exceeding 10 characters"],
-    [{ isbn13: invalidISBN13 }, "should reject isbn13 exceeding 13 characters"],
-    [{ isbn: invalidISBN13 }, "should reject isbn exceeding 10 characters"],
+    [{ isbn10: "12345678901" }, "should reject isbn10 exceeding 10 characters"],
+    [{ isbn13: "12345678901234" }, "should reject isbn13 exceeding 13 characters"],
+    [{ isbn: "12345678901234" }, "should reject isbn exceeding 10 characters"],
     [{ isbn: undefined}, "should reject undefined isbn"],
     [{ isbn: "" }, "should reject empty isbn"],
     [{ isbn: null}, "should reject null isbn"],
 
     // Pages field tests
     [{ pages: -1 }, "should reject negative pages value"],
-    [{ pages: maxInt + 1 }, "should reject pages exceeding INT_MAX"],
-    [{ pages: negativeMaxInt }, "should reject pages below INT_MIN"],
+    [{ pages: 2147483647 + 1 }, "should reject pages exceeding INT_MAX"],
+    [{ pages: -2147483648 }, "should reject pages below INT_MIN"],
     [{ pages: -10000 }, "should reject pages exceeding valid min value"],
     [{ pages: NaN }, "should reject Nan pages value"],
 
     // MSRP field tests
-    [{ msrp: overMaxMSRP }, "should reject msrp exceeding valid max value"],
+    [{ msrp: 100000000.0 }, "should reject msrp exceeding valid max value"],
     [{ msrp: -1 }, "should reject negative msrp value"],
-    [{ msrp: underMaxMSRP }, "should reject msrp below valid min value"],
+    [{ msrp: -100000000.0 }, "should reject msrp below valid min value"],
     [{ msrp: -10000 }, "should reject msrp below valid min value"],
     [{ msrp: NaN }, "should reject Nan msrp"],
 
     
-    [{ binding: overMaxText }, "should reject binding exceeding 255 characters"],
-    [{ dimensions: overMaxText }, "should reject dimensions exceeding 255 characters"],
-    [{ synopsis: overMaxText }, "should reject synopsis exceeding 255 characters"],
-    [{ language: overMaxText }, "should reject language exceeding 255 characters"],
+    [{ binding: "A".repeat(256) }, "should reject binding exceeding 255 characters"],
+    [{ dimensions: "A".repeat(256) }, "should reject dimensions exceeding 255 characters"],
+    [{ synopsis: "A".repeat(256) }, "should reject synopsis exceeding 255 characters"],
+    [{ language: "A".repeat(256) }, "should reject language exceeding 255 characters"],
   ];
 
   test.each(cases)("%s", async (fieldData, description) => {
@@ -423,19 +407,16 @@ describe("BookData field associations - Authors", () => {
 });
 
 describe("BookData field associations - Authors (Negative Tests)", () => {
-  const maxTextPlusOne = "Maximal is a long text of 255 characters, and this text will be 255 characters long. Max es un texto largo de 255 caracteres, y este texto tendrá 255 caracteres. Maksimal er en tekst på 255 tegn, og denne tekst vil være på 255 tegn. Her er fyld til sidst.-";
-  const maxInt = 2147483647;
-  const negativeMaxInt = -2147483648;
 
   const minimalBookData: BookAPIData = { title: "Test Book" };
 
   const cases: [Partial<BookAPIData>, string][] = [
-    [{ authors: [maxTextPlusOne], isbn: "0000000101"}, "should ignore empty or invalid author names"],
+    [{ authors: ["A".repeat(256)], isbn: "0000000101"}, "should ignore empty or invalid author names"],
     [{ authors: ["1"], isbn: "0000000102"}, "should ignore empty or invalid author names"],
     [{ authors: ["-1"], isbn: "0000000103"}, "should ignore empty or invalid author names"],
     [{ authors: [undefined as any], isbn: "0000000107"}, "should ignore empty or invalid author names"],
-    [{ authors: [maxInt.toString()], isbn: "0000000108"}, "should ignore empty or invalid author names"],
-    [{ authors: [negativeMaxInt.toString()], isbn: "0000000109"}, "should ignore empty or invalid author names"],
+    [{ authors: ["2147483647"], isbn: "0000000108"}, "should ignore empty or invalid author names"],
+    [{ authors: ["-2147483648"], isbn: "0000000109"}, "should ignore empty or invalid author names"],
   ];
 
   test.each(cases)(
