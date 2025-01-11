@@ -195,6 +195,18 @@ export const addBookToCollection = async (
   collectionId: number,
   bookId: number
 ) => {
+  if (!email || typeof email !== "string" || !email.trim()) {
+    throw new ValidationError("Invalid email address");
+  }
+
+  if (!collectionId || typeof collectionId !== "number" || collectionId <= 0 || isNaN(collectionId)) {
+    throw new ValidationError("Invalid collection ID");
+  }
+
+  if (!bookId || typeof bookId !== "number" || bookId <= 0 || isNaN(bookId)) {
+    throw new ValidationError("Invalid book ID");
+  }
+
   const t = await sequelize.transaction();
   try {
     const user = await User.findOne({ where: { email }, transaction: t });
@@ -210,7 +222,7 @@ export const addBookToCollection = async (
     if (!collection) {
       throw new NotFoundError("Collection not found");
     }
-    
+
     if (collection.userId !== user.id) {
       throw new UnauthorizedError(
         "You are not authorized to add a book to this collection"
@@ -256,7 +268,6 @@ export const addBookToCollection = async (
     await t.rollback();
     throw error;
   }
-
 };
 
 /**
@@ -275,6 +286,18 @@ export const removeBookFromCollection = async (
   collectionId: number,
   bookId: number
 ) => {
+  if (!email || typeof email !== "string" || !email.trim()) {
+    throw new ValidationError("Invalid email address");
+  }
+
+  if (!collectionId || typeof collectionId !== "number" || collectionId <= 0 || isNaN(collectionId)) {
+    throw new ValidationError("Invalid collection ID");
+  }
+
+  if (!bookId || typeof bookId !== "number" || bookId <= 0 || isNaN(bookId)) {
+    throw new ValidationError("Invalid book ID");
+  }
+
   const t = await sequelize.transaction();
   try {
     const user = await User.findOne({ where: { email }, transaction: t });
@@ -290,7 +313,7 @@ export const removeBookFromCollection = async (
     if (!collection) {
       throw new NotFoundError("Collection not found");
     }
-    
+
     if (collection.userId !== user.id) {
       throw new ForbiddenError(
         "You are not authorized to remove a book from this collection"

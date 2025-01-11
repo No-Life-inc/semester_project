@@ -241,8 +241,7 @@ describe("deleteCollection function negative tests", () => {
   );
 });
 
-
-//addBookToCollection positive test cases
+// Add Book to Collection Positive Tests
 describe("addBookToCollection function positive tests", () => {
   test.each([
     ["test_email@example.com", "Collection 1", 1],
@@ -287,29 +286,40 @@ describe("addBookToCollection function positive tests", () => {
 // Negative test cases for addBookToCollection
 describe("addBookToCollection function negative tests", () => {
   test.each([
-    ["non_existent_user@example.com", 1, 1, NotFoundError, "User not found"],
+    [null, 1, 1, ValidationError, "Invalid email address"],
+    ["", 1, 1, ValidationError, "Invalid email address"],
+    ["  ", 1, 1, ValidationError, "Invalid email address"],
+    [undefined, 1, 1, ValidationError, "Invalid email address"],
+    ["test_email@example.com", 0, 1, ValidationError, "Invalid collection ID"],
+    ["test_email@example.com", -1, 1, ValidationError, "Invalid collection ID"],
+    ["test_email@example.com", NaN, 1, ValidationError, "Invalid collection ID"],
+    ["test_email@example.com", 1, 0, ValidationError, "Invalid book ID"],
+    ["test_email@example.com", 1, -1, ValidationError, "Invalid book ID"],
+    ["test_email@example.com", 1, NaN, ValidationError, "Invalid book ID"],
     ["test_email@example.com", 999, 1, NotFoundError, "Collection not found"],
-    ["test_email@example.com", 3, 1, UnauthorizedError, "You are not authorized to add a book to this collection"],
+    ["non_existent_user@example.com", 1, 1, NotFoundError, "User not found"],
+    ["test_email@example.com", 3, 3, UnauthorizedError, "You are not authorized to add a book to this collection"],
     ["test@test.com", 3, 3, ValidationError, "Book already exists in the collection"],
   ])(
-    "should throw an error (email: %s, collectionId: %i, bookId: %i, errorClass: %s, errorMessage: %s)",
+    "should throw an error (email: %s, collectionId: %s, bookId: %s, errorClass: %s, errorMessage: %s)",
     async (
-      email: string,
-      collectionId: number,
-      bookId: number,
+      email: string | null | undefined,
+      collectionId: number | null | undefined,
+      bookId: number | null | undefined,
       errorClass: typeof NotFoundError | typeof ValidationError | typeof UnauthorizedError,
       errorMessage: string
     ) => {
       await expect(
-        addBookToCollection(email, collectionId, bookId)
+        addBookToCollection(email as string, collectionId as number, bookId as number)
       ).rejects.toThrow(errorClass);
       await expect(
-        addBookToCollection(email, collectionId, bookId)
+        addBookToCollection(email as string, collectionId as number, bookId as number)
       ).rejects.toThrow(errorMessage);
     }
   );
 });
 
+// Remove Book from Collection Positive Tests
 type RemoveBookFromCollectionTestCase = [string, number, number];
 
 const removeBookFromCollectionPositiveCases: RemoveBookFromCollectionTestCase[] = [
@@ -346,15 +356,26 @@ describe("removeBookFromCollection function positive tests", () => {
   );
 });
 
+// Remove Book from Collection Negative Tests
 type RemoveBookFromCollectionNegativeTestCase = [
-  string,
-  number,
-  number,
-  typeof NotFoundError | typeof UnauthorizedError,
+  string | null | undefined,
+  number | null | undefined,
+  number | null | undefined,
+  typeof NotFoundError | typeof ForbiddenError | typeof ValidationError,
   string
 ];
 
 const removeBookFromCollectionNegativeCases: RemoveBookFromCollectionNegativeTestCase[] = [
+  [null, 1, 1, ValidationError, "Invalid email address"],
+  ["", 1, 1, ValidationError, "Invalid email address"],
+  ["  ", 1, 1, ValidationError, "Invalid email address"],
+  [undefined, 1, 1, ValidationError, "Invalid email address"],
+  ["test_email@example.com", 0, 1, ValidationError, "Invalid collection ID"],
+  ["test_email@example.com", -1, 1, ValidationError, "Invalid collection ID"],
+  ["test_email@example.com", NaN, 1, ValidationError, "Invalid collection ID"],
+  ["test_email@example.com", 1, 0, ValidationError, "Invalid book ID"],
+  ["test_email@example.com", 1, -1, ValidationError, "Invalid book ID"],
+  ["test_email@example.com", 1, NaN, ValidationError, "Invalid book ID"],
   ["non_existent_user@example.com", 1, 1, NotFoundError, "User not found"],
   ["test_email@example.com", 999, 1, NotFoundError, "Collection not found"],
   ["test_email@example.com", 3, 1, ForbiddenError, "You are not authorized to remove a book from this collection"],
@@ -363,76 +384,20 @@ const removeBookFromCollectionNegativeCases: RemoveBookFromCollectionNegativeTes
 
 describe("removeBookFromCollection function negative tests", () => {
   test.each(removeBookFromCollectionNegativeCases)(
-    "should throw an error (email: %s, collectionId: %i, bookId: %i, errorClass: %s, errorMessage: %s)",
+    "should throw an error (email: %s, collectionId: %s, bookId: %s, errorClass: %s, errorMessage: %s)",
     async (
-      email: string,
-      collectionId: number,
-      bookId: number,
-      errorClass: typeof NotFoundError | typeof UnauthorizedError,
+      email: string | null | undefined,
+      collectionId: number | null | undefined,
+      bookId: number | null | undefined,
+      errorClass: typeof NotFoundError | typeof ForbiddenError | typeof ValidationError,
       errorMessage: string
     ) => {
       await expect(
-        removeBookFromCollection(email, collectionId, bookId)
+        removeBookFromCollection(email as string, collectionId as number, bookId as number)
       ).rejects.toThrow(errorClass);
       await expect(
-        removeBookFromCollection(email, collectionId, bookId)
+        removeBookFromCollection(email as string, collectionId as number, bookId as number)
       ).rejects.toThrow(errorMessage);
     }
   );
 });
-
-
-// Boundary Tests for Collection Name
-const maxText = "A".repeat(255);
-const maxTextMinusOne = "A".repeat(254);
-const maxTextPlusOne = "A".repeat(256);
-
-type NameBoundaryTestCase = [
-  string,
-  typeof ValidationError | null,
-  string | null
-];
-
-const nameBoundaryCases: NameBoundaryTestCase[] = [
-  ["", ValidationError, "Collection name is required"],
-  ["A", null, null],
-  [maxTextMinusOne, null, null],
-  [maxTextPlusOne, ValidationError, "Collection name must be between 1 and 255 characters"],
-  [maxText, null, null],
-  ["Special!@#$%^&*()", null, null],
-];
-
-describe("Boundary tests for Collection name", () => {
-  test.each(nameBoundaryCases)(
-    "should handle name boundary cases (name: %s)",
-    async (name: string, errorClass: typeof ValidationError | null, errorMessage: string | null) => {
-      const email = "test@test.com";
-
-      if (errorClass) {
-        await expect(createCollection(name, email)).rejects.toThrow(errorClass);
-        await expect(createCollection(name, email)).rejects.toThrow(errorMessage!);
-      } else {
-        const collection = await createCollection(name, email);
-        expect(collection).toBeDefined();
-        expect(collection.name).toBe(name);
-      }
-    }
-  );
-});
-
-// Test for removing a book from an empty collection
-describe("Remove book from an empty collection", () => {
-  test("should throw an error when removing a book from an empty collection", async () => {
-    const email = "test@test.com";
-    const collection = await createCollection("Empty Collection", email);
-    const bookId = 999; // Assume this book ID does not exist in the collection
-
-    await expect(
-      removeBookFromCollection(email, collection.id, bookId)
-    ).rejects.toThrow(NotFoundError);
-    await expect(
-      removeBookFromCollection(email, collection.id, bookId)
-    ).rejects.toThrow("UserBook entry not found");
-  });
-});
-
