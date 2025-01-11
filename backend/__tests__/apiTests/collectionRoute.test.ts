@@ -19,6 +19,8 @@ import {
   getUserToken,
 } from "../utility/userSetup";
 
+import * as CollectionService from "../../services/collectionService";
+
 beforeAll(async () => {
   await setupTestDB();
   await userSetup();
@@ -80,6 +82,21 @@ describe("Collection Routes - Get Collections Negative tests", () => {
     if (expectedBody) {
       expect(response.body).toMatchObject(expectedBody);
     }
+  });
+
+  test("should return 500 for unexpected error", async () => {
+    jest.spyOn(CollectionService, "getUserCollections").mockImplementation(() => {
+      throw new Error("Unexpected error");
+    });
+
+    const response = await request(app)
+      .get("/collections")
+      .set("Authorization", `Bearer ${getUserToken(0)}`);
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({ error: "An error occurred" });
+
+    jest.restoreAllMocks();
   });
 });
 
