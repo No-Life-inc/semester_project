@@ -156,21 +156,21 @@ describe("Collection Routes - POST /collections Negative Tests", () => {
       {},
       () => getUserToken(0),
       422,
-      { message: "Collection name is required" },
+      { error: "Collection name is required" },
     ],
     [
       "should return 422 for null name",
       { name: null },
       () => getUserToken(0),
       422,
-      { message: "Collection name is required" },
+      { error: "Collection name is required" },
     ],
     [
       "should return 422 for empty string name",
       { name: "" },
       () => getUserToken(0),
       422,
-      { message: "Collection name is required" },
+      { error: "Collection name is required" },
     ],
     [
       "should return 422 for name exceeding 255 characters",
@@ -194,6 +194,22 @@ describe("Collection Routes - POST /collections Negative Tests", () => {
       }
     }
   );
+
+  test("should return 500 for unexpected error", async () => {
+    jest.spyOn(CollectionService, "createCollection").mockImplementation(() => {
+      throw new Error("Unexpected error");
+    });
+
+    const response = await request(app)
+      .post("/collections")
+      .set("Authorization", `Bearer ${getUserToken(0)}`)
+      .send({ name: "Valid Collection Name" });
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({ error: "An error occurred" });
+
+    jest.restoreAllMocks();
+  });
 });
 
 // Positive Tests for POST /addBook
