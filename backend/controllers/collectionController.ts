@@ -91,6 +91,11 @@ export const updateCollection = async (
   const { email } = req.user;
 
   try {
+    const collectionId = Number(id);
+    if (!collectionId || collectionId <= 0 || isNaN(collectionId)) {
+      throw new ValidationError("Invalid collection ID");
+    }
+
     if (!name) {
       throw new ValidationError("Collection name is required");
     }
@@ -137,6 +142,11 @@ export const deleteCollection = async (
   const { email } = req.user;
 
   try {
+    const collectionId = Number(id);
+    if (!collectionId || collectionId <= 0 || isNaN(collectionId)) {
+      throw new ValidationError("Invalid collection ID");
+    }
+    
     await CollectionService.deleteCollection(Number(id), email);
     res.status(200).json({ message: "Collection deleted successfully" });
   } catch (error) {

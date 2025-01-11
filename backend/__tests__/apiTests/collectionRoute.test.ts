@@ -514,7 +514,55 @@ describe("Collection Routes - PUT /collections/:id Negative Tests", () => {
       { name: "Updated Name" },
       () => getUserToken(2),
       403,
-      { message: "You are not authorized to update this collection" },
+      { error: "You are not authorized to update this collection" },
+    ],
+    [
+      "should return 422 for id = 0",
+      0,
+      { name: "Valid Name" },
+      () => getUserToken(0),
+      422,
+      { error: "Invalid collection ID" },
+    ],
+    [
+      "should return 422 for id < 0",
+      -1,
+      { name: "Valid Name" },
+      () => getUserToken(0),
+      422,
+      { error: "Invalid collection ID" },
+    ],
+    [
+      "should return 422 for id = NaN",
+      NaN,
+      { name: "Valid Name" },
+      () => getUserToken(0),
+      422,
+      { error: "Invalid collection ID" },
+    ],
+    [
+      "should return 422 for missing name",
+      1,
+      {},
+      () => getUserToken(0),
+      422,
+      { error: "Collection name is required" },
+    ],
+    [
+      "should return 422 for empty string name",
+      1,
+      { name: "" },
+      () => getUserToken(0),
+      422,
+      { error: "Collection name is required" },
+    ],
+    [
+      "should return 422 for name exceeding 255 characters",
+      1,
+      { name: "A".repeat(256) },
+      () => getUserToken(0),
+      422,
+      { error: "Collection name exceeds the maximum length of 255 characters" },
     ],
   ])(
     "%s",
@@ -538,6 +586,22 @@ describe("Collection Routes - PUT /collections/:id Negative Tests", () => {
       }
     }
   );
+
+  test("should return 500 for unexpected error", async () => {
+    jest.spyOn(CollectionService, "updateCollection").mockImplementation(() => {
+      throw new Error("Unexpected error");
+    });
+
+    const response = await request(app)
+      .put("/collections/1")
+      .set("Authorization", `Bearer ${getUserToken(0)}`)
+      .send({ name: "Valid Name" });
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({ error: "An error occurred" });
+
+    jest.restoreAllMocks();
+  });
 });
 
 // Positive Tests for DELETE /collections/:id
@@ -597,11 +661,32 @@ describe("Collection Routes - DELETE /collections/:id Negative Tests", () => {
       { message: "Invalid or expired token" },
     ],
     [
+      "should return 422 for invalid ID = 0",
+      0,
+      () => getUserToken(0),
+      422,
+      { error: "Invalid collection ID" },
+    ],
+    [
+      "should return 422 for invalid ID < 0",
+      -1,
+      () => getUserToken(0),
+      422,
+      { error: "Invalid collection ID" },
+    ],
+    [
+      "should return 422 for invalid ID = NaN",
+      NaN,
+      () => getUserToken(0),
+      422,
+      { error: "Invalid collection ID" },
+    ],
+    [
       "should return 403 for unauthorized access to collection",
       3,
       () => getUserToken(1),
       403,
-      { message: "You are not authorized to delete this collection" },
+      { error: "You are not authorized to delete this collection" },
     ],
   ])(
     "%s",
@@ -623,4 +708,19 @@ describe("Collection Routes - DELETE /collections/:id Negative Tests", () => {
       }
     }
   );
+
+  test("should return 500 for unexpected error", async () => {
+    jest.spyOn(CollectionService, "deleteCollection").mockImplementation(() => {
+      throw new Error("Unexpected error");
+    });
+
+    const response = await request(app)
+      .delete("/collections/1")
+      .set("Authorization", `Bearer ${getUserToken(0)}`);
+
+    expect(response.status).toBe(500);
+    expect(response.body).toMatchObject({ error: "An error occurred" });
+
+    jest.restoreAllMocks();
+  });
 });
