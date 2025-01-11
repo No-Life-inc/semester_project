@@ -171,7 +171,7 @@ Book.init(
             type: DataTypes.STRING,
             allowNull: true,
             validate: {
-                len: [0, 255], // Ensures the value is between 1 and 255 characters
+                len: [0, 255], 
             },
         },
         createdAt: {
