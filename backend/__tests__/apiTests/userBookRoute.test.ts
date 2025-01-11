@@ -16,6 +16,8 @@ import { userSetup, getUserToken, teardownUserSetup } from "../utility/userSetup
 import {bookSetup, getBookId, teardownBookSetup} from "../utility/bookSetup"
 import router from "../../routes/V1/userBookRoutes";
 
+import * as userBookService from "../../services/userBookService";
+
 beforeAll(async () => {
 await setupTestDB();
 await userSetup();
@@ -63,15 +65,15 @@ describe('UserBook Routes - Get UserBooks Positive tests', () => {
 
 describe('UserBook Routes - Get UserBooks Negative tests', () => {
     test.each([
-        ["should return 400 for invalid token", "/userBook", 50, 401],
-        ["should return 400 for invalid page number", "/userBook?page=0", 1, 422],
-        ["should return 400 for invalid page number", "/userBook?page=-1", 1, 422],
-        ["should return 400 for invalid page number", "/userBook?page=-2", 1, 422],
-        ["should return 400 for invalid limit", "/userBook?limit=0", 1, 422],
-        ["should return 400 for invalid limit", "/userBook?limit=-1", 1, 422],
-        ["should return 400 for invalid limit", "/userBook?limit=-2", 1, 422],
-        ["should return 400 for invalid limit", "/userBook?limit=101", 1, 422],
-        ["should return 400 for invalid limit", "/userBook?limit=102", 1, 422],
+        ["should return 401 for invalid token", "/userBook", 50, 401],
+        ["should return 422 for invalid page number", "/userBook?page=0", 1, 422],
+        ["should return 422 for invalid page number", "/userBook?page=-1", 1, 422],
+        ["should return 422 for invalid page number", "/userBook?page=-2", 1, 422],
+        ["should return 422 for invalid limit", "/userBook?limit=0", 1, 422],
+        ["should return 422 for invalid limit", "/userBook?limit=-1", 1, 422],
+        ["should return 422 for invalid limit", "/userBook?limit=-2", 1, 422],
+        ["should return 422 for invalid limit", "/userBook?limit=101", 1, 422],
+        ["should return 422 for invalid limit", "/userBook?limit=102", 1, 422],
     ])(
         "%s", 
         async (description, route, tokenId, expectedStatus) => {
@@ -83,6 +85,20 @@ describe('UserBook Routes - Get UserBooks Negative tests', () => {
             expect(response.status).toBe(expectedStatus);
         }
     );
+
+    test("should get 500 for unexpected error", async () => {
+    
+        jest.spyOn(userBookService, "getUserBooks").mockImplementation(() => {
+          throw new Error("Unexpected error");
+        });
+    
+        const response = await request(app)
+            .get("/userBook/")
+            .set('Authorization', `Bearer ${getUserToken(1)}`);
+    
+        expect(response.status).toBe(500);
+        expect(response.body).toEqual({ error: "An error occurred" });
+      });
 });
 
 describe("UserBook Routes - Add Book to User Positive Tests", () => {
@@ -134,31 +150,31 @@ describe("UserBook Routes - Add Book to User Positive Tests", () => {
 describe("UserBook Routes - Add Book to User Negative Tests", () => {
     test.each([
       [
-        "should return 400 when book does not exist",
+        "should return 404 when book does not exist",
         { bookId: 9999 },
         404,
         1,
       ],
       [
-        "should return 400 when bookId is 0",
+        "should return 422 when bookId is 0",
         { bookId: 0 },
         422,
         1,
       ],
       [
-        "should return 400 when bookId is -1",
+        "should return 422 when bookId is -1",
         { bookId: -1 },
         422,
         1,
       ],
       [
-        "should return 400 when bookId is NaN",
+        "should return 422 when bookId is NaN",
         { bookId: NaN },
         422,
         1,
       ],
       [
-        "should return 400 when bookId is invalid",
+        "should return 422 when bookId is invalid",
         { bookId: "invalid" },
         422,
         1,
@@ -184,6 +200,20 @@ describe("UserBook Routes - Add Book to User Negative Tests", () => {
         expect(response.status).toBe(expectedStatus);
       }
     );
+
+    test("should get 500 for unexpected error", async () => {
+    
+      jest.spyOn(userBookService, "addBookToUser").mockImplementation(() => {
+        throw new Error("Unexpected error");
+      });
+  
+      const response = await request(app)
+      .post("/userBook/")
+      .set("Authorization", `Bearer ${getUserToken(1)}`)
+  
+      expect(response.status).toBe(500);
+      expect(response.body).toEqual({ error: "An error occurred" });
+    });
   });
 
 describe("UserBook Routes - Remove Book from User Positive Tests", () => {
@@ -213,19 +243,19 @@ describe("UserBook Routes - Remove Book from User Positive Tests", () => {
 describe("UserBook Routes - Remove Book from User Negative Tests", () => {
     test.each([
       [
-        "should return 400 when bookId is 0",
+        "should return 422 when bookId is 0",
         0,
         422,
         1,
       ],
       [
-        "should return 400 when bookId is -1",
+        "should return 422 when bookId is -1",
         -1,
         422,
         1,
       ],
       [
-        "should return 400 when bookId is -2",
+        "should return 422 when bookId is -2",
         -2,
         422,
         1,
@@ -243,13 +273,13 @@ describe("UserBook Routes - Remove Book from User Negative Tests", () => {
         1,
       ],
       [
-        "should return 400 when bookId is NaN",
+        "should return 422 when bookId is NaN",
         NaN,
         422,
         1,
       ],
       [
-        "should return 400 when bookId is invalid",
+        "should return 422 when bookId is invalid",
         "invalid",
         422,
         1,
@@ -273,6 +303,20 @@ describe("UserBook Routes - Remove Book from User Negative Tests", () => {
         
         expect(response.status).toBe(expectedStatus);
 
+      });
+
+      test("should get 500 for unexpected error", async () => {
+    
+        jest.spyOn(userBookService, "removeBookFromUser").mockImplementation(() => {
+          throw new Error("Unexpected error");
+        });
+    
+        const response = await request(app)
+        .delete("/userBook/1")
+        .set("Authorization", `Bearer ${getUserToken(1)}`);
+    
+        expect(response.status).toBe(500);
+        expect(response.body).toEqual({ error: "An error occurred" });
       });
 
   });
