@@ -2,7 +2,7 @@ import UserBookTag from "../models/sequelize/UserBookTag";
 import {getTagById} from "./tagService";
 import Tag from "../models/sequelize/Tag";
 import {getUserBookById} from "./userBookService";
-import {BaseError, ConflictError, InternalServerError, NotFoundError} from "../utility/errors";
+import {BaseError, ConflictError, InternalServerError, NotFoundError, ValidationError} from "../utility/errors";
 
 
 //Add docstrings to the following functions'
@@ -19,6 +19,11 @@ import {BaseError, ConflictError, InternalServerError, NotFoundError} from "../u
  */
 export const addTagToBook = async (tagId: number, userBookId: number, userId: number) => {
     try{
+
+        if (userId < 1 || isNaN(userId)) {
+            throw new ValidationError("Invalid User id. User id must be a number greater than or equal to 1.");
+        }
+
         const userBook = await getUserBookById(userBookId);
 
         if (userBook.userId !== userId) {
@@ -64,6 +69,11 @@ export const addTagToBook = async (tagId: number, userBookId: number, userId: nu
  */
 export const deleteTagFromBook = async (tagId: number, userBookId: number, userId: number) => {
     try {
+
+        if (userId < 1 || isNaN(userId)) {
+            throw new ValidationError("Invalid User id. User id must be a number greater than or equal to 1.");
+        }
+
         const userBook = await getUserBookById(userBookId);
 
         if (userBook.userId !== userId) {
@@ -107,6 +117,11 @@ export const deleteTagFromBook = async (tagId: number, userBookId: number, userI
  */
 export const getTagsForBook = async (userBookId: number, userId: number) => {
     try {
+
+        if (userId < 1 || isNaN(userId)) {
+            throw new ValidationError("Invalid User id. User id must be a number greater than or equal to 1.");
+        }
+
         const userBook = await getUserBookById(userBookId);
 
         if (userBook.userId !== userId) {

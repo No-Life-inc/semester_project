@@ -31,17 +31,27 @@ describe("getAllTags - Positive Tests", () => {
 });
 
 describe("getAllTags - Negative Tests", () => {
-    const negativeCases: [number | string, number | string, Error][] = [
+    const negativeCases: [number | string | null | undefined, number | string | null | undefined, Error][] = [
         [0, 10, new BadRequestError("Page must be a positive number greater than 0.")],
         [-1, 10, new BadRequestError("Page must be a positive number greater than 0.")],
+        [-2, 10, new BadRequestError("Page must be a positive number greater than 0.")],
         ["invalid", 10, new BadRequestError("Page must be a positive number greater than 0.")],
+        [null, 10, new BadRequestError("Page must be a positive number greater than 0.")],
+        [undefined, 10, new BadRequestError("Page must be a positive number greater than 0.")],
         [1000, 10, new BadRequestError("Page 1000 exceeds the maximum page number 6.")],
+        [7, 10, new BadRequestError("Page 7 exceeds the maximum page number 6.")],
+        [8, 10, new BadRequestError("Page 8 exceeds the maximum page number 6.")],
         [NaN, 10, new BadRequestError("Page must be a positive number greater than 0.")],
         [1, 0, new BadRequestError("Limit must be a positive number greater than 0.")],
         [1, -1, new BadRequestError("Limit must be a positive number greater than 0.")],
+        [1, -2, new BadRequestError("Limit must be a positive number greater than 0.")],
+        [1, 101, new BadRequestError("Limit must be a positive number less than or equal to 100.")],
+        [1, 102, new BadRequestError("Limit must be a positive number less than or equal to 100.")],
         [1, "invalid", new BadRequestError("Limit must be a positive number greater than 0.")],
         [1, 1000, new BadRequestError("Limit must be a positive number less than or equal to 100.")],
-        [1, NaN, new BadRequestError("Limit must be a positive number greater than 0.")]
+        [1, NaN, new BadRequestError("Limit must be a positive number greater than 0.")],
+        [1, null, new BadRequestError("Limit must be a positive number greater than 0.")],
+        [1, undefined, new BadRequestError("Limit must be a positive number greater than 0.")],
     ];
 
     test.each(negativeCases)("should throw an error for invalid page or limit (page: %s, limit: %i)", async (page, limit, expectedError) => {
@@ -61,10 +71,13 @@ describe("getTagById - Positive Tests", () => {
 });
 
 describe("getTagById - Negative Tests", () => {
-    const negativeCases: [number | string, Error][] = [
+    const negativeCases: [number | string | null | undefined, Error][] = [
         [0, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
         [-1, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [-2, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
         [NaN, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [null, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [undefined, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
         ["invalid", new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
         [9999, new NotFoundError("Tag not found")]
     ];
@@ -110,10 +123,13 @@ describe("deleteTagById - Positive Tests", () => {
 });
 
 describe("deleteTagById - Negative Tests", () => {
-    const negativeCases: [number | string, Error][] = [
+    const negativeCases: [number | string | null | undefined, Error][] = [
         [0, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
         [-1, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [-2, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
         [NaN, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [null, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [undefined, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
         ["invalid", new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
         [9999, new NotFoundError("Tag not found")]
     ];
