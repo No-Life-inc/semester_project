@@ -20,11 +20,18 @@ Subject.init({
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        field: "id",
     },
     name: {
         type: DataTypes.STRING,
         allowNull: false,
-    },
+        validate: {
+          notEmpty: true,
+          notNull: true,
+          len: [1, 255]
+        },
+        field: "name",
+      },
     createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

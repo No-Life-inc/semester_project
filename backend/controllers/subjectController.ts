@@ -22,7 +22,6 @@ export const getAllSubjectsController = async (request: Request, response: Respo
         else
             response.status(500).json({ error: "An error occurred" });
         }
-
   };
 
 

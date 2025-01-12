@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it, jest, test } from "@jest/glo
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import { getAllSubjects, getSubjectById } from "../../services/subjectService";
 import { NotFoundError, ValidationError } from "../../utility/errors";
+import Subject from "../../models/sequelize/Subject";
 
 jest.setTimeout(120000);
 
@@ -92,6 +93,41 @@ test.each(negativeTestCases)(
 );
 });
  
+describe("Subject model field boundary positive tests", () => {
+  const cases: [Partial<Subject>, keyof Subject, any, string][] = [
+    [{ name: "A" }, "name", "A", "should accept minimal valid name (1 char)"],
+    [{ name: "Valid Name" }, "name", "Valid Name", "should accept typical valid name"],
+    [{ name: "A".repeat(255) }, "name", "A".repeat(255), "should accept maximal valid name (255 chars)"],
+  ];
 
-//TODO: boundary tests
+  test.each(cases)(
+    "%s",
+    async (fieldData, fieldToCheck, expectedValue, description) => {
+      const subject = await Subject.create(fieldData);
+
+      expect(subject).toBeDefined();
+      expect(subject[fieldToCheck]).toEqual(expectedValue);
+
+      expect(subject.id).toBeDefined();
+      expect(subject.id).toBeGreaterThan(0);
+      expect(subject.createdAt).toBeDefined();
+      expect(subject.createdAt).toBeInstanceOf(Date);
+    }
+  );
+});
+
+describe("Subject model field boundary negative tests", () => {
+  const cases: [Partial<Subject>, keyof Subject, string, string][] = [
+    [{ name: "" }, "name", "Validation error: Validation notEmpty on name failed", "should reject empty name"],
+    [{ name: " " }, "name", "Validation error: Validation notEmpty on name failed", "should reject whitespace-only name"],
+    [{ name: "A".repeat(256) }, "name", "Validation error: Validation len on name failed", "should reject name exceeding 255 chars"],
+  ];
+
+  test.each(cases)(
+    "%s",
+    async (fieldData, fieldToCheck, expectedError, description) => {
+      await expect(Subject.create(fieldData)).rejects.toThrow(expectedError);
+    }
+  );
+});
 
