@@ -33,23 +33,36 @@ describe("getBooksBySubject function positive tests", () => {
 });
 
 describe("getBooksBySubject function negative tests", () => {
-  const negativeTestCases: [number, number, number, string][] = [
-      [-1, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
-      [NaN, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
-      [0, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
-      [1, -1, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
-      [1, NaN, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
-      [1, 0, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
-      [1, 1, -1, "Invalid limit. Limit must be a number greater than or equal to 1."],
-      [1, 1, NaN, "Invalid limit. Limit must be a number greater than or equal to 1."],
-      [1, 1, 101, "Invalid limit. Limit must be a number less than or equal to 100."],
-      [1, 1, 0, "Invalid limit. Limit must be a number greater than or equal to 1."]
+  const negativeTestCases: [number | null | undefined, number | null | undefined, number | null | undefined, string][] = [
+    [undefined, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
+    [null, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
+    [-1, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
+    [-2, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
+    [NaN, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
+    [0, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
+    ["a" as any, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
+    [1, undefined, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
+    [1, null, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
+    [1, -1, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
+    [1, -2, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
+    [1, NaN, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
+    [1, 0, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
+    [1, "a" as any, 1, "Invalid page number. Page must be a number greater than or equal to 1."],
+    [1, 1, undefined, "Invalid limit. Limit must be a number greater than or equal to 1."],
+    [1, 1, null, "Invalid limit. Limit must be a number greater than or equal to 1."],
+    [1, 1, -1, "Invalid limit. Limit must be a number greater than or equal to 1."],
+    [1, 1, -2, "Invalid limit. Limit must be a number greater than or equal to 1."],
+    [1, 1, NaN, "Invalid limit. Limit must be a number greater than or equal to 1."],
+    [1, 1, 101, "Invalid limit. Limit must be a number less than or equal to 100."],
+    [1, 1, 102, "Invalid limit. Limit must be a number less than or equal to 100."],
+    [1, 1, 0, "Invalid limit. Limit must be a number greater than or equal to 1."],
+    [1, 1, "a" as any, "Invalid limit. Limit must be a number greater than or equal to 1."],
   ];
 
   test.each(negativeTestCases)(
     "should throw an error (subjectId: %i, page: %i, limit: %i, errorMessage: %s)",
-    async (subjectId: number, page: number, limit: number, errorMessage: string) => {
-      await expect(getBooksBySubject(subjectId, page, limit)).rejects.toThrow(errorMessage);
+    async (subjectId, page, limit, errorMessage) => {
+      await expect(getBooksBySubject(Number(subjectId), Number(page), Number(limit))).rejects.toThrow(errorMessage);
     }
   );
 });

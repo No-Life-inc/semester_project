@@ -35,13 +35,22 @@ test.each(positiveTestCases)(
 });
 
 describe("getAllSubjects function negative tests", () => {
-    const negativeTestCases = [
-      [-1, 10, "Invalid page number. Page must be a number greater than or equal to 1.", ValidationError],
-      [NaN, 10, "Invalid page number. Page must be a number greater than or equal to 1.", ValidationError],
-      [1, -10, "Invalid limit. Limit must be a number greater than or equal to 1.", ValidationError],
+    const negativeTestCases: [number | null | undefined, number | null | undefined, string, typeof ValidationError][] = [
+      [null, 1, "Invalid page number. Page must be a number greater than or equal to 1.", ValidationError],
+      [undefined, 1, "Invalid page number. Page must be a number greater than or equal to 1.", ValidationError],
+      [-1, 1, "Invalid page number. Page must be a number greater than or equal to 1.", ValidationError],
+      [-2, 1, "Invalid page number. Page must be a number greater than or equal to 1.", ValidationError],
+      [NaN, 1, "Invalid page number. Page must be a number greater than or equal to 1.", ValidationError],
+      ["a" as any, 1, "Invalid page number. Page must be a number greater than or equal to 1.", ValidationError],
+      [1, null, "Invalid limit. Limit must be a number greater than or equal to 1.", ValidationError],
+      [1, undefined, "Invalid limit. Limit must be a number greater than or equal to 1.", ValidationError],
+      [1, -1, "Invalid limit. Limit must be a number greater than or equal to 1.", ValidationError],
+      [1, -2, "Invalid limit. Limit must be a number greater than or equal to 1.", ValidationError],
       [1, NaN, "Invalid limit. Limit must be a number greater than or equal to 1.", ValidationError],
       [1, 101, "Invalid limit. Limit must be a number less than or equal to 100.", ValidationError],
+      [1, 102, "Invalid limit. Limit must be a number less than or equal to 100.", ValidationError],
       [1, 0, "Invalid limit. Limit must be a number greater than or equal to 1.", ValidationError],
+      [1, "a" as any, "Invalid limit. Limit must be a number greater than or equal to 1.", ValidationError],
     ];
   
     test.each(negativeTestCases)(
