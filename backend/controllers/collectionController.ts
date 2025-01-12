@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../types/authenticatedRequest";
 import * as CollectionService from "../services/collectionService";
-import { BadRequestError, ValidationError } from "../utility/errors";
+import { BadRequestError, ValidationError, BaseError } from "../utility/errors";
 
 /**
  * Creates a new collection for the authenticated user.
@@ -27,17 +27,17 @@ export const createCollection = async (
       throw new ValidationError("Collection name is required");
     }
     if (name.length > 255) {
-      return res
-        .status(422)
-        .json({
-          message: "Collection name must be between 1 and 255 characters",
-        });
+      return res.status(422).json({
+        message: "Collection name must be between 1 and 255 characters",
+      });
     }
 
     const newCollection = await CollectionService.createCollection(name, email);
     res.status(201).json(newCollection);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error instanceof BaseError)
+      res.status(error.statusCode).json({ error: error.message });
+    else res.status(500).json({ error: "An error occurred" });
   }
 };
 
@@ -62,7 +62,9 @@ export const getUserCollections = async (
     const collections = await CollectionService.getUserCollections(email);
     res.status(200).json(collections);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error instanceof BaseError)
+      res.status(error.statusCode).json({ error: error.message });
+    else res.status(500).json({ error: "An error occurred" });
   }
 };
 
@@ -89,12 +91,19 @@ export const updateCollection = async (
   const { email } = req.user;
 
   try {
+    const collectionId = Number(id);
+    if (!collectionId || collectionId <= 0 || isNaN(collectionId)) {
+      throw new ValidationError("Invalid collection ID");
+    }
+
     if (!name) {
       throw new ValidationError("Collection name is required");
     }
 
     if (name.length > 255) {
-      throw new ValidationError("Collection name exceeds the maximum length of 255 characters");
+      throw new ValidationError(
+        "Collection name exceeds the maximum length of 255 characters"
+      );
     }
 
     const updatedCollection = await CollectionService.updateCollection(
@@ -106,7 +115,9 @@ export const updateCollection = async (
       .status(200)
       .json({ message: "Collection updated successfully", updatedCollection });
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error instanceof BaseError)
+      res.status(error.statusCode).json({ error: error.message });
+    else res.status(500).json({ error: "An error occurred" });
   }
 };
 
@@ -131,10 +142,17 @@ export const deleteCollection = async (
   const { email } = req.user;
 
   try {
+    const collectionId = Number(id);
+    if (!collectionId || collectionId <= 0 || isNaN(collectionId)) {
+      throw new ValidationError("Invalid collection ID");
+    }
+    
     await CollectionService.deleteCollection(Number(id), email);
     res.status(200).json({ message: "Collection deleted successfully" });
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error instanceof BaseError)
+      res.status(error.statusCode).json({ error: error.message });
+    else res.status(500).json({ error: "An error occurred" });
   }
 };
 
@@ -175,7 +193,9 @@ export const addBookToCollection = async (
     );
     res.status(201).json({ message: "Book added to collection successfully" });
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error instanceof BaseError)
+      res.status(error.statusCode).json({ error: error.message });
+    else res.status(500).json({ error: "An error occurred" });
   }
 };
 
@@ -217,6 +237,8 @@ export const removeBookFromCollection = async (
       .status(200)
       .json({ message: "Book removed from collection successfully" });
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error instanceof BaseError)
+      res.status(error.statusCode).json({ error: error.message });
+    else res.status(500).json({ error: "An error occurred" });
   }
 };

@@ -1,8 +1,13 @@
 import {ValidationError} from "../utility/errors";
 
 export const validatePassword = (password: string): void => {
-    if (password.trim() === "") {
-        throw new ValidationError("Password cannot be whitespace.");
+
+    if (password === null || password === undefined) {
+        throw new ValidationError("Password cannot be null or undefined.");
+    }
+
+    if (typeof password !== "string" || password.trim() === "") {
+        throw new ValidationError("Password cannot be empty or whitespace.");
     }
 
     if (/\s/.test(password)) {
@@ -32,7 +37,11 @@ export const validatePassword = (password: string): void => {
 };
 
 export const validateEmail = (email: string): void => {
-    if (!email || email.trim() === "") {
+    if (email === null || email === undefined) {
+        throw new ValidationError("Email cannot be null or undefined.");
+    }
+
+    if (typeof email !== "string" || email.trim() === "") {
         throw new ValidationError("Email cannot be empty or whitespace.");
     }
 
@@ -47,10 +56,13 @@ export const validateEmail = (email: string): void => {
 
 export const validateName = (name: string): void => {
 
-    if (!name || name.trim() === "") {
-        throw new ValidationError("Name cannot be empty or whitespace.");
+    if (name === null || name === undefined) {
+        throw new ValidationError("Name cannot be null or undefined.");
     }
 
+    if (typeof name !== "string" || name.trim() === "") {
+        throw new ValidationError("Name cannot be empty or whitespace.");
+    }
     if (name.length < 2) {
         throw new ValidationError("Name must be at least 2 characters long.");
     }
@@ -62,5 +74,4 @@ export const validateName = (name: string): void => {
     if (!/^[a-zA-Z\s'’-]+$/.test(name)) {
         throw new ValidationError("Invalid characters in name.");
     }
-
 }

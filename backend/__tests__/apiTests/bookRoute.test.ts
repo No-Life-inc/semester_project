@@ -14,6 +14,8 @@ import request from "supertest";
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import router from "../../routes/V1/bookRoutes";
 
+import * as bookService from "../../services/bookService";
+
 beforeAll(async () => {
   await setupTestDB();
 });
@@ -81,6 +83,18 @@ describe('Book Routes - Get Books Negative tests', () => {
       expect(response.status).toBe(expectedStatus);
     }
   );
+
+  test("should get 500 for unexpected error", async () => {
+
+    jest.spyOn(bookService, "getBooks").mockImplementation(() => {
+      throw new Error("Unexpected error");
+    });
+
+    const response = await request(app).get("/book/");
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({ error: "An error occurred" });
+  });
 });
 
 
@@ -126,6 +140,18 @@ describe('Book Routes - Get Book By ID Negative tests', () => {
       expect(response.status).toBe(expectedStatus);
     }
   );
+
+  test("should get 500 for unexpected error", async () => {
+
+    jest.spyOn(bookService, "getBookById").mockImplementation(() => {
+      throw new Error("Unexpected error");
+    });
+
+    const response = await request(app).get("/book/id/1");
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({ error: "An error occurred" });
+  });
 });
 
 describe('Book Routes - Search Books Positive tests', () => {
@@ -166,5 +192,16 @@ describe('Book Routes - Search Books Negative tests', () => {
       expect(response.status).toBe(expectedStatus);
     }
   );
-}
-);
+
+  test("should get 500 for unexpected error", async () => {
+
+    jest.spyOn(bookService, "getBooksByTitle").mockImplementation(() => {
+      throw new Error("Unexpected error");
+    });
+
+    const response = await request(app).get("/book/search?title=The");
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({ error: "An error occurred" });
+  });
+});

@@ -1,6 +1,8 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import {sequelize} from "../../config/SqlConfig";
 
+import { ValidationError } from "../../utility/errors";
+
 // Define the attributes for the Author model
 interface AuthorAttributes {
     id: number;
@@ -34,7 +36,7 @@ Author.init(
                 isNotOnlyNumbers(value: any) {
                     if (/^-?\d+$/.test(value)) { 
                       // Matches strings that are entirely numeric, optionally with a leading '-'
-                      throw new Error("Name cannot consist of numbers only.");
+                      throw new ValidationError("Name cannot consist of numbers only.");
                     }
                   },
                   is: {

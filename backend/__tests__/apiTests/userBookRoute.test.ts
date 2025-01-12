@@ -16,6 +16,8 @@ import { userSetup, getUserToken, teardownUserSetup } from "../utility/userSetup
 import {bookSetup, getBookId, teardownBookSetup} from "../utility/bookSetup"
 import router from "../../routes/V1/userBookRoutes";
 
+import * as userBookService from "../../services/userBookService";
+
 beforeAll(async () => {
 await setupTestDB();
 await userSetup();
@@ -83,6 +85,20 @@ describe('UserBook Routes - Get UserBooks Negative tests', () => {
             expect(response.status).toBe(expectedStatus);
         }
     );
+
+    test("should get 500 for unexpected error", async () => {
+    
+        jest.spyOn(userBookService, "getUserBooks").mockImplementation(() => {
+          throw new Error("Unexpected error");
+        });
+    
+        const response = await request(app)
+            .get("/userBook/")
+            .set('Authorization', `Bearer ${getUserToken(1)}`);
+    
+        expect(response.status).toBe(500);
+        expect(response.body).toEqual({ error: "An error occurred" });
+      });
 });
 
 describe("UserBook Routes - Add Book to User Positive Tests", () => {
@@ -184,6 +200,20 @@ describe("UserBook Routes - Add Book to User Negative Tests", () => {
         expect(response.status).toBe(expectedStatus);
       }
     );
+
+    test("should get 500 for unexpected error", async () => {
+    
+      jest.spyOn(userBookService, "addBookToUser").mockImplementation(() => {
+        throw new Error("Unexpected error");
+      });
+  
+      const response = await request(app)
+      .post("/userBook/")
+      .set("Authorization", `Bearer ${getUserToken(1)}`)
+  
+      expect(response.status).toBe(500);
+      expect(response.body).toEqual({ error: "An error occurred" });
+    });
   });
 
 describe("UserBook Routes - Remove Book from User Positive Tests", () => {
@@ -273,6 +303,20 @@ describe("UserBook Routes - Remove Book from User Negative Tests", () => {
         
         expect(response.status).toBe(expectedStatus);
 
+      });
+
+      test("should get 500 for unexpected error", async () => {
+    
+        jest.spyOn(userBookService, "removeBookFromUser").mockImplementation(() => {
+          throw new Error("Unexpected error");
+        });
+    
+        const response = await request(app)
+        .delete("/userBook/1")
+        .set("Authorization", `Bearer ${getUserToken(1)}`);
+    
+        expect(response.status).toBe(500);
+        expect(response.body).toEqual({ error: "An error occurred" });
       });
 
   });

@@ -18,8 +18,8 @@ describe("validatePassword function - Positive Tests", () => {
 
 describe("validatePassword function - Negative Tests", () => {
     test.each([
-        ["", "Password cannot be whitespace."],
-        ["     ", "Password cannot be whitespace."]
+        ["", "Password cannot be empty or whitespace."],
+        ["     ", "Password cannot be empty or whitespace."]
     ])("should throw an error if password is empty or only whitespace '%s'", (password, expectedError) => {
         const act = () => validatePassword(password);
         expect(act).toThrow(expectedError);

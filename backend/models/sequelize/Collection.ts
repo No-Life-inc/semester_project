@@ -33,14 +33,11 @@ Collection.init(
             autoIncrement: true,
         },
         name: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(255),
             allowNull: false,
             validate: {
-                notEmpty: true,
-                notNull: {
-                    msg: "Name cannot be null",
-                }
-            }
+                len: { args: [1, 255], msg: "Collection name must be between 1 and 255 characters" }, 
+            },
         },
         userId: {
             type: DataTypes.INTEGER,

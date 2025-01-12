@@ -21,12 +21,22 @@ import { sequelize } from "../config/SqlConfig";
  * @throws {NotFoundError} - Throws an error if the user is not found.
  */
 export const createCollection = async (name: string, email: string) => {
-  if (!name) {
+  if (!name || name.trim() === "") {
     throw new ValidationError("Collection name is required");
   }
 
   if (name.length > 255) {
     throw new ValidationError("Collection name must be between 1 and 255 characters");
+  }
+
+  const isNumeric = !isNaN(Number(name));
+  if (isNumeric) {
+    throw new ValidationError("Collection name cannot be a number");
+  }
+
+  const containsOnlySpaces = name.trim().length === 0;
+  if (containsOnlySpaces) {
+    throw new ValidationError("Collection name cannot be empty or whitespace");
   }
 
   const user = await User.findOne({ where: { email } });
@@ -46,6 +56,10 @@ export const createCollection = async (name: string, email: string) => {
  * @throws {NotFoundError} - Throws an error if the user is not found.
  */
 export const getUserCollections = async (email: string) => {
+  if (!email || typeof email !== "string" || !email.trim()) {
+    throw new ValidationError("Invalid email address");
+  }
+
   const user = await User.findOne({
     where: { email },
     include: [
@@ -79,6 +93,19 @@ export const getUserCollections = async (email: string) => {
  * @throws {NotFoundError} - Throws an error if the collection is not found.
  */
 export const updateCollection = async (id: number, name: string, email: string) => {
+  if (!name || name.trim() === "") {
+    throw new ValidationError("Collection name cannot be empty or whitespace");
+  }
+
+  if (name.length > 255) {
+    throw new ValidationError("Collection name must be between 1 and 255 characters");
+  }
+
+  const isNumeric = !isNaN(Number(name));
+  if (isNumeric) {
+    throw new ValidationError("Collection name cannot be a number");
+  }
+
   const collection = await Collection.findByPk(id);
   if (!collection) {
     throw new NotFoundError("Collection not found");
@@ -114,10 +141,14 @@ export const updateCollection = async (id: number, name: string, email: string) 
  * @throws {UnauthorizedError} - Throws an error if the user is not authorized to delete the collection.
  */
 export const deleteCollection = async (id: number, email: string) => {
-
-  if (id <= 0) {
+  if (!id || typeof id !== "number" || id <= 0 || isNaN(id)) {
     throw new ValidationError("Invalid collection ID");
   }
+
+  if (!email || typeof email !== "string" || !email.trim()) {
+    throw new ValidationError("Invalid email address");
+  }
+
   const user = await User.findOne({ where: { email } });
 
   if (!user) {
@@ -164,6 +195,18 @@ export const addBookToCollection = async (
   collectionId: number,
   bookId: number
 ) => {
+  if (!email || typeof email !== "string" || !email.trim()) {
+    throw new ValidationError("Invalid email address");
+  }
+
+  if (!collectionId || typeof collectionId !== "number" || collectionId <= 0 || isNaN(collectionId)) {
+    throw new ValidationError("Invalid collection ID");
+  }
+
+  if (!bookId || typeof bookId !== "number" || bookId <= 0 || isNaN(bookId)) {
+    throw new ValidationError("Invalid book ID");
+  }
+
   const t = await sequelize.transaction();
   try {
     const user = await User.findOne({ where: { email }, transaction: t });
@@ -179,7 +222,7 @@ export const addBookToCollection = async (
     if (!collection) {
       throw new NotFoundError("Collection not found");
     }
-    
+
     if (collection.userId !== user.id) {
       throw new UnauthorizedError(
         "You are not authorized to add a book to this collection"
@@ -225,7 +268,6 @@ export const addBookToCollection = async (
     await t.rollback();
     throw error;
   }
-
 };
 
 /**
@@ -244,6 +286,18 @@ export const removeBookFromCollection = async (
   collectionId: number,
   bookId: number
 ) => {
+  if (!email || typeof email !== "string" || !email.trim()) {
+    throw new ValidationError("Invalid email address");
+  }
+
+  if (!collectionId || typeof collectionId !== "number" || collectionId <= 0 || isNaN(collectionId)) {
+    throw new ValidationError("Invalid collection ID");
+  }
+
+  if (!bookId || typeof bookId !== "number" || bookId <= 0 || isNaN(bookId)) {
+    throw new ValidationError("Invalid book ID");
+  }
+
   const t = await sequelize.transaction();
   try {
     const user = await User.findOne({ where: { email }, transaction: t });
@@ -259,7 +313,7 @@ export const removeBookFromCollection = async (
     if (!collection) {
       throw new NotFoundError("Collection not found");
     }
-    
+
     if (collection.userId !== user.id) {
       throw new ForbiddenError(
         "You are not authorized to remove a book from this collection"
