@@ -105,7 +105,9 @@ test.each(negativeTestCases)(
 describe("Subject model field boundary positive tests", () => {
   const cases: [Partial<Subject>, keyof Subject, any, string][] = [
     [{ name: "A" }, "name", "A", "should accept minimal valid name (1 char)"],
+    [{ name: "AA" }, "name", "AA", "should accept minimal valid name (2 char)"],
     [{ name: "Valid Name" }, "name", "Valid Name", "should accept typical valid name"],
+    [{ name: "A".repeat(254) }, "name", "A".repeat(254), "should accept maximal valid name (255 chars)"],
     [{ name: "A".repeat(255) }, "name", "A".repeat(255), "should accept maximal valid name (255 chars)"],
   ];
 
@@ -126,10 +128,13 @@ describe("Subject model field boundary positive tests", () => {
 });
 
 describe("Subject model field boundary negative tests", () => {
-  const cases: [Partial<Subject>, keyof Subject, string, string][] = [
+  const cases: [{ name: string | null | undefined }, keyof Subject, string, string][] = [
     [{ name: "" }, "name", "Validation error: Validation notEmpty on name failed", "should reject empty name"],
     [{ name: " " }, "name", "Validation error: Validation notEmpty on name failed", "should reject whitespace-only name"],
     [{ name: "A".repeat(256) }, "name", "Validation error: Validation len on name failed", "should reject name exceeding 255 chars"],
+    [{ name: "A".repeat(257) }, "name", "Validation error: Validation len on name failed", "should reject name exceeding 255 chars"],
+    [{ name: null }, "name", "notNull Violation: Subject.name cannot be null", "should reject null name"],
+    [{ name: undefined }, "name", "notNull Violation: Subject.name cannot be null", "should reject undefined name"],
   ];
 
   test.each(cases)(
