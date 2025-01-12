@@ -151,7 +151,7 @@ it('displays error message if email is invalid', () => {
 
   cy.get('[data-testid="save-profile-changes-button"]').click();
 
-  cy.get('[data-testid="edit-profile-error"]').should('have.text', 'An unexpected error occurred');
+  cy.get('[data-testid="edit-profile-error"]').should('have.text', 'Email is already in use.');
 
 });
 

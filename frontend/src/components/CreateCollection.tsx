@@ -43,11 +43,16 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onSuccess }) => {
                 setPage((prevPage) => prevPage + 1);
             }
         } catch (error: any) {
-            if (error.response && error.response.data && error.response.data.error) {
+            console.error(error);
+
+            if (error.response?.status === 400) {
+                setHasMoreTags(false);
+            }
+            else if (error.response && error.response.data && error.response.data.error) {
                 setMessage(error.response.data.error);
-              } else {
-                setMessage('An error occurred while fething tags. Please try again.');
-              }
+            } else {
+                setMessage('An error occurred while fetching tags. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
