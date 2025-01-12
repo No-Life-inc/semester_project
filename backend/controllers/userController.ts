@@ -1,6 +1,5 @@
 import {Request, Response} from "express";
 import {registerUser, loginUser, editUser, editPassword} from "../services/userService";
-import {verifyToken} from "../services/jwtService";
 import {AuthenticatedRequest} from "../types/authenticatedRequest";
 import {BadRequestError, BaseError, ValidationError} from "../utility/errors";
 
@@ -25,7 +24,7 @@ export const registerUserController = async (request: Request, response: Respons
         }
 
         const user = await registerUser(name, email.toLowerCase(), password);
-        response.json(user);
+        response.status(201).json(user);
     } catch (error: any) {
         if (error instanceof BaseError) {
             response.status(error.statusCode).json({ error: error.message });
@@ -78,8 +77,6 @@ export const loginUserController = async (request: Request, response: Response) 
 export const editUserController = async (request: AuthenticatedRequest, response: Response) => {
     const { name, email: newEmail } = request.body;
     const { email  }  = request.user;
-    let safeEmail;
-
 
     try {
         if (!name && !newEmail) {
@@ -114,7 +111,6 @@ export const editPasswordController = async (request: AuthenticatedRequest, resp
     const { email } = request.user;
 
     try {
-        // Validate input
         if (!oldPassword || !password) {
             throw new BadRequestError("Both 'oldPassword' and 'password' must be provided");
         }
@@ -132,9 +128,4 @@ export const editPasswordController = async (request: AuthenticatedRequest, resp
             response.status(500).json({ error: "An unexpected error occurred" });
         }
     }
-};
-
-const extractToken = (authHeader: string | undefined): string | null => {
-    if (!authHeader) return null;
-    return authHeader;
 };

@@ -1,8 +1,7 @@
 import { afterAll, beforeAll, describe, expect, jest, test } from "@jest/globals";
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
-import knex from "knex";
-import knexConfig from "../../knexfile";
 import { getAllTags, getTagById, addTag, deleteTagById } from "../../services/tagService";
+import { BadRequestError, NotFoundError, ConflictError, InternalServerError } from "../../utility/errors";
 
 jest.setTimeout(120000);
 
@@ -14,76 +13,109 @@ afterAll(async () => {
     await teardownTestDB();
 });
 
-// Tests for getAllTags
-describe("getAllTags function tests", () => {
-    const testCases = [
-        [1, 10, 10],
-        [1, 5, 5],
-        [2, 10, 10],
-        [1, 50, 50],
+describe("getAllTags - Positive Tests", () => {
+    const positiveCases = [
+        [1, 1, 1], [1, 5, 5], [2, 10, 10], [1, 50, 50], [1, 100, 100]
     ];
 
-    test.each(testCases)("should fetch tags (page: %i, limit: %i)",
-        async (page, limit, expectedLength) => {
-            const tags = await getAllTags(page, limit);
-            expect(tags?.length).toBeLessThanOrEqual(expectedLength);
-        }
-    );
+
+    test.each(positiveCases)("should fetch tags (page: %i, limit: %i)", async (page, limit, expectedLength) => {
+        const tags = await getAllTags(page, limit);
+        expect(tags?.length).toBeLessThanOrEqual(expectedLength);
+    });
 });
 
-describe("getTagById function tests", () => {
-    const positiveTestCases = [1, 2, 3, 4, 5];
-
-    test.each(positiveTestCases)(
-        "should fetch a tag by valid id (tagId: %i)",
-        async (tagId) => {
-            const tag = await getTagById(tagId);
-            expect(tag).toBeDefined();
-            expect(tag.id).toBe(tagId);
-        }
-    );
-
-    const negativeTestCases = [
-        [0, "Invalid tag id. Tag id must be a number greater than or equal to 1."],
-        [-1, "Invalid tag id. Tag id must be a number greater than or equal to 1."],
-        [NaN, "Invalid tag id. Tag id must be a number greater than or equal to 1."],
-        [5555, "Tag not found"],
+describe("getAllTags - Negative Tests", () => {
+    const negativeCases: [number | string, number | string, Error][] = [
+        [0, 10, new BadRequestError("Page must be a positive number greater than 0.")],
+        [-1, 10, new BadRequestError("Page must be a positive number greater than 0.")],
+        ["invalid", 10, new BadRequestError("Page must be a positive number greater than 0.")],
+        [1000, 10, new BadRequestError("Page 1000 exceeds the maximum page number 6.")],
+        [NaN, 10, new BadRequestError("Page must be a positive number greater than 0.")],
+        [1, 0, new BadRequestError("Limit must be a positive number greater than 0.")],
+        [1, -1, new BadRequestError("Limit must be a positive number greater than 0.")],
+        [1, "invalid", new BadRequestError("Limit must be a positive number greater than 0.")],
+        [1, 1000, new BadRequestError("Limit must be a positive number less than or equal to 100.")],
+        [1, NaN, new BadRequestError("Limit must be a positive number greater than 0.")]
     ];
 
-    test.each(negativeTestCases)(
-        "should throw an error for invalid id (tagId: %i, errorMessage: %s)",
-        async (tagId, errorMessage) => {
-            await expect(getTagById(Number(tagId))).rejects.toThrow(errorMessage);
-        }
-    );
+    test.each(negativeCases)("should throw an error for invalid page or limit (page: %s, limit: %i)", async (page, limit, expectedError) => {
+        await expect(getAllTags(Number(page), Number(limit))).rejects.toThrow(expectedError.constructor);
+        await expect(getAllTags(Number(page), Number(limit))).rejects.toThrow(expectedError.message);
+    });
 });
 
-describe("addTag function tests", () => {
-    test("should create a new tag successfully", async () => {
-        const tagName = "New Tag";
+describe("getTagById - Positive Tests", () => {
+    const positiveCases: number[] = [1, 2, 25, 58, 59];
+
+    test.each(positiveCases)("should fetch a tag by valid id (tagId: %i)", async (tagId) => {
+        const tag = await getTagById(tagId);
+        expect(tag).toBeDefined();
+        expect(tag.id).toBe(tagId);
+    });
+});
+
+describe("getTagById - Negative Tests", () => {
+    const negativeCases: [number | string, Error][] = [
+        [0, new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [-1, new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [NaN, new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        ["invalid", new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [9999, new NotFoundError("Tag not found")]
+    ];
+
+    test.each(negativeCases)("should throw an error for invalid id (tagId: %s)", async (tagId, expectedError) => {
+        await expect(getTagById(Number(tagId))).rejects.toThrow(expectedError.constructor);
+        await expect(getTagById(Number(tagId))).rejects.toThrow(expectedError.message);
+    });
+});
+
+describe("addTag - Positive Tests", () => {
+    const positiveCases: [string][] = [
+        ["A"], ["AA"], ["A".repeat(50)], ["A".repeat(254)], ["A".repeat(255)]
+    ];
+
+    test.each(positiveCases)("should create a new tag with valid name: %s", async (tagName) => {
         const newTag = await addTag(tagName);
         expect(newTag).toBeDefined();
         expect(newTag.name).toBe(tagName);
     });
+});
 
-    test("should throw an error when creating a tag without a name", async () => {
-        await expect(addTag("")).rejects.toThrow("Tag name is required");
-    });
-    test("should throw an error when Tag.create fails", async () => {
-        const longName = "a".repeat(256);
-        await expect(addTag(longName)).rejects.toThrow("Tag name cannot exceed 255 characters.");
+describe("addTag - Negative Tests", () => {
+    const negativeCases: [string | number, Error][] = [
+        ["", new BadRequestError("Tag name is required")],
+        ["A".repeat(256), new ConflictError("Tag name cannot exceed 255 characters.")],
+        [" ", new BadRequestError("Tag name is required")]
+    ];
+
+    test.each(negativeCases)("should throw an error for invalid tag name: %s", async (tagName, expectedError) => {
+        await expect(addTag(String(tagName))).rejects.toThrow(expectedError.constructor);
+        await expect(addTag(String(tagName))).rejects.toThrow(expectedError.message);
     });
 });
 
-describe("deleteTagById function tests", () => {
+describe("deleteTagById - Positive Tests", () => {
     test("should delete a tag successfully", async () => {
         const tagName = "Temporary Tag";
         const tag = await addTag(tagName);
         const deletedCount = await deleteTagById(tag.id);
         expect(deletedCount).toBe(1);
     });
+});
 
-    test("should throw an error when deleting a non-existent tag", async () => {
-        await expect(deleteTagById(9999)).rejects.toThrow("Tag not found");
+describe("deleteTagById - Negative Tests", () => {
+    const negativeCases: [number | string, Error][] = [
+        [0, new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [-1, new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [NaN, new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        ["invalid", new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [9999, new NotFoundError("Tag not found")]
+    ];
+
+    test.each(negativeCases)("should throw an error for invalid tag id: %s", async (tagId, expectedError) => {
+        await expect(deleteTagById(Number(tagId))).rejects.toThrow(expectedError.constructor);
+        await expect(deleteTagById(Number(tagId))).rejects.toThrow(expectedError.message);
     });
 });
+

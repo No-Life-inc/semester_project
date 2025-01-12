@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
 import User from "../models/sequelize/User";
 import {validateEmail, validateName, validatePassword} from "./validatorService";
-import {generateToken, verifyToken, DecodedToken} from "./jwtService";
-import {BadRequestError, ConflictError, NotFoundError, UnauthorizedError} from "../utility/errors";
+import {generateToken} from "./jwtService";
+import {ConflictError, NotFoundError, UnauthorizedError, ValidationError} from "../utility/errors";
 
 /**
  * Registers a new user.
@@ -95,23 +95,34 @@ export const editUser = async (email: string, name: string, newEmail: string) =>
         validateEmail(newEmail);
     }
 
-    const user = await User.findOne({ where: { email: email } });
+    const user = await User.findOne({ where: { email } });
 
     if (!user) {
         throw new NotFoundError("User not found.");
     }
 
-    if (newEmail) {
-        user.email = newEmail;
+    if (newEmail && newEmail !== user.email) {
+        const existingUser = await User.findOne({ where: { email: newEmail } });
+        if (existingUser) {
+            throw new ConflictError("Email is already in use.");
+        }
     }
-    if (name) {
+
+    if (name && name !== user.name) {
         user.name = name;
     }
 
-    await user.save();
+    if (newEmail && newEmail !== user.email) {
+        user.email = newEmail;
+    }
+
+    if (user.changed()) {
+        await user.save();
+    }
+
     const newToken = generateToken(user);
 
-    return { user: user, newToken };
+    return { user: user.toJSON(), newToken };
 }
 
 /**
@@ -158,9 +169,13 @@ export const editPassword = async (email: string, oldPassword: string, password:
  *
  * */
 export const getUserIdByEmail = async (email: string) => {
+    if (!email || email.trim() === "") {
+        throw new ValidationError("Email cannot be empty or whitespace.");
+    }
+
     const user = await User.findOne({ where: { email } });
     if (!user) {
         throw new NotFoundError("User not found.");
     }
     return user.id;
-}
+};
