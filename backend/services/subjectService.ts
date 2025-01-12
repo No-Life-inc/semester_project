@@ -1,4 +1,5 @@
 import Subject from "../models/sequelize/Subject";
+import { ValidationError, NotFoundError} from "../utility/errors";
 
 /**
  * Fetches a paginated list of subjects from the database.
@@ -28,15 +29,15 @@ export const getAllSubjects = async (page: number = 1, limit: number = 50) => {
     }
 
     if (isNaN(page) || page < 1) {
-        throw new Error("Invalid page number. Page must be a number greater than or equal to 1.");
+        throw new ValidationError("Invalid page number. Page must be a number greater than or equal to 1.");
     }
 
     if(isNaN(limit) || limit < 1) {
-        throw new Error("Invalid limit. Limit must be a number greater than or equal to 1.");
+        throw new ValidationError("Invalid limit. Limit must be a number greater than or equal to 1.");
     }
 
     if (limit > 100) {
-        throw new Error("Invalid limit. Limit must be a number less than or equal to 100.");
+        throw new ValidationError("Invalid limit. Limit must be a number less than or equal to 100.");
     }
   
     const offset = (Number(page) - 1) * Number(limit);
@@ -60,15 +61,16 @@ export const getAllSubjects = async (page: number = 1, limit: number = 50) => {
  * 
  * @throws {Error} Throws an error if id is invalid or if the subject is not found.
  */
-export const getSubjectById = async (id: number): Promise<Subject> => {
-    if (isNaN(id) || id < 1) {
-        throw new Error("Invalid subject ID. Subject ID must be a number greater than or equal to 1.");
-    }
-
+export const getSubjectById = async (id: number) => {
     try {
+        if (typeof id !== "number" || isNaN(id) || id < 1) {
+            throw new ValidationError("Invalid subject ID. Subject ID must be a number greater than or equal to 1.");
+        }
+
         const subject = await Subject.findByPk(id);
+        
         if (!subject) {
-            throw new Error("Subject not found");
+            throw new NotFoundError("Subject not found");
         }
         return subject;
     } catch (error) {

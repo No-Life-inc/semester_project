@@ -33,7 +33,7 @@ Subject.init({
     },
 }, {
     sequelize: sequelize,
-    tableName: "subjects", // Update the table name if necessary
+    tableName: "subjects", 
     timestamps: true,
     createdAt: "created_at",
     updatedAt: false,

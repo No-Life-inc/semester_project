@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { getAllSubjects, getSubjectById } from "../services/subjectService";
+import { BaseError } from "../utility/errors";
 
 /**
  * Controller to fetch all subjects.
@@ -16,8 +17,11 @@ export const getAllSubjectsController = async (request: Request, response: Respo
         const subjects = await getAllSubjects(Number(page), Number(limit));
         response.json(subjects);
     } catch (error) {
-        response.status(error.statusCode || 400).json({ message: error.message });
-    }
+        if (error instanceof BaseError)
+            response.status(error.statusCode).json({ error: error.message });
+        else
+            response.status(500).json({ error: "An error occurred" });
+        }
 
   };
 
@@ -28,15 +32,23 @@ export const getAllSubjectsController = async (request: Request, response: Respo
  * @param {Request} req - The request object.
  * @param {Response} res - The response object.
  * 
- * @returns {Promise<void>} - A promise that resolves to void.
  */
-export const getSubjectByIdController = async (req: Request, res: Response): Promise<void> => {
+export const getSubjectByIdController = async (req: Request, res: Response) => {
     const { id } = req.params;
 
+    const subjectId = parseInt(id, 10);
+    if (!id || id.trim() === "" || isNaN(subjectId) || subjectId < 1) {
+        return res.status(422).json({ error: "ID parameter must be a valid positive number" });
+    }
+
     try {
-        const subject = await getSubjectById(Number(id));
+        const subject = await getSubjectById(subjectId);
+
         res.json(subject);
     } catch (error) {
-        res.status(error.statusCode || 400).json({ message: error.message });
-    }
+        if (error instanceof BaseError)
+            res.status(error.statusCode).json({ error: error.message });
+        else
+            res.status(500).json({ error: "An error occurred" });
+        }
 };

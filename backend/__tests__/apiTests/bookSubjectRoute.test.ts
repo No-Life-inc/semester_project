@@ -20,13 +20,20 @@ afterAll(async () => {
 
 describe('Book Subject Routes - Get Books By Subject Positive Tests', () => {
   test.each([
-    ["should get books for subject with ID 1", "/bookSubject/1", 200, Array.isArray, 38],
-    ["should get books for subject with ID 1", "/bookSubject/1?limit=1", 200, Array.isArray, 1],
-    ["should get books for subject with ID 50", "/bookSubject/50?limit=2", 200, Array.isArray, 2],
-    ["should get books for subject with ID 1", "/bookSubject/1?page=1&limit=10", 200, Array.isArray, 10],
-    ["should get books for subject with ID 2", "/bookSubject/2?page=1&limit=5", 200, Array.isArray, 5],
-    ["should get books for subject with ID 50", "/bookSubject/50?page=1&limit=2", 200, Array.isArray, 2],
-
+    ["should get books for subject with ID 1", "/bookSubject/1", 200, Array.isArray, 10],
+    ["should get books for subject with ID 2", "/bookSubject/2", 200, Array.isArray, 10],
+    ["should get books for subject with ID 50", "/bookSubject/50", 200, Array.isArray, 2],
+    ["should get books for subject with ID 99", "/bookSubject/99", 200, Array.isArray, 2],
+    ["should get books for subject with ID 100", "/bookSubject/100", 200, Array.isArray, 1],
+    ["should get 1 book for subject with ID 1", "/bookSubject/1?limit=1", 200, Array.isArray, 1],
+    ["should get 2 books for subject with ID 1", "/bookSubject/1?limit=2", 200, Array.isArray, 2],
+    ["should get 19 books for subject with ID 1", "/bookSubject/1?limit=19", 200, Array.isArray, 19],
+    ["should get 37 books for subject with ID 1", "/bookSubject/1?limit=37", 200, Array.isArray, 37],
+    ["should get 38 books for subject with ID 1", "/bookSubject/1?limit=38", 200, Array.isArray, 38],
+    ["should get 10 book for subject with ID 1 on page 1", "/bookSubject/1?page=1", 200, Array.isArray, 10],
+    ["should get 10 book for subject with ID 1 on page 2", "/bookSubject/1?page=2", 200, Array.isArray, 10],
+    ["should get 10 book for subject with ID 1 on page 3", "/bookSubject/1?page=3", 200, Array.isArray, 10],
+    ["should get 8 book for subject with ID 1 on page 4", "/bookSubject/1?page=4", 200, Array.isArray, 8],
   ])(
     "%s",
     async (description, route, expectedStatus, expectedBodyType, expectedLength) => {
@@ -43,14 +50,30 @@ describe('Book Subject Routes - Get Books By Subject Positive Tests', () => {
 
 describe('Book Subject Routes - Get Books By Subject Negative Tests', () => {
   test.each([
-    ["should return error for invalid subject ID (0)", "/bookSubject/0", 400],
-    ["should return error for invalid subject ID (-1)", "/bookSubject/-1", 400],
-    ["should return error for non-numeric subject ID", "/bookSubject/NaN", 400],
-    ["should return error for invalid limit (0)", "/bookSubject/1?page=1&limit=0", 400],
-    ["should return error for invalid limit (-10)", "/bookSubject/1?page=1&limit=-10", 400],
-    ["should return error for limit exceeding max (101)", "/bookSubject/1?page=1&limit=101", 400],
-    ["should return error for invalid page (-1)", "/bookSubject/1?page=-1&limit=10", 400],
-    ["should return error for non-numeric page", "/bookSubject/1?page=a&limit=10", 400],
+    ["should get 0 books with ID 0", "/bookSubject/0", 422],
+    ["should get 0 books with ID -1", "/bookSubject/-1", 422],
+    ["should get 0 books with ID -2", "/bookSubject/-2", 422],
+    ["should get 0 books with ID NaN", "/bookSubject/NaN", 422],
+    ["should get 0 books with ID white space", "/bookSubject/ ", 404],
+    ["should get 0 books with ID undefined", "/bookSubject/", 404],
+    ["should get 0 books with ID 185", "/bookSubject/185", 404],
+    ["should get 0 books with ID 186", "/bookSubject/186", 404],
+    ["should get 0 books with limit 0", "/bookSubject/1?limit=0", 422],
+    ["should get 0 books with limit -1", "/bookSubject/1?limit=-1", 422],
+    ["should get 0 books with limit -2", "/bookSubject/1?limit=-2", 422],
+    ["should get 0 books with limit NaN", "/bookSubject/1?limit=NaN", 422],
+    ["should get 0 books with limit white space", "/bookSubject/1?limit= ", 422],
+    ["should get 0 books limit undefined", "/bookSubject/1?limit=", 422],
+    ["should get 0 books limit 101", "/bookSubject/1?limit=101", 422],
+    ["should get 0 books limit 102", "/bookSubject/1?limit=102", 422],
+    ["should get 0 books page 0", "/bookSubject/1?page=0", 422],
+    ["should get 0 books page -1", "/bookSubject/1?page=-1", 422],
+    ["should get 0 books page -2", "/bookSubject/1?page=-2", 422],
+    ["should get 0 books page NaN", "/bookSubject/1?page=NaN", 422],
+    ["should get 0 books page white space", "/bookSubject/1?page= ", 422],
+    ["should get 0 books page undefined", "/bookSubject/1?page=", 422],
+
+
   ])(
     "%s",
     async (description, route, expectedStatus) => {

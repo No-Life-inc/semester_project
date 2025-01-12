@@ -5,6 +5,6 @@ import { getAllSubjectsController, getSubjectByIdController } from '../../contro
 const router = Router();
 
 router.get('/', getAllSubjectsController);
-router.get('/:id', getSubjectByIdController);
+router.get('/id/:id', getSubjectByIdController);
 
 export default router;

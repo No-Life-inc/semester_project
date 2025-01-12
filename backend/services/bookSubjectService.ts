@@ -1,5 +1,6 @@
 import Book from "../models/sequelize/Book"; // Ensure the path is correct
 import Subject from "../models/sequelize/Subject"; // Ensure the path is correct
+import { ValidationError, NotFoundError } from "../utility/errors";
 
 /**
  * Fetches books associated with a given subject ID.
@@ -12,30 +13,30 @@ import Subject from "../models/sequelize/Subject"; // Ensure the path is correct
 export const getBooksBySubject = async (
     subjectId: number,
     page: number = 1,
-    limit: number = 50
+    limit: number = 10
 ): Promise<Book[]> => {
     if (page === undefined) {
         page = 1;
     }
 
     if (limit === undefined) {
-        limit = 50;
+        limit = 10;
     }
     
     if (isNaN(subjectId) || subjectId < 1) {
-        throw new Error("Invalid subject ID. Subject ID must be a number greater than or equal to 1.");
+        throw new ValidationError("Invalid subject ID. Subject ID must be a number greater than or equal to 1.");
     }
 
     if (isNaN(page) || page < 1) {
-        throw new Error("Invalid page number. Page must be a number greater than or equal to 1.");
+        throw new ValidationError("Invalid page number. Page must be a number greater than or equal to 1.");
     }
 
     if (isNaN(limit) || limit < 1) {
-        throw new Error("Invalid limit. Limit must be a number greater than or equal to 1.");
+        throw new ValidationError("Invalid limit. Limit must be a number greater than or equal to 1.");
     }
 
     if (limit > 100) {
-        throw new Error("Invalid limit. Limit must be a number less than or equal to 100.");
+        throw new ValidationError("Invalid limit. Limit must be a number less than or equal to 100.");
     }
 
     const offset = (page - 1) * limit;
@@ -53,6 +54,10 @@ export const getBooksBySubject = async (
                 },
             ],
         });
+
+        if (books.length === 0) {
+            throw new NotFoundError(`No books found for subject ID ${subjectId}.`);
+        }
 
         return books;
     } catch (error) {
