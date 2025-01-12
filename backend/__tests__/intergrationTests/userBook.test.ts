@@ -185,6 +185,7 @@ describe("removeBookFromUser function negative tests", () => {
     async (...args: (string | number | typeof ValidationError | NotFoundError | UnauthorizedError | null | undefined)[]) => {
       const [email, bookId, errorMessage, err] = args as [string, number, string, typeof ValidationError | NotFoundError | UnauthorizedError];
       await expect(removeBookFromUser(email, Number(bookId))).rejects.toThrow(errorMessage);
+      await expect(removeBookFromUser(email, Number(bookId))).rejects.toThrow(err);
     }
   );
 });

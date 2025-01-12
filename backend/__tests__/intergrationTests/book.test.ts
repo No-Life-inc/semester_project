@@ -305,69 +305,6 @@ describe("BookData field boundary positive tests", () => {
   );
 });
 
-// describe("BookData field boundary negative tests", () => {
-
-//   const minimalBookData: BookAPIData = { title: " " };
-
-//   const cases: [Partial<BookAPIData>, string][] = [
-//     // Title field tests
-//     [{ title: "A".repeat(256) }, "should reject title exceeding 255 characters"],
-//     [{ title: undefined }, "should reject undefined title"],
-//     [{ title: "" }, "should reject empty title"],
-//     [{ title: null }, "should reject null title"],
-
-//     // Image field tests
-//     [{ image: "A".repeat(256) }, "should reject image URL exceeding 255 characters"],
-
-//     // Title_long field tests
-//     [{ title_long: "A".repeat(256) }, "should reject title_long exceeding 255 characters"],
-
-//     // Date_published field tests
-//     [{ date_published: "10000-01-01" }, "should reject invalid date_published beyond 9999-12-31"],
-//     [{ date_published: "0000-00-00" }, "should reject invalid date_published of 0001-01-00"],
-//     [{ date_published: "9999-12-31" }, "should reject invalid date_published of 9999-12-31"],
-//     [{ date_published: "9999-12-32" }, "should reject invalid date_published of 9999-12-32"],
-
-//     // ISBN fields
-//     [{ isbn10: "12345678901" }, "should reject isbn10 exceeding 10 characters"],
-//     [{ isbn13: "12345678901234" }, "should reject isbn13 exceeding 13 characters"],
-//     [{ isbn: "12345678901234" }, "should reject isbn exceeding 10 characters"],
-//     [{ isbn: undefined}, "should reject undefined isbn"],
-//     [{ isbn: "" }, "should reject empty isbn"],
-//     [{ isbn: null}, "should reject null isbn"],
-
-//     // Pages field tests
-//     [{ pages: -1 }, "should reject negative pages value"],
-//     [{ pages: 2147483647 + 1 }, "should reject pages exceeding INT_MAX"],
-//     [{ pages: -2147483648 }, "should reject pages below INT_MIN"],
-//     [{ pages: -10000 }, "should reject pages exceeding valid min value"],
-//     [{ pages: NaN }, "should reject Nan pages value"],
-
-//     // MSRP field tests
-//     [{ msrp: 100000000.0 }, "should reject msrp exceeding valid max value"],
-//     [{ msrp: -1 }, "should reject negative msrp value"],
-//     [{ msrp: -100000000.0 }, "should reject msrp below valid min value"],
-//     [{ msrp: -10000 }, "should reject msrp below valid min value"],
-//     [{ msrp: NaN }, "should reject Nan msrp"],
-
-    
-//     [{ binding: "A".repeat(256) }, "should reject binding exceeding 255 characters"],
-//     [{ dimensions: "A".repeat(256) }, "should reject dimensions exceeding 255 characters"],
-//     [{ synopsis: "A".repeat(256) }, "should reject synopsis exceeding 255 characters"],
-//     [{ language: "A".repeat(256) }, "should reject language exceeding 255 characters"],
-//   ];
-
-//   test.each(cases)("%s", async (fieldData, description) => {
-    
-//     const invalidDataArray: BookAPIData[] = [{...minimalBookData, ...fieldData }];
-
-   
-//     await expect(addBooks(invalidDataArray)).rejects.toThrow(
-//       /validation error|invalid/i 
-//     );
-//   });
-// });
-
 describe("BookData field boundary negative tests", () => {
   const minimalBookData: BookAPIData = { title: " " };
 
@@ -580,6 +517,46 @@ describe("BookData field associations - Publisher", () => {
   );
 });
 
+describe("BookData field associations - Publisher (Negative Tests)", () => {
+  const minimalBookData: BookAPIData = { title: "Test Book" };
+
+  const cases: [Partial<BookAPIData>, string, string][] = [
+    [
+      { publisher: "A".repeat(256), isbn: "0000000110" },
+      "should reject publisher names longer than 255 characters",
+      "Validation error: Validation len on name failed",
+    ],
+    [
+      { publisher: "1", isbn: "0000000112" },
+      "should reject numeric publisher names",
+      "Validation error: Name cannot consist of numbers only.",
+    ],
+    [
+      { publisher: "-1", isbn: "0000000113" },
+      "should reject negative numeric publisher names",
+      "Validation error: Name must only contain alphanumeric characters and spaces.",
+    ],
+    [
+      { publisher: "2147483647", isbn: "0000000114" },
+      "should reject excessively large numeric strings as publisher names",
+      "Validation error: Name cannot consist of numbers only.",
+    ],
+    [
+      { publisher: "-2147483648", isbn: "0000000115" },
+      "should reject excessively negative numeric strings as publisher names",
+      "Validation error: Name must only contain alphanumeric characters and spaces.",
+    ],
+  ];
+
+  test.each(cases)(
+    "%s",
+    async (fieldData, description, expectedError) => {
+      const invalidDataArray: BookAPIData[] = [{ ...minimalBookData, ...fieldData }];
+
+      await expect(addBooks(invalidDataArray)).rejects.toThrow(expectedError);
+    }
+  );
+});
 
 describe("getBooksByTitle Positive Tests", () => {
   const positiveTestCases = [

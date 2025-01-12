@@ -93,6 +93,11 @@ export const getUserCollections = async (email: string) => {
  * @throws {NotFoundError} - Throws an error if the collection is not found.
  */
 export const updateCollection = async (id: number, name: string, email: string) => {
+
+  if (!id || typeof id !== "number" || id <= 0 || isNaN(id)) {
+    throw new ValidationError("Invalid collection ID");
+  }
+
   if (!name || name.trim() === "") {
     throw new ValidationError("Collection name cannot be empty or whitespace");
   }
