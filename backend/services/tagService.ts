@@ -1,5 +1,5 @@
 import Tag from '../models/sequelize/Tag';
-import {BadRequestError, ConflictError, InternalServerError, NotFoundError} from "../utility/errors";
+import {BadRequestError, ConflictError, InternalServerError, NotFoundError, ValidationError} from "../utility/errors";
 
 /**
  * Fetches all tags from the database.
@@ -39,7 +39,6 @@ export const getAllTags = async (page: number, limit: number) => {
     });
 };
 
-
 /**
  * Fetches a tag by its ID.
  *
@@ -53,7 +52,7 @@ export const getAllTags = async (page: number, limit: number) => {
 export const getTagById = async (id: number) => {
 
     if (isNaN(id) || id < 1) {
-        throw new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.");
+        throw new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.");
     }
 
     const tag = await Tag.findByPk(id);
@@ -107,7 +106,7 @@ export const addTag = async (name: string) => {
  */
 export const deleteTagById = async (id: number) => {
     if (isNaN(id) || id < 1) {
-        throw new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.");
+        throw new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.");
     }
 
     const deletedCount = await Tag.destroy({ where: { id } });
