@@ -56,7 +56,7 @@ describe("deleteTagFromBook - Negative Tests", () => {
     const negativeCases: [string, number, number, number, Error][] = [
         ["should throw NotFoundError if book is not found", 1, 9999, 1, new NotFoundError("UserBook not found")],
         ["should throw ConflictError if user does not own the book", 1, 1, 2, new ConflictError("You do not have permission to modify this book.")],
-        ["should throw NotFoundError if tag is not found on the book", 9999, 1, 1, new NotFoundError("Tag not found on the book.")],
+        ["should throw NotFoundError if tag is not found on the book", 9999, 1, 1, new NotFoundError("Tag not found")],
     ];
 
     test.each(negativeCases)("%s", async (description, tagId, bookId, userId, expectedError) => {

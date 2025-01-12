@@ -21,18 +21,11 @@ export const addTagToBook = async (tagId: number, userBookId: number, userId: nu
     try{
         const userBook = await getUserBookById(userBookId);
 
-        if (!userBook) {
-            throw new NotFoundError("Book not found");
-        }
-
         if (userBook.userId !== userId) {
             throw new ConflictError("You do not have permission to modify this book");
         }
 
-        const tag = await getTagById(tagId);
-        if (!tag) {
-            throw new NotFoundError("Tag not found");
-        }
+        await getTagById(tagId);
 
         const existingUserBookTag = await UserBookTag.findOne({
             where: {
@@ -69,22 +62,20 @@ export const addTagToBook = async (tagId: number, userBookId: number, userId: nu
  * deleteTagFromBook(1, 1)
  * // This will delete the tag with ID 1 from the book with ID 1
  */
-export const deleteTagFromBook = async (tagId: number, bookId: number, userId: number) => {
+export const deleteTagFromBook = async (tagId: number, userBookId: number, userId: number) => {
     try {
-        const userBook = await getUserBookById(bookId);
-
-        if (!userBook) {
-            throw new NotFoundError("Book not found.");
-        }
+        const userBook = await getUserBookById(userBookId);
 
         if (userBook.userId !== userId) {
             throw new ConflictError("You do not have permission to modify this book.");
         }
 
+        await getTagById(tagId);
+
         const deletedCount = await UserBookTag.destroy({
             where: {
                 tagId: tagId,
-                userBookId: bookId
+                userBookId: userBookId
             }
         });
 
@@ -118,10 +109,6 @@ export const getTagsForBook = async (userBookId: number, userId: number) => {
     try {
         const userBook = await getUserBookById(userBookId);
 
-        if (!userBook) {
-            throw new NotFoundError("Book not found.");
-        }
-
         if (userBook.userId !== userId) {
             throw new ConflictError("You do not have permission to view this book.");
         }
@@ -130,10 +117,6 @@ export const getTagsForBook = async (userBookId: number, userId: number) => {
             where: { userBookId },
             include: [{ model: Tag, as: "tag" }],
         });
-
-        if (tags.length === 0) {
-            throw new NotFoundError(`No tags found for the book with ID ${userBookId}.`);
-        }
 
         return tags;
     } catch (error) {

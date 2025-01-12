@@ -1,7 +1,12 @@
 import { afterAll, beforeAll, describe, expect, jest, test } from "@jest/globals";
 import { setupTestDB, teardownTestDB } from "../../database/knex/setupTestDB";
 import { getAllTags, getTagById, addTag, deleteTagById } from "../../services/tagService";
-import { BadRequestError, NotFoundError, ConflictError, InternalServerError } from "../../utility/errors";
+import {
+    BadRequestError,
+    NotFoundError,
+    ConflictError,
+    ValidationError
+} from "../../utility/errors";
 
 jest.setTimeout(120000);
 
@@ -57,10 +62,10 @@ describe("getTagById - Positive Tests", () => {
 
 describe("getTagById - Negative Tests", () => {
     const negativeCases: [number | string, Error][] = [
-        [0, new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
-        [-1, new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
-        [NaN, new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
-        ["invalid", new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [0, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [-1, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [NaN, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        ["invalid", new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
         [9999, new NotFoundError("Tag not found")]
     ];
 
@@ -106,10 +111,10 @@ describe("deleteTagById - Positive Tests", () => {
 
 describe("deleteTagById - Negative Tests", () => {
     const negativeCases: [number | string, Error][] = [
-        [0, new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
-        [-1, new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
-        [NaN, new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
-        ["invalid", new BadRequestError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [0, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [-1, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        [NaN, new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
+        ["invalid", new ValidationError("Invalid tag id. Tag id must be a number greater than or equal to 1.")],
         [9999, new NotFoundError("Tag not found")]
     ];
 
