@@ -13,6 +13,18 @@ import {BadRequestError, ConflictError, InternalServerError, NotFoundError} from
  * // This will fetch the first 10 tags
  */
 export const getAllTags = async (page: number, limit: number) => {
+    if (isNaN(page) || page <= 0) {
+        throw new BadRequestError("Page must be a positive number greater than 0.");
+    }
+
+    if (isNaN(limit) || limit <= 0) {
+        throw new BadRequestError("Limit must be a positive number greater than 0.");
+    }
+
+    if (limit > 100) {
+        throw new BadRequestError("Limit must be a positive number less than or equal to 100.");
+    }
+
     const totalTags = await Tag.count();
     const maxPage = Math.ceil(totalTags / limit);
 
@@ -26,6 +38,7 @@ export const getAllTags = async (page: number, limit: number) => {
         limit,
     });
 };
+
 
 /**
  * Fetches a tag by its ID.
@@ -61,17 +74,19 @@ export const getTagById = async (id: number) => {
  * // This will create a new tag with the name "Fantasy"
  */
 export const addTag = async (name: string) => {
-    if (!name) {
+
+    if (typeof name !== 'string' || name.trim() === '') {
         throw new BadRequestError("Tag name is required");
     }
-    // check if tag name already exists
+
+    if (name.length > 255) {
+        throw new ConflictError("Tag name cannot exceed 255 characters.");
+    }
     const tag = await Tag.findOne({ where: { name } });
     if (tag) {
         throw new BadRequestError("Tag name already exists");
     }
-    if (name.length > 255) {
-        throw new ConflictError("Tag name cannot exceed 255 characters.");
-    }
+
     const addTag = await Tag.create({ name });
     if (!addTag) {
         throw new InternalServerError("Tag not created");
