@@ -38,6 +38,8 @@ describe("getBooksBySubject function negative tests", () => {
     [null, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
     [-1, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
     [-2, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
+    [185, 1, 1, "No books found for subject ID 185."],
+    [186, 1, 1, "No books found for subject ID 186."],
     [NaN, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
     [0, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
     ["a" as any, 1, 1, "Invalid subject ID. Subject ID must be a number greater than or equal to 1."],
