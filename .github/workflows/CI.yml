@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - development
+      - ZackCI
   pull_request:
     branches:
       - main
