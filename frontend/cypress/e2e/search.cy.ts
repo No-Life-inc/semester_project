@@ -1,8 +1,8 @@
 describe('Search Books (Live API)', () => {
   beforeEach(() => {
     cy.visit('/login');
-    cy.get('[data-testid="login-email-input"]').type('b@b.dk');
-    cy.get('[data-testid="login-password-input"]').type('Test12345');
+    cy.get('[data-testid="login-email-input"]').type('test_email@example.com');
+    cy.get('[data-testid="login-password-input"]').type('YourStrongPassword123');
     cy.get('[data-testid="login-submit-button"]').click();
 
     cy.url().should('eq', 'http://localhost:3000/');
