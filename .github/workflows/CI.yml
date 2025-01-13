@@ -37,10 +37,6 @@ jobs:
         run: npm install
         working-directory: ./backend
 
-      #- name: Install frontend dependencies
-      #  run: npm install
-      #  working-directory: ./frontend
-
       - name: Wait for MSSQL to be ready
         run: |
           for i in {1..15}; do
