@@ -33,7 +33,7 @@ describe("Positive Register user data boundary tests", () => {
         ["should accept maximal valid email (255 chars)", { name: "Valid User", email: "a".repeat(243) + "@example.com", password: validPassword }],
         // Password cases
         ["should accept minimal valid password (8 chars)", { name: "Valid User", email: "valid6@example.com", password: minPassword }],
-        ["should accept one above minimal valid password (8 chars)", { name: "Valid User", email: "valid7@example.com", password: minPassword }],
+        ["should accept one above minimal valid password (9 chars)", { name: "Valid User", email: "valid7@example.com", password: minPassword+"1" }],
         ["should accept typical password", { name: "Valid User", email: "valid8@example.com", password: validPassword }],
         ["should accept one below maximal valid password (127 chars)", { name: "Valid User", email: "valid9@example.com", password: "A".repeat(125)+ "b1" }],
         ["should accept maximal valid password (128 chars)", { name: "Valid User", email: "valid10@example.com", password: "A".repeat(126) + "b1" }],

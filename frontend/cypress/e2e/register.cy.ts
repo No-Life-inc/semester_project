@@ -20,7 +20,7 @@ describe('Register Page', () => {
     cy.get('[data-testid="register-submit-button"]').click();
 
     cy.wait('@registerRequest').then((interception) => {
-      expect(interception.response?.statusCode).to.equal(200);
+      expect(interception.response?.statusCode).to.equal(201);
       expect(interception.request.body).to.deep.equal({
         name: 'Hans',
         email: uniqueEmail,
