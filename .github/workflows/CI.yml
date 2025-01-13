@@ -5,6 +5,11 @@ on:
     branches:
       - main
       - development
+      - BetulCI
+      - MortenCI
+      - LongCI
+      - ZackCI
+
   pull_request:
     branches:
       - main
