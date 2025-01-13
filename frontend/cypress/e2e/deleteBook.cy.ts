@@ -1,4 +1,4 @@
-describe('Login and Edit Details', () => {
+describe('Delete a book from collection', () => {
     beforeEach(() => {
   
       cy.clearLocalStorage();
@@ -21,7 +21,7 @@ describe('Login and Edit Details', () => {
         cy.visit('/profile');
         cy.url().should('include', '/profile');
         cy.get('[data-testid="book-3"]').should('exist');
-        cy.contains('My Evil Mother: A Short Story3')
+        cy.contains('My Evil Mother: A Short Story')
 
         cy.get('[data-testid="remove-book-3"]').click();
 
@@ -29,7 +29,7 @@ describe('Login and Edit Details', () => {
 
         cy.visit('/books');
 
-        cy.get('[data-testid="search-books-input"]').type('My Evil Mother: A Short Story3');
+        cy.get('[data-testid="search-books-input"]').type('My Evil Mother: A Short Story');
 
         cy.get('[data-testid="collection-selector-3"]').select('Collection 3');
         cy.get('[data-testid="add-to-collection-button-3"]').click();

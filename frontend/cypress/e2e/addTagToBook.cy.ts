@@ -1,4 +1,4 @@
-describe('Login and Edit Details', () => {
+describe('Add tag to book', () => {
     beforeEach(() => {
   
       cy.clearLocalStorage();
@@ -31,19 +31,19 @@ describe('Login and Edit Details', () => {
         
         cy.get('[data-testid="tag-selector-3"]')
           .find('option')
-          .contains("TagTest")   
+          .contains("Anime")
           .should('exist');
         
         
         cy.get('[data-testid="tag-selector-3"]')
-          .select('TagTest');
+          .select('Anime');
     
         
         cy.get('[data-testid="add-tag-3"]').click();
     
        
         cy.get('[data-testid="show-tags-3"]').click();
-        cy.contains('TagTest'); 
+        cy.contains('Anime');
     });
     
 
