@@ -95,7 +95,7 @@ Book.init(
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-                len: [0, 10],
+                len: [0, 13],
                 notEmpty: true,
             },
         },

@@ -192,6 +192,7 @@ describe("BookData field boundary positive tests", () => {
   const cases: [Partial<BookAPIData>, keyof Book, any, string][] = [
     [{ isbn: "1234567889" }, "title", " ", "should accept minimal valid title"],
     [{ title: "A", isbn: "1234567890" }, "title", "A", "should accept minimal valid title"],
+    [{ title: "AA", isbn: "91234567890" }, "title", "AA", "should accept minimal valid title"],
     [{ title: "Default Title", isbn: "1234567888" }, "title", "Default Title", "should accept a middle valid title"],
     [{ title: "A".repeat(255), isbn: "1234567891" }, "title", "A".repeat(255), "should accept maximal title (255 chars)"],
     [{ title: "A".repeat(254), isbn: "1234567892" }, "title", "A".repeat(254), "should accept title one character below limit"],
@@ -199,6 +200,7 @@ describe("BookData field boundary positive tests", () => {
     // Image field tests
     [{ image: "", isbn: "1234567893" }, "image", "", "should accept minimal image URL"],
     [{ image: "a", isbn: "1234567894" }, "image", "a", "should accept close to minimal image URL"],
+    [{ image: "aa", isbn: "91234567894" }, "image", "aa", "should accept close to minimal image URL"],
     [{ image: "http://".padEnd(140, "a"), isbn: "1234567895" }, "image", "http://".padEnd(140, "a"), "should accept a middle image URL"],
     [{ image: "http://".padEnd(255, "a"), isbn: "0000000006" }, "image", "http://".padEnd(255, "a"), "should accept maximal image URL (255 chars)"],
     [{ image: "http://".padEnd(254, "a"), isbn: "1234567896" }, "image", "http://".padEnd(254, "a"), "should accept close to maximal image URL (254 chars)"],
@@ -206,6 +208,7 @@ describe("BookData field boundary positive tests", () => {
     // Title_long field tests
     [{ title_long: "", isbn: "0000000001" }, "titleLong", "", "should accept minimal title_long"],
     [{ title_long: "a", isbn: "0000000002" }, "titleLong", "a", "should accept close to minimal title_long"],
+    [{ title_long: "aa", isbn: "90000000002" }, "titleLong", "aa", "should accept close to minimal title_long"],
     [{ title_long: "Default Title", isbn: "0000000005" }, "titleLong", "Default Title", "should accept a middle title_long"],
     [{ title_long: "A".repeat(255), isbn: "0000000003" }, "titleLong", "A".repeat(255), "should accept maximal title_long (255 chars)"],
     [{ title_long: "A".repeat(254), isbn: "0000000004" }, "titleLong", "A".repeat(254), "should accept maximal title_long (255 chars)"],
@@ -219,14 +222,16 @@ describe("BookData field boundary positive tests", () => {
 
     //Synopsis field tests
     [{ synopsis: "", isbn: "0000000014" }, "synopsis", "", "should accept minimal synopsis"],
-    [{ synopsis: " ", isbn: "0000000015" }, "synopsis", " ", "should accept close to minimal synopsis"],
-    [{ synopsis: "A".repeat(255), isbn: "0000000013" }, "synopsis", "A".repeat(255), "should accept maximal synopsis (255 chars)"],
-    [{ synopsis: "A".repeat(254), isbn: "0000000016" }, "synopsis", "A".repeat(254), "should accept maximal synopsis (255 chars)"],
+    [{ synopsis: " ", isbn: "0000000015" }, "synopsis", " ", "should accept minimal synopsis"],
+    [{ synopsis: " A", isbn: "90000000015" }, "synopsis", " A", "should accept close to minimal synopsis"],
+    [{ synopsis: "A".repeat(65535), isbn: "0000000013" }, "synopsis", "A".repeat(65535), "should accept maximal synopsis (max length string)"],
+    [{ synopsis: "A".repeat(65534), isbn: "0000099913" }, "synopsis", "A".repeat(65534), "should accept close to maximal synopsis (max length string)"],
     [{ synopsis: "Test synopsis", isbn: "0000000017" }, "synopsis", "Test synopsis", "should accept a middle synopsis"],
 
     //isbn13 field tests
     [{ isbn13: "", isbn: "0000000018" }, "isbn13", "", "should accept minimal isbn13"],
     [{ isbn13: " ", isbn: "0000000020" }, "isbn13", " ", "should accept close to minimum ISBN-13 (13 chars)"],
+    [{ isbn13: " A", isbn: "90000000020" }, "isbn13", " A", "should accept close to minimum ISBN-13 (13 chars)"],
     [{ isbn13: "9999999999999", isbn: "0000000019" }, "isbn13", "9999999999999", "should accept max ISBN-13 (13 chars)"],
     [{ isbn13: "999999999999", isbn: "0000000022" }, "isbn13", "999999999999", "should accept close to max ISBN-13 (13 chars)"],
     [{ isbn13: "1234567890123", isbn: "0000000021" }, "isbn13", "1234567890123", "should accept a middle ISBN-13 (13 chars)"],
@@ -234,6 +239,7 @@ describe("BookData field boundary positive tests", () => {
     //edition field tests
     [{ edition: "", isbn: "0000000023" }, "edition", "", "should accept minimal edition"],
     [{ edition: "a", isbn: "0000000024" }, "edition", "a", "should accept close to minimal edition"],
+    [{ edition: "aa", isbn: "90000000024" }, "edition", "aa", "should accept close to minimal edition"],
     [{ edition: "A".repeat(255), isbn: "0000000025" }, "edition", "A".repeat(255), "should accept maximal edition (255 chars)"],
     [{ edition: "A".repeat(254), isbn: "0000000026" }, "edition", "A".repeat(254), "should accept maximal edition (255 chars)"],
     [{ edition: "Default Edition", isbn: "0000000027" }, "edition", "Default Edition", "should accept a middle edition"],
@@ -241,6 +247,7 @@ describe("BookData field boundary positive tests", () => {
     //binding field tests
     [{ binding: "", isbn: "0000000028" }, "binding", "", "should accept minimal binding"],
     [{ binding: "a", isbn: "0000000029" }, "binding", "a", "should accept close to minimal binding"],
+    [{ binding: "aa", isbn: "90000000029" }, "binding", "aa", "should accept close to minimal binding"],
     [{ binding: "A".repeat(255), isbn: "0000000030" }, "binding", "A".repeat(255), "should accept maximal binding (255 chars)"],
     [{ binding: "A".repeat(254), isbn: "0000000031" }, "binding", "A".repeat(254), "should accept maximal binding (255 chars)"],
     [{ binding: "Default Binding", isbn: "0000000032" }, "binding", "Default Binding", "should accept a middle binding"],
@@ -248,6 +255,7 @@ describe("BookData field boundary positive tests", () => {
     //language field tests
     [{ language: "", isbn: "0000000033" }, "language", "", "should accept minimal language"],
     [{ language: "a", isbn: "0000000034" }, "language", "a", "should accept close to minimal language"],
+    [{ language: "aa", isbn: "90000000034" }, "language", "aa", "should accept close to minimal language"],
     [{ language: "A".repeat(255), isbn: "0000000035" }, "language", "A".repeat(255), "should accept maximal language (255 chars)"],
     [{ language: "A".repeat(254), isbn: "0000000036" }, "language", "A".repeat(254), "should accept language binding (255 chars)"],
     [{ language: "Default language", isbn: "0000000037" }, "language", "Default language", "should accept a middle language"],
@@ -255,6 +263,7 @@ describe("BookData field boundary positive tests", () => {
     //dimensions field tests
     [{ dimensions: "", isbn: "0000000038" }, "dimensions", "", "should accept minimal dimensions"],
     [{ dimensions: "a", isbn: "0000000039" }, "dimensions", "a", "should accept close to minimal dimensions"],
+    [{ dimensions: "aa", isbn: "90000000039" }, "dimensions", "aa", "should accept close to minimal dimensions"],
     [{ dimensions: "A".repeat(255), isbn: "0000000040" }, "dimensions", "A".repeat(255), "should accept maximal dimensions (255 chars)"],
     [{ dimensions: "A".repeat(254), isbn: "0000000041" }, "dimensions", "A".repeat(254), "should accept maximal dimensions (255 chars)"],
     [{ dimensions: "Default dimensions", isbn: "0000000042" }, "dimensions", "Default dimensions", "should accept a middle dimensions"],
@@ -262,6 +271,7 @@ describe("BookData field boundary positive tests", () => {
     //isbn10 field tests
     [{ isbn10: "", isbn: "0000000043" }, "isbn10", "", "should accept minimal isbn10"],
     [{ isbn10: " ", isbn: "0000000044" }, "isbn10", " ", "should accept close to minimal isbn10"],
+    [{ isbn10: "12", isbn: "90000000044" }, "isbn10", "12", "should accept close to minimal isbn10"],
     [{ isbn10: "1234567890", isbn: "0000000045" }, "isbn10", "1234567890", "should accept middle isbn10 (10 chars)"],
     [{ isbn10: "123456789", isbn: "0000000046" }, "isbn10", "123456789", "should accept close to max isbn10 (10 chars)"],
     [{ isbn10: "9999999999", isbn: "0000000047" }, "isbn10", "9999999999", "should accept maximal isbn10 (10 chars)"],
@@ -272,12 +282,21 @@ describe("BookData field boundary positive tests", () => {
     [{ pages: 100, isbn: "0000000050" }, "pages", 100, "should accept middle pages"],
     [{ pages: 9999, isbn: "0000000051" }, "pages", 9999, "should accept some large page number"],
     [{ pages: 2147483647, isbn: "0000000052" }, "pages", 2147483647, "should accept maximal pages (INT_MAX)"],
+    [{ pages: 2147483646, isbn: "00000099953" }, "pages", 2147483646, "should accept maximal pages (INT_MAX)"],
 
+    //msrp field tests
     [{ msrp: 0, isbn: "0000000053" }, "msrp", 0, "should accept minimal msrp"],
     [{ msrp: 1, isbn: "0000000054" }, "msrp", 1, "should accept close to minimal msrp"],
     [{ msrp: 100, isbn: "0000000055" }, "msrp", 100, "should accept middle msrp value"],
     [{ msrp: 9999, isbn: "0000000056" }, "msrp", 9999, "should accept a large msrp value"],
     [{ msrp: 99999999.98, isbn: "0000000057" }, "msrp", 99999999.98, "should accept maximal msrp (INT_MAX)"],
+
+    //isbn field tests
+    [{ isbn: "1" }, "isbn", "1", "should accept minimal isbn10 length"],
+    [{ isbn: "12" }, "isbn", "12", "should accept close to minimal isbn10 length"],
+    [{ isbn: "111100018123" }, "isbn", "111100018123", "should accept maximum ISBN length (13 chars)"],
+    [{ isbn: "11110001812" }, "isbn", "11110001812", "should accept close to maximum ISBN length (12 chars)"],
+    [{ isbn: "11110001" }, "isbn", "11110001", "should accept middle ISBN length (8 chars)"],
 
   ];
 
@@ -328,6 +347,7 @@ describe("BookData field boundary negative tests", () => {
 
     // ISBN fields
     [{ isbn10: "12345678901" }, "Validation error: Validation notEmpty on isbn failed", "should reject isbn10 exceeding 10 characters"],
+    [{ isbn10: "" }, "Validation error: Validation notEmpty on isbn failed", "should reject isbn10 exceeding 10 characters"],
     [{ isbn13: "12345678901234" }, "Validation error: Validation notEmpty on isbn failed", "should reject isbn13 exceeding 13 characters"],
     [{ isbn: "12345678901234" }, "Validation error: Validation len on isbn failed", "should reject isbn exceeding 10 characters"],
     [{ isbn: undefined }, "Validation error: Validation notEmpty on isbn failed", "should reject undefined isbn"],
