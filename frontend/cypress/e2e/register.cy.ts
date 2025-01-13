@@ -34,8 +34,8 @@ describe('Register Page', () => {
   it('should show an error message if email is in use', () => {
 
     cy.get('[data-testid="register-name-input"]').type('Hans');
-    cy.get('[data-testid="register-email-input"]').type('h@h.com');
-    cy.get('[data-testid="register-password-input"]').type('Password123');
+    cy.get('[data-testid="register-email-input"]').type('test@test.com');
+    cy.get('[data-testid="register-password-input"]').type('YourStrongPassword123');
     cy.get('[data-testid="register-submit-button"]').click();
 
     cy.get('[data-testid="register-message"]').should('contain', 'Email is already in use.');
@@ -46,7 +46,7 @@ describe('Register Page', () => {
   
     cy.get('[data-testid="register-name-input"]').type('Betül');
     cy.get('[data-testid="register-email-input"]').type('h@h.com');
-    cy.get('[data-testid="register-password-input"]').type('Password123');
+    cy.get('[data-testid="register-password-input"]').type('YourStrongPassword123');
     cy.get('[data-testid="register-submit-button"]').click();
   
     cy.get('[data-testid="register-message"]').should('contain', 'Invalid characters in name.');
