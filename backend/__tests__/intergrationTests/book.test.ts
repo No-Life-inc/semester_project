@@ -230,11 +230,11 @@ describe("BookData field boundary positive tests", () => {
 
     //isbn13 field tests
     [{ isbn13: "", isbn: "0000000018" }, "isbn13", "", "should accept minimal isbn13"],
-    [{ isbn13: " ", isbn: "0000000020" }, "isbn13", " ", "should accept close to minimum ISBN-13 (13 chars)"],
-    [{ isbn13: " A", isbn: "90000000020" }, "isbn13", " A", "should accept close to minimum ISBN-13 (13 chars)"],
+    [{ isbn13: " ", isbn: "0000000020" }, "isbn13", " ", "should accept close to minimum ISBN-13 (1 chars)"],
+    [{ isbn13: " A", isbn: "90000000020" }, "isbn13", " A", "should accept close to minimum ISBN-13 (2 chars)"],
     [{ isbn13: "9999999999999", isbn: "0000000019" }, "isbn13", "9999999999999", "should accept max ISBN-13 (13 chars)"],
-    [{ isbn13: "999999999999", isbn: "0000000022" }, "isbn13", "999999999999", "should accept close to max ISBN-13 (13 chars)"],
-    [{ isbn13: "1234567890123", isbn: "0000000021" }, "isbn13", "1234567890123", "should accept a middle ISBN-13 (13 chars)"],
+    [{ isbn13: "999999999999", isbn: "0000000022" }, "isbn13", "999999999999", "should accept close to max ISBN-13 (12 chars)"],
+    [{ isbn13: "12345678", isbn: "0000000021" }, "isbn13", "12345678", "should accept a middle ISBN-13 (8 chars)"],
 
     //edition field tests
     [{ edition: "", isbn: "0000000023" }, "edition", "", "should accept minimal edition"],
