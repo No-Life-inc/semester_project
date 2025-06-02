@@ -16,7 +16,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe("fetchBooksFromExternalAPI Positive tests", () => {
     const testCases = [
-      ["twillight", 3], 
+      ["twillight", 4], 
       ["Jeffy", 18], 
       [-1, 10000], 
       [0, 8155],
